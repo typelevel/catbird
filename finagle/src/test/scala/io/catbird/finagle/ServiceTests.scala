@@ -1,9 +1,12 @@
 package io.catbird.finagle
 
+import cats.data.Kleisli
+import com.twitter.bijection.InversionFailure
 import com.twitter.finagle.Service
 import com.twitter.util.Future
+import io.catbird.util._
 import org.scalatest.FunSuite
-import scala.util.Success
+import scala.util.{ Failure, Success }
 
 /**
  * TODO: real tests
@@ -15,5 +18,16 @@ class ServiceTests extends FunSuite with ServiceConversions {
     }
 
     assert(Success(service) === serviceToKleisli.invert(serviceToKleisli(service)))
+  }
+
+  test("Non-Service Kleisli[Future, Int, String] should fail with an InversionFailure") {
+    val kleisli: Kleisli[Future, Int, String] = Kleisli.kleisliArrow[Future].lift(_.toString)
+
+    assert(
+      serviceToKleisli.invert(kleisli) match {
+        case Failure(InversionFailure(_, _)) => true
+        case _ => false
+      }
+    )
   }
 }
