@@ -31,10 +31,6 @@ lazy val baseSettings = Seq(
       case _ => Nil
     }
   ),
-  resolvers ++= Seq(
-    "bintray/non" at "http://dl.bintray.com/non/maven",
-    Resolver.sonatypeRepo("releases")
-  ),
   wartremoverWarnings in (Compile, compile) ++= Warts.allBut(
     Wart.NoNeedForMonad
   )
