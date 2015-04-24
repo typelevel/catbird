@@ -1,0 +1,16 @@
+sudo: false
+language: scala
+
+scala:
+  - 2.11.6
+
+jdk:
+  - openjdk7
+  - oraclejdk7
+  - oraclejdk8
+
+script:
+  - sbt ++$TRAVIS_SCALA_VERSION coverage test scalastyle
+
+after_success:
+  - sbt coveralls
