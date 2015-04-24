@@ -1,8 +1,8 @@
 import ScoverageSbtPlugin.ScoverageKeys.coverageExcludedPackages
 
 val bijectionVersion = "0.7.2"
-val utilVersion = "6.23.0"
-val finagleVersion = "6.24.0"
+val utilVersion = "6.24.0"
+val finagleVersion = "6.25.0"
 
 lazy val buildSettings = Seq(
   organization := "io.catbird",
