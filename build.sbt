@@ -49,7 +49,7 @@ lazy val root = project.in(file("."))
   .aggregate(util, finagle)
   .dependsOn(util, finagle)
   .dependsOn(
-    ProjectRef(uri("git://github.com/non/cats.git"), "std")
+    ProjectRef(uri("git://github.com/travisbrown/cats.git#demo"), "std")
   )
 
 lazy val test = project
@@ -65,9 +65,9 @@ lazy val test = project
     coverageExcludedPackages := "io\\.catbird\\.test\\..*"
   )
   .dependsOn(
-    ProjectRef(uri("git://github.com/non/cats.git"), "core"),
-    ProjectRef(uri("git://github.com/non/cats.git"), "laws"),
-    ProjectRef(uri("git://github.com/non/cats.git"), "std")
+    ProjectRef(uri("git://github.com/travisbrown/cats.git#demo"), "core"),
+    ProjectRef(uri("git://github.com/travisbrown/cats.git#demo"), "laws"),
+    ProjectRef(uri("git://github.com/travisbrown/cats.git#demo"), "std")
   )
   .disablePlugins(CoverallsPlugin)
 
@@ -80,7 +80,7 @@ lazy val util = project
     )
   )
   .dependsOn(
-    ProjectRef(uri("git://github.com/non/cats.git"), "core"),
+    ProjectRef(uri("git://github.com/travisbrown/cats.git#demo"), "core"),
     test % "test"
   )
   .disablePlugins(CoverallsPlugin)
