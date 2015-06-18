@@ -6,12 +6,13 @@ import cats.{ Comonad, Eq }
 import cats.laws.discipline._
 import com.twitter.conversions.time._
 import com.twitter.util.Future
-import io.catbird.test.util.ArbitraryKInstances
+import io.catbird.test.util.{ ArbitraryKInstances, EqKInstances }
 import org.scalatest.FunSuite
 import org.typelevel.discipline.scalatest.Discipline
 
 class FutureSuite extends FunSuite with Discipline
-  with FutureInstances with ArbitraryKInstances {
+  with FutureInstances with ArbitraryKInstances with EqKInstances {
+  implicit val eqk: EqK[Future] = futureEqK(1.second)
   implicit val eqv: Eq[Future[Int]] = futureEq(1.second)
   implicit val comonad: Comonad[Future] = futureComonad(1.second)
 

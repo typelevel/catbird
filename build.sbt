@@ -31,6 +31,7 @@ lazy val baseSettings = Seq(
       case _ => Nil
     }
   ),
+  resolvers += Resolver.sonatypeRepo("snapshots"),
   wartremoverWarnings in (Compile, compile) ++= Warts.allBut(
     Wart.NoNeedForMonad
   )
@@ -46,7 +47,7 @@ lazy val root = project.in(file("."))
     git.remoteRepo := "git@github.com:travisbrown/catbird.git"
   )
   .settings(scalacOptions in (Compile, console) := compilerOptions)
-  .aggregate(util, finagle)
+  .aggregate(util, finagle, laws)
   .dependsOn(util, finagle)
   .dependsOn(
     ProjectRef(uri("git://github.com/non/cats.git"), "std")
@@ -57,6 +58,7 @@ lazy val test = project
   .settings(
     libraryDependencies ++= Seq(
       "com.twitter" %% "bijection-core" % bijectionVersion,
+      "com.twitter" %% "finagle-core" % finagleVersion,
       "com.twitter" %% "util-core" % utilVersion,
       "org.scalacheck" %% "scalacheck" % "1.12.2",
       "org.scalatest" %% "scalatest" % "2.2.4",
@@ -67,9 +69,13 @@ lazy val test = project
   .dependsOn(
     ProjectRef(uri("git://github.com/non/cats.git"), "core"),
     ProjectRef(uri("git://github.com/non/cats.git"), "laws"),
-    ProjectRef(uri("git://github.com/non/cats.git"), "std")
+    ProjectRef(uri("git://github.com/non/cats.git"), "std"),
+    util
   )
-  .disablePlugins(CoverallsPlugin)
+
+lazy val laws = project
+  .settings(buildSettings ++ baseSettings)
+  .dependsOn(util, finagle, test % "test")
 
 lazy val util = project
   .settings(buildSettings ++ baseSettings)
@@ -80,10 +86,8 @@ lazy val util = project
     )
   )
   .dependsOn(
-    ProjectRef(uri("git://github.com/non/cats.git"), "core"),
-    test % "test"
+    ProjectRef(uri("git://github.com/non/cats.git"), "core")
   )
-  .disablePlugins(CoverallsPlugin)
 
 lazy val finagle = project
   .settings(allSettings)
@@ -92,8 +96,7 @@ lazy val finagle = project
       "com.twitter" %% "finagle-core" % finagleVersion
     )
   )
-  .dependsOn(util, test % "test")
-  .disablePlugins(CoverallsPlugin)
+  .dependsOn(util)
 
 lazy val publishSettings = Seq(
   publishMavenStyle := true,

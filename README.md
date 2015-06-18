@@ -10,6 +10,7 @@ It currently includes the following:
 
 * An injection from [Finagle](https://github.com/twitter/finagle) services to Kleisli arrows over
   `Future`
+* Category and profunctor instances for `Service`
 * Monad instances for `Future` and `Var`
 * Semigroup and equality instances for `Future`, `Var`, and `Try`
 * A bijection from `Try[A]` to `Xor[Throwable, A]`
