@@ -1,6 +1,6 @@
 # catbird
 
-[![Build status](https://img.shields.io/travis/travisbrown/catbird/master.svg)](http://travis-ci.org/travisbrown/catbird) [![Coverage status](https://img.shields.io/coveralls/travisbrown/catbird/master.svg)](https://coveralls.io/r/travisbrown/catbird?branch=master)
+[![Build status](https://img.shields.io/travis/travisbrown/catbird/master.svg)](http://travis-ci.org/travisbrown/catbird)
 
 This project provides [cats](https://github.com/non/cats) type class instances (and other useful
 cats-related stuff) for various [Twitter Open Source](https://twitter.com/twitteross) Scala
