@@ -12,5 +12,3 @@ jdk:
 script:
   - sbt ++$TRAVIS_SCALA_VERSION coverage test scalastyle
 
-after_success:
-  - sbt coveralls

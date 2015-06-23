@@ -60,8 +60,8 @@ lazy val test = project
       "com.twitter" %% "bijection-core" % bijectionVersion,
       "com.twitter" %% "finagle-core" % finagleVersion,
       "com.twitter" %% "util-core" % utilVersion,
-      "org.scalacheck" %% "scalacheck" % "1.12.2",
-      "org.scalatest" %% "scalatest" % "2.2.4",
+      "org.scalacheck" %% "scalacheck" % "1.12.4",
+      "org.scalatest" %% "scalatest" % "2.2.5",
       "org.typelevel" %% "discipline" % "0.2.1"
     ),
     coverageExcludedPackages := "io\\.catbird\\.test\\..*"
