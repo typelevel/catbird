@@ -1,14 +1,14 @@
 import ScoverageSbtPlugin.ScoverageKeys.coverageExcludedPackages
 
-val bijectionVersion = "0.7.2"
-val utilVersion = "6.24.0"
-val finagleVersion = "6.25.0"
+val bijectionVersion = "0.8.1"
+val utilVersion = "6.25.0"
+val finagleVersion = "6.26.0"
 
 lazy val buildSettings = Seq(
   organization := "io.catbird",
   version := "0.1.0-SNAPSHOT",
-  scalaVersion := "2.11.6",
-  crossScalaVersions := Seq("2.11.6")
+  scalaVersion := "2.11.7",
+  crossScalaVersions := Seq("2.10.5", "2.11.7")
 )
 
 lazy val compilerOptions = Seq(
@@ -31,6 +31,8 @@ lazy val baseSettings = Seq(
       case _ => Nil
     }
   ),
+  libraryDependencies +=
+    compilerPlugin("org.spire-math" %% "kind-projector" % "0.5.4"),
   resolvers += Resolver.sonatypeRepo("snapshots"),
   wartremoverWarnings in (Compile, compile) ++= Warts.allBut(
     Wart.NoNeedForMonad
@@ -60,7 +62,7 @@ lazy val test = project
       "com.twitter" %% "bijection-core" % bijectionVersion,
       "com.twitter" %% "finagle-core" % finagleVersion,
       "com.twitter" %% "util-core" % utilVersion,
-      "org.scalacheck" %% "scalacheck" % "1.12.4",
+      "org.scalacheck" %% "scalacheck" % "1.12.5-SNAPSHOT",
       "org.scalatest" %% "scalatest" % "2.2.5",
       "org.typelevel" %% "discipline" % "0.2.1"
     ),
