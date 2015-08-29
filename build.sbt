@@ -1,8 +1,10 @@
+import ReleaseTransformations._
 import ScoverageSbtPlugin.ScoverageKeys.coverageExcludedPackages
 
 val bijectionVersion = "0.8.1"
-val utilVersion = "6.25.0"
-val finagleVersion = "6.26.0"
+val catsVersion = "0.1.3-SNAPSHOT"
+val utilVersion = "6.27.0"
+val finagleVersion = "6.28.0"
 
 lazy val buildSettings = Seq(
   organization := "io.catbird",
@@ -31,18 +33,27 @@ lazy val baseSettings = Seq(
       case _ => Nil
     }
   ),
-  libraryDependencies +=
-    compilerPlugin("org.spire-math" %% "kind-projector" % "0.5.4"),
+  scalacOptions in (Compile, console) := compilerOptions,
+  libraryDependencies ++= Seq(
+    "org.spire-math" %% "cats-core" % catsVersion,
+    compilerPlugin("org.spire-math" %% "kind-projector" % "0.6.3")
+  ),
   resolvers += Resolver.sonatypeRepo("snapshots"),
   wartremoverWarnings in (Compile, compile) ++= Warts.allBut(
     Wart.NoNeedForMonad
+  ),
+  ScoverageSbtPlugin.ScoverageKeys.coverageHighlighting := (
+    CrossVersion.partialVersion(scalaVersion.value) match {
+      case Some((2, 10)) => false
+      case _ => true
+    }
   )
 )
 
 lazy val allSettings = buildSettings ++ baseSettings ++ unidocSettings
 
 lazy val root = project.in(file("."))
-  .settings(allSettings ++ noPublish)
+  .settings(allSettings ++ noPublishSettings)
   .settings(unidocSettings ++ site.settings ++ ghpages.settings)
   .settings(
     site.addMappingsToSiteDir(mappings in (ScalaUnidoc, packageDoc), "api"),
@@ -51,9 +62,6 @@ lazy val root = project.in(file("."))
   .settings(scalacOptions in (Compile, console) := compilerOptions)
   .aggregate(util, finagle, laws)
   .dependsOn(util, finagle)
-  .dependsOn(
-    ProjectRef(uri("git://github.com/non/cats.git"), "std")
-  )
 
 lazy val test = project
   .settings(buildSettings ++ baseSettings)
@@ -63,17 +71,13 @@ lazy val test = project
       "com.twitter" %% "finagle-core" % finagleVersion,
       "com.twitter" %% "util-core" % utilVersion,
       "org.scalacheck" %% "scalacheck" % "1.12.5-SNAPSHOT",
-      "org.scalatest" %% "scalatest" % "2.2.5",
-      "org.typelevel" %% "discipline" % "0.2.1"
+      "org.scalatest" %% "scalatest" % "3.0.0-M7",
+      "org.spire-math" %% "cats-laws" % catsVersion,
+      "org.typelevel" %% "discipline" % "0.4"
     ),
     coverageExcludedPackages := "io\\.catbird\\.test\\..*"
   )
-  .dependsOn(
-    ProjectRef(uri("git://github.com/non/cats.git"), "core"),
-    ProjectRef(uri("git://github.com/non/cats.git"), "laws"),
-    ProjectRef(uri("git://github.com/non/cats.git"), "std"),
-    util
-  )
+  .dependsOn(util)
 
 lazy val laws = project
   .settings(buildSettings ++ baseSettings)
@@ -87,9 +91,6 @@ lazy val util = project
       "com.twitter" %% "util-core" % utilVersion
     )
   )
-  .dependsOn(
-    ProjectRef(uri("git://github.com/non/cats.git"), "core")
-  )
 
 lazy val finagle = project
   .settings(allSettings)
@@ -101,8 +102,13 @@ lazy val finagle = project
   .dependsOn(util)
 
 lazy val publishSettings = Seq(
+  releaseCrossBuild := true,
+  releasePublishArtifactsAction := PgpKeys.publishSigned.value,
+  homepage := Some(url("https://github.com/travisbrown/catbird")),
+  licenses := Seq("Apache 2.0" -> url("http://www.apache.org/licenses/LICENSE-2.0")),
   publishMavenStyle := true,
-  publishArtifact := true,
+  publishArtifact in Test := false,
+  pomIncludeRepository := { _ => false },
   publishTo := {
     val nexus = "https://oss.sonatype.org/"
     if (isSnapshot.value)
@@ -110,16 +116,15 @@ lazy val publishSettings = Seq(
     else
       Some("releases"  at nexus + "service/local/staging/deploy/maven2")
   },
-  publishArtifact in Test := false,
-  licenses := Seq("Apache 2.0" -> url("http://www.apache.org/licenses/LICENSE-2.0")),
-  homepage := Some(url("https://github.com/travisbrown/catbird")),
   autoAPIMappings := true,
   apiURL := Some(url("https://travisbrown.github.io/catbird/api/")),
+  scmInfo := Some(
+    ScmInfo(
+      url("https://github.com/travisbrown/catbird"),
+      "scm:git:git@github.com:travisbrown/catbird.git"
+    )
+  ),
   pomExtra := (
-    <scm>
-      <url>git://github.com/travisbrown/catbird.git</url>
-      <connection>scm:git://github.com/travisbrown/catbird.git</connection>
-    </scm>
     <developers>
       <developer>
         <id>travisbrown</id>
@@ -130,7 +135,37 @@ lazy val publishSettings = Seq(
   )
 )
 
-lazy val noPublish = Seq(
-  publish := {},
-  publishLocal := {}
+lazy val noPublishSettings = Seq(
+  publish := (),
+  publishLocal := (),
+  publishArtifact := false
 )
+
+lazy val sharedReleaseProcess = Seq(
+  releaseProcess := Seq[ReleaseStep](
+    checkSnapshotDependencies,
+    inquireVersions,
+    runClean,
+    runTest,
+    setReleaseVersion,
+    commitReleaseVersion,
+    tagRelease,
+    publishArtifacts,
+    setNextVersion,
+    commitNextVersion,
+    ReleaseStep(action = Command.process("sonatypeReleaseAll", _)),
+    pushChanges
+  )
+)
+
+credentials ++= (
+  for {
+    username <- Option(System.getenv().get("SONATYPE_USERNAME"))
+    password <- Option(System.getenv().get("SONATYPE_PASSWORD"))
+  } yield Credentials(
+    "Sonatype Nexus Repository Manager",
+    "oss.sonatype.org",
+    username,
+    password
+  )
+).toSeq
