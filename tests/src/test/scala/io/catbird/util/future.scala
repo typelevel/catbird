@@ -6,7 +6,7 @@ import cats.{ Comonad, Eq }
 import cats.laws.discipline._
 import com.twitter.conversions.time._
 import com.twitter.util.Future
-import io.catbird.test.util.{ ArbitraryKInstances, EqKInstances }
+import io.catbird.tests.util.{ ArbitraryKInstances, EqKInstances }
 import org.scalatest.FunSuite
 import org.typelevel.discipline.scalatest.Discipline
 

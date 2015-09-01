@@ -1,4 +1,4 @@
-package io.catbird.test.util
+package io.catbird.tests.util
 
 import cats.Eq
 import cats.laws.discipline.EqK

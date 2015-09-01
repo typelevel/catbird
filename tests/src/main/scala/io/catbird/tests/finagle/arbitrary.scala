@@ -1,4 +1,4 @@
-package io.catbird.test.finagle
+package io.catbird.tests.finagle
 
 import com.twitter.finagle.Service
 import io.catbird.util.futureInstance

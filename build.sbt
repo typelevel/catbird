@@ -8,7 +8,6 @@ val finagleVersion = "6.28.0"
 
 lazy val buildSettings = Seq(
   organization := "io.catbird",
-  version := "0.1.0-SNAPSHOT",
   scalaVersion := "2.11.7",
   crossScalaVersions := Seq("2.10.5", "2.11.7")
 )
@@ -50,21 +49,19 @@ lazy val baseSettings = Seq(
   )
 )
 
-lazy val allSettings = buildSettings ++ baseSettings ++ unidocSettings
-
 lazy val root = project.in(file("."))
-  .settings(allSettings ++ noPublishSettings)
+  .settings(buildSettings ++ baseSettings ++ unidocSettings ++ noPublishSettings)
   .settings(unidocSettings ++ site.settings ++ ghpages.settings)
   .settings(
     site.addMappingsToSiteDir(mappings in (ScalaUnidoc, packageDoc), "api"),
     git.remoteRepo := "git@github.com:travisbrown/catbird.git"
   )
   .settings(scalacOptions in (Compile, console) := compilerOptions)
-  .aggregate(util, finagle, laws)
+  .aggregate(util, finagle, tests)
   .dependsOn(util, finagle)
 
-lazy val test = project
-  .settings(buildSettings ++ baseSettings)
+lazy val tests = project
+  .settings(buildSettings ++ baseSettings ++ noPublishSettings)
   .settings(
     libraryDependencies ++= Seq(
       "com.twitter" %% "bijection-core" % bijectionVersion,
@@ -75,16 +72,13 @@ lazy val test = project
       "org.spire-math" %% "cats-laws" % catsVersion,
       "org.typelevel" %% "discipline" % "0.4"
     ),
-    coverageExcludedPackages := "io\\.catbird\\.test\\..*"
+    coverageExcludedPackages := "io\\.catbird\\.tests\\..*"
   )
-  .dependsOn(util)
-
-lazy val laws = project
-  .settings(buildSettings ++ baseSettings)
-  .dependsOn(util, finagle, test % "test")
+  .dependsOn(util, finagle)
 
 lazy val util = project
-  .settings(buildSettings ++ baseSettings)
+  .settings(moduleName := "catbird-util")
+  .settings(buildSettings ++ baseSettings ++ publishSettings)
   .settings(
     libraryDependencies ++= Seq(
       "com.twitter" %% "bijection-core" % bijectionVersion,
@@ -93,7 +87,8 @@ lazy val util = project
   )
 
 lazy val finagle = project
-  .settings(allSettings)
+  .settings(moduleName := "catbird-finagle")
+  .settings(buildSettings ++ baseSettings ++ publishSettings)
   .settings(
     libraryDependencies ++= Seq(
       "com.twitter" %% "finagle-core" % finagleVersion

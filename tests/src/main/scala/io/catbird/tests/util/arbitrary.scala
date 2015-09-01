@@ -1,4 +1,4 @@
-package io.catbird.test.util
+package io.catbird.tests.util
 
 import cats.laws.discipline.ArbitraryK
 import com.twitter.util.{ Future, Return, Try, Var }
