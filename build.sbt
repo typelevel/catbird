@@ -2,7 +2,7 @@ import ReleaseTransformations._
 import ScoverageSbtPlugin.ScoverageKeys.coverageExcludedPackages
 
 val bijectionVersion = "0.8.1"
-val catsVersion = "0.1.3-SNAPSHOT"
+val catsVersion = "0.2.0"
 val utilVersion = "6.27.0"
 val finagleVersion = "6.28.0"
 
