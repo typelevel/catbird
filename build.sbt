@@ -49,8 +49,10 @@ lazy val baseSettings = Seq(
   )
 )
 
+lazy val allSettings = buildSettings ++ baseSettings ++ publishSettings
+
 lazy val root = project.in(file("."))
-  .settings(buildSettings ++ baseSettings ++ unidocSettings ++ noPublishSettings)
+  .settings(allSettings ++ noPublishSettings)
   .settings(unidocSettings ++ site.settings ++ ghpages.settings)
   .settings(
     site.addMappingsToSiteDir(mappings in (ScalaUnidoc, packageDoc), "api"),
@@ -61,7 +63,7 @@ lazy val root = project.in(file("."))
   .dependsOn(util, finagle)
 
 lazy val tests = project
-  .settings(buildSettings ++ baseSettings ++ noPublishSettings)
+  .settings(allSettings ++ noPublishSettings)
   .settings(
     libraryDependencies ++= Seq(
       "com.twitter" %% "bijection-core" % bijectionVersion,
@@ -78,7 +80,7 @@ lazy val tests = project
 
 lazy val util = project
   .settings(moduleName := "catbird-util")
-  .settings(buildSettings ++ baseSettings ++ publishSettings)
+  .settings(allSettings)
   .settings(
     libraryDependencies ++= Seq(
       "com.twitter" %% "bijection-core" % bijectionVersion,
@@ -88,7 +90,7 @@ lazy val util = project
 
 lazy val finagle = project
   .settings(moduleName := "catbird-finagle")
-  .settings(buildSettings ++ baseSettings ++ publishSettings)
+  .settings(allSettings)
   .settings(
     libraryDependencies ++= Seq(
       "com.twitter" %% "finagle-core" % finagleVersion
