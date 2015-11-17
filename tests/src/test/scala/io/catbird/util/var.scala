@@ -5,14 +5,14 @@ import cats.std.int._
 import cats.{ Comonad, Eq }
 import cats.laws.discipline._
 import com.twitter.util.Var
-import io.catbird.tests.util.{ ArbitraryKInstances, EqKInstances }
+import io.catbird.tests.util.ArbitraryInstances
 import org.scalatest.FunSuite
 import org.typelevel.discipline.scalatest.Discipline
 
-class VarSuite extends FunSuite with Discipline
-  with VarInstances with ArbitraryKInstances with EqKInstances {
-  implicit val eqk: EqK[Var] = varEqK
-  implicit val eqv: Eq[Var[Int]] = varEq
+class VarSuite extends FunSuite with Discipline with VarInstances with ArbitraryInstances {
+  implicit val eqVarInt: Eq[Var[Int]] = varEq
+  implicit val eqVarVarInt: Eq[Var[Var[Int]]] = varEq
+  implicit val eqVarVarVarInt: Eq[Var[Var[Var[Int]]]] = varEq
   implicit val comonad: Comonad[Var] = varComonad
 
   checkAll("Var[Int]", MonadTests[Var].monad[Int, Int, Int])

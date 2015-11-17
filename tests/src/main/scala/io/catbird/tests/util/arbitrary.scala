@@ -1,20 +1,7 @@
 package io.catbird.tests.util
 
-import cats.laws.discipline.ArbitraryK
 import com.twitter.util.{ Future, Return, Try, Var }
 import org.scalacheck.Arbitrary
-
-trait ArbitraryKInstances extends ArbitraryInstances {
-  implicit def futureArbitraryK: ArbitraryK[Future] =
-    new ArbitraryK[Future] {
-      def synthesize[A](implicit A: Arbitrary[A]): Arbitrary[Future[A]] = futureArbitrary
-    }
-
-  implicit def varArbitraryK: ArbitraryK[Var] =
-    new ArbitraryK[Var] {
-      def synthesize[A](implicit A: Arbitrary[A]): Arbitrary[Var[A]] = varArbitrary
-    }
-}
 
 trait ArbitraryInstances {
   implicit def futureArbitrary[A](implicit A: Arbitrary[A]): Arbitrary[Future[A]] =
