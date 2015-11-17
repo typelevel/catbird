@@ -1,15 +1,14 @@
 import ReleaseTransformations._
-import ScoverageSbtPlugin.ScoverageKeys.coverageExcludedPackages
 
 val bijectionVersion = "0.8.1"
-val catsVersion = "0.2.0"
-val utilVersion = "6.27.0"
-val finagleVersion = "6.28.0"
+val catsVersion = "0.4.0-SNAPSHOT"
+val utilVersion = "6.29.0"
+val finagleVersion = "6.30.0"
 
 lazy val buildSettings = Seq(
   organization := "io.catbird",
   scalaVersion := "2.11.7",
-  crossScalaVersions := Seq("2.10.5", "2.11.7")
+  crossScalaVersions := Seq("2.10.6", "2.11.7")
 )
 
 lazy val compilerOptions = Seq(
@@ -41,7 +40,7 @@ lazy val baseSettings = Seq(
   wartremoverWarnings in (Compile, compile) ++= Warts.allBut(
     Wart.NoNeedForMonad
   ),
-  ScoverageSbtPlugin.ScoverageKeys.coverageHighlighting := (
+  coverageHighlighting := (
     CrossVersion.partialVersion(scalaVersion.value) match {
       case Some((2, 10)) => false
       case _ => true
@@ -69,8 +68,8 @@ lazy val tests = project
       "com.twitter" %% "bijection-core" % bijectionVersion,
       "com.twitter" %% "finagle-core" % finagleVersion,
       "com.twitter" %% "util-core" % utilVersion,
-      "org.scalacheck" %% "scalacheck" % "1.12.5-SNAPSHOT",
-      "org.scalatest" %% "scalatest" % "3.0.0-M7",
+      "org.scalacheck" %% "scalacheck" % "1.12.5",
+      "org.scalatest" %% "scalatest" % "3.0.0-M9",
       "org.spire-math" %% "cats-laws" % catsVersion,
       "org.typelevel" %% "discipline" % "0.4"
     ),

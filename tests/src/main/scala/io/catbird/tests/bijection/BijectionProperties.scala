@@ -38,7 +38,7 @@ trait BijectionProperties {
     eqA: Eq[A],
     eqB: Eq[B]
   ): Prop = {
-    implicit val inj = Injection.fromBijection(bij.bijection)
+    implicit val inj: Injection[A, B] = Injection.fromBijection(bij.bijection)
     isInjective[A, B] && invertIsInjection[A, B]
   }
 }
