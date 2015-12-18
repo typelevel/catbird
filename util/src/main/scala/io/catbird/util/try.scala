@@ -25,7 +25,7 @@ trait TryInstances extends TryInstances1 {
   implicit def trySemigroup[A](implicit A: Semigroup[A]): Semigroup[Try[A]] = new TrySemigroup[A]
 }
 
-trait TryInstances1 {
+private[util] trait TryInstances1 {
   implicit def tryMonoid[A](implicit A: Monoid[A]): Monoid[Try[A]] =
     new TrySemigroup[A] with Monoid[Try[A]] {
       def empty: Try[A] = Return(A.empty)
