@@ -1,7 +1,7 @@
 import ReleaseTransformations._
 
 val bijectionVersion = "0.8.1"
-val catsVersion = "0.4.0-SNAPSHOT"
+val catsVersion = "0.4.0"
 val utilVersion = "6.30.0"
 val finagleVersion = "6.31.0"
 
@@ -33,7 +33,7 @@ lazy val baseSettings = Seq(
   ),
   scalacOptions in (Compile, console) := compilerOptions,
   libraryDependencies ++= Seq(
-    "org.spire-math" %% "cats-core" % catsVersion,
+    "org.typelevel" %% "cats-core" % catsVersion,
     compilerPlugin("org.spire-math" %% "kind-projector" % "0.6.3")
   ),
   resolvers += Resolver.sonatypeRepo("snapshots"),
@@ -70,7 +70,7 @@ lazy val tests = project
       "com.twitter" %% "util-core" % utilVersion,
       "org.scalacheck" %% "scalacheck" % "1.12.5",
       "org.scalatest" %% "scalatest" % "3.0.0-M9",
-      "org.spire-math" %% "cats-laws" % catsVersion,
+      "org.typelevel" %% "cats-laws" % catsVersion,
       "org.typelevel" %% "discipline" % "0.4"
     ),
     coverageExcludedPackages := "io\\.catbird\\.tests\\..*"

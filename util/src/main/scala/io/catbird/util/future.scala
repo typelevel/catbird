@@ -9,7 +9,7 @@ trait FutureInstances extends FutureInstances1 {
       def pure[A](x: A): Future[A] = Future.value(x)
       def flatMap[A, B](fa: Future[A])(f: A => Future[B]): Future[B] = fa.flatMap(f)
       override final def map[A, B](fa: Future[A])(f: A => B): Future[B] = fa.map(f)
-      override final def ap[A, B](fa: Future[A])(f: Future[A => B]): Future[B] = fa.join(f).map {
+      override final def ap[A, B](f: Future[A => B])(fa: Future[A]): Future[B] = fa.join(f).map {
         case (a, ab) => ab(a)
       }
       override final def product[A, B](fa: Future[A], fb: Future[B]): Future[(A, B)] = fa.join(fb)
