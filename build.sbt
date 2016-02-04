@@ -1,6 +1,6 @@
 import ReleaseTransformations._
 
-val bijectionVersion = "0.8.1"
+val bijectionVersion = "0.9.0"
 val catsVersion = "0.4.0"
 val utilVersion = "6.30.0"
 val finagleVersion = "6.31.0"

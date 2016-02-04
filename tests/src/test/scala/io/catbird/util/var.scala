@@ -4,6 +4,7 @@ import algebra.laws.GroupLaws
 import cats.std.int._
 import cats.{ Comonad, Eq }
 import cats.laws.discipline._
+import cats.laws.discipline.eq._
 import com.twitter.util.Var
 import io.catbird.tests._
 import io.catbird.tests.util.ArbitraryInstances

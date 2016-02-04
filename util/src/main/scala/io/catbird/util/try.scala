@@ -9,9 +9,7 @@ trait TryInstances extends TryInstances1 {
   /**
    * Here for the sake of convenience, but needs a better home.
    */
-  implicit def throwableEq: Eq[Throwable] = new Eq[Throwable] {
-    def eqv(x: Throwable, y: Throwable): Boolean = x == y
-  }
+  implicit def throwableEq: Eq[Throwable] = Eq.fromUniversalEquals
 
   implicit def tryEq[A](implicit A: Eq[A]): Eq[Try[A]] =
     new Eq[Try[A]] {
