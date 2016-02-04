@@ -6,7 +6,7 @@ import cats.functor.Profunctor
 import io.catbird.util.futureInstance
 import com.twitter.bijection.{ Injection, InversionFailure }
 import com.twitter.finagle.Service
-import com.twitter.util.{ Future }
+import com.twitter.util.Future
 import scala.util.Success
 
 trait ServiceInstances {
