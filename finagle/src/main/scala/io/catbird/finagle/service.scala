@@ -26,7 +26,7 @@ trait ServiceInstances {
 
 trait ServiceConversions {
   implicit def serviceToKleisli[I, O]: Injection[Service[I, O], Kleisli[Future, I, O]] =
-    Injection.build[Service[I, O], Kleisli[Future, I, O]](Kleisli.function) {
+    Injection.build[Service[I, O], Kleisli[Future, I, O]](Kleisli(_)) {
       case Kleisli(service: Service[I, O]) => Success(service)
       case other => InversionFailure.failedAttempt(other)
     }
