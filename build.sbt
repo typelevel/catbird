@@ -1,9 +1,9 @@
 import ReleaseTransformations._
 
 val bijectionVersion = "0.9.0"
-val catsVersion = "0.4.0"
-val utilVersion = "6.30.0"
-val finagleVersion = "6.31.0"
+val catsVersion = "0.4.1"
+val utilVersion = "6.32.0"
+val finagleVersion = "6.33.0"
 
 lazy val buildSettings = Seq(
   organization := "io.catbird",
@@ -34,7 +34,7 @@ lazy val baseSettings = Seq(
   scalacOptions in (Compile, console) := compilerOptions,
   libraryDependencies ++= Seq(
     "org.typelevel" %% "cats-core" % catsVersion,
-    compilerPlugin("org.spire-math" %% "kind-projector" % "0.6.3")
+    compilerPlugin("org.spire-math" %% "kind-projector" % "0.7.1")
   ),
   resolvers += Resolver.sonatypeRepo("snapshots"),
   wartremoverWarnings in (Compile, compile) ++= Warts.allBut(
