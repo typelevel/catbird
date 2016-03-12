@@ -1,14 +1,14 @@
 import ReleaseTransformations._
 
-val bijectionVersion = "0.9.0"
+val bijectionVersion = "0.9.2"
 val catsVersion = "0.4.1"
-val utilVersion = "6.32.0"
-val finagleVersion = "6.33.0"
+val utilVersion = "6.33.0"
+val finagleVersion = "6.34.0"
 
 lazy val buildSettings = Seq(
   organization := "io.catbird",
-  scalaVersion := "2.11.7",
-  crossScalaVersions := Seq("2.10.6", "2.11.7")
+  scalaVersion := "2.11.8",
+  crossScalaVersions := Seq("2.10.6", "2.11.8")
 )
 
 lazy val compilerOptions = Seq(

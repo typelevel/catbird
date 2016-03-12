@@ -6,7 +6,6 @@ import cats.{ Comonad, Eq }
 import cats.laws.discipline._
 import cats.laws.discipline.eq._
 import com.twitter.util.Var
-import io.catbird.tests._
 import io.catbird.tests.util.ArbitraryInstances
 import org.scalatest.FunSuite
 import org.typelevel.discipline.scalatest.Discipline

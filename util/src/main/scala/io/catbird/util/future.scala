@@ -1,7 +1,7 @@
 package io.catbird.util
 
 import cats.{ CoflatMap, Comonad, Eq, Eval, MonadError, Monoid, Semigroup }
-import com.twitter.util.{ Await, Duration, Future }
+import com.twitter.util.{ Await, Duration, Future, Try }
 
 trait FutureInstances extends FutureInstances1 {
   implicit final val futureInstance: MonadError[Future, Throwable] with CoflatMap[Future] =
@@ -22,10 +22,10 @@ trait FutureInstances extends FutureInstances1 {
       final def raiseError[A](e: Throwable): Future[A] = Future.exception(e)
     }
 
-  implicit def futureSemigroup[A](implicit A: Semigroup[A]): Semigroup[Future[A]] =
+  implicit final def futureSemigroup[A](implicit A: Semigroup[A]): Semigroup[Future[A]] =
     new FutureSemigroup[A]
 
-  def futureEq[A](atMost: Duration)(implicit A: Eq[A]): Eq[Future[A]] = new Eq[Future[A]] {
+  final def futureEq[A](atMost: Duration)(implicit A: Eq[A]): Eq[Future[A]] = new Eq[Future[A]] {
     def eqv(x: Future[A], y: Future[A]): Boolean = Await.result(
       (x.join(y)).map {
         case (xa, ya) => A.eqv(xa, ya)
@@ -33,10 +33,13 @@ trait FutureInstances extends FutureInstances1 {
       atMost
     )
   }
+
+  final def futureEqWithFailure[A](atMost: Duration)(implicit A: Eq[A]): Eq[Future[A]] =
+    futureEq[Try[A]](atMost).on(_.liftToTry)
 }
 
 private[util] trait FutureInstances1 {
-  def futureComonad(atMost: Duration): Comonad[Future] =
+  final def futureComonad(atMost: Duration): Comonad[Future] =
     new FutureCoflatMap with Comonad[Future] {
       def extract[A](x: Future[A]): A = Await.result(x, atMost)
       def map[A, B](fa: Future[A])(f: A => B): Future[B] = fa.map(f)
@@ -49,9 +52,9 @@ private[util] trait FutureInstances1 {
 }
 
 private[util] abstract class FutureCoflatMap extends CoflatMap[Future] {
-  def coflatMap[A, B](fa: Future[A])(f: Future[A] => B): Future[B] = Future(f(fa))
+  final def coflatMap[A, B](fa: Future[A])(f: Future[A] => B): Future[B] = Future(f(fa))
 }
 
 private[util] class FutureSemigroup[A](implicit A: Semigroup[A]) extends Semigroup[Future[A]] {
-  def combine(fx: Future[A], fy: Future[A]): Future[A] = (fx join fy).map((A.combine _).tupled)
+  final def combine(fx: Future[A], fy: Future[A]): Future[A] = (fx join fy).map((A.combine _).tupled)
 }
