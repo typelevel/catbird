@@ -57,17 +57,23 @@ lazy val root = project.in(file("."))
     site.addMappingsToSiteDir(mappings in (ScalaUnidoc, packageDoc), "api"),
     git.remoteRepo := "git@github.com:travisbrown/catbird.git"
   )
+  .settings(
+    initialCommands in console :=
+      """
+        |import com.twitter.finagle._
+        |import com.twitter.util._
+        |import io.catbird.finagle._
+        |import io.catbird.util._
+      """.stripMargin
+  )
   .settings(scalacOptions in (Compile, console) := compilerOptions)
-  .aggregate(util, finagle, tests)
-  .dependsOn(util, finagle)
+  .aggregate(util, finagle, bijections, tests)
+  .dependsOn(util, finagle, bijections)
 
 lazy val tests = project
   .settings(allSettings ++ noPublishSettings)
   .settings(
     libraryDependencies ++= Seq(
-      "com.twitter" %% "bijection-core" % bijectionVersion,
-      "com.twitter" %% "finagle-core" % finagleVersion,
-      "com.twitter" %% "util-core" % utilVersion,
       "org.scalacheck" %% "scalacheck" % "1.12.5",
       "org.scalatest" %% "scalatest" % "3.0.0-M9",
       "org.typelevel" %% "cats-laws" % catsVersion,
@@ -75,14 +81,13 @@ lazy val tests = project
     ),
     coverageExcludedPackages := "io\\.catbird\\.tests\\..*"
   )
-  .dependsOn(util, finagle)
+  .dependsOn(util, finagle, bijections)
 
 lazy val util = project
   .settings(moduleName := "catbird-util")
   .settings(allSettings)
   .settings(
     libraryDependencies ++= Seq(
-      "com.twitter" %% "bijection-core" % bijectionVersion,
       "com.twitter" %% "util-core" % utilVersion
     )
   )
@@ -92,6 +97,17 @@ lazy val finagle = project
   .settings(allSettings)
   .settings(
     libraryDependencies ++= Seq(
+      "com.twitter" %% "finagle-core" % finagleVersion
+    )
+  )
+  .dependsOn(util)
+
+lazy val bijections = project
+  .settings(moduleName := "catbird-bijections")
+  .settings(allSettings)
+  .settings(
+    libraryDependencies ++= Seq(
+      "com.twitter" %% "bijection-core" % bijectionVersion,
       "com.twitter" %% "finagle-core" % finagleVersion
     )
   )

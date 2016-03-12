@@ -1,7 +1,7 @@
 package io.catbird.finagle
 
+import algebra.Eq
 import cats.std.int._
-import cats.Eq
 import cats.data.Kleisli
 import cats.laws.discipline._
 import cats.laws.discipline.eq._
@@ -9,6 +9,7 @@ import com.twitter.bijection.InversionFailure
 import com.twitter.conversions.time._
 import com.twitter.finagle.Service
 import com.twitter.util.Future
+import io.catbird.bijections.finagle.ServiceConversions
 import io.catbird.tests.finagle.{ ArbitraryInstances, EqInstances }
 import io.catbird.util._
 import org.scalatest.FunSuite

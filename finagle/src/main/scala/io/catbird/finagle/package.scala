@@ -1,3 +1,3 @@
 package io.catbird
 
-package object finagle extends ServiceInstances with ServiceConversions
+package object finagle extends ServiceInstances

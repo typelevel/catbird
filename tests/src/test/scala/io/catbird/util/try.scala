@@ -2,19 +2,25 @@ package io.catbird.util
 
 import algebra.laws.GroupLaws
 import cats.data.Xor
+import cats.laws.discipline.MonadErrorTests
+import cats.laws.discipline.eq._
 import cats.laws.discipline.arbitrary._
 import cats.std.int._
 import cats.std.string._
+import cats.std.unit._
 import com.twitter.util.{ Return, Throw, Try }
+import io.catbird.bijections.util.TryConversions
+import io.catbird.tests.EqInstances
 import io.catbird.tests.bijection.BijectionProperties
 import io.catbird.tests.util.ArbitraryInstances
 import org.scalatest.prop.{ Checkers, PropertyChecks }
 import org.scalatest.{ FunSuite, PropSpec }
 import org.typelevel.discipline.scalatest.Discipline
 
-trait TryTest extends ArbitraryInstances with TryConversions with TryInstances
+trait TryTest extends ArbitraryInstances with EqInstances with TryConversions with TryInstances
 
 class TrySuite extends FunSuite with TryTest with Discipline {
+  checkAll("Try[Int]", MonadErrorTests[Try, Throwable].monadError[Int, Int, Int])
   checkAll("Try[Int]", GroupLaws[Try[Int]].semigroup(trySemigroup[Int]))
   checkAll("Try[Int]", GroupLaws[Try[Int]].monoid)
 }

@@ -45,7 +45,7 @@ private[util] trait FutureInstances1 {
       def map[A, B](fa: Future[A])(f: A => B): Future[B] = fa.map(f)
     }
 
-  implicit def futureMonoid[A](implicit A: Monoid[A]): Monoid[Future[A]] =
+  implicit final def futureMonoid[A](implicit A: Monoid[A]): Monoid[Future[A]] =
     new FutureSemigroup[A] with Monoid[Future[A]] {
       def empty: Future[A] = Future.value(A.empty)
     }
