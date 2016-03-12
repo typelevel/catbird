@@ -1,6 +1,6 @@
 package io.catbird.util
 
-import cats.{ Eq, Monoid, Semigroup }
+import cats.{ Eq, MonadError, Monoid, Semigroup }
 import com.twitter.util.{ Return, Throw, Try }
 
 trait TryInstances extends TryInstances1 {
@@ -15,6 +15,18 @@ trait TryInstances extends TryInstances1 {
 
   implicit final def trySemigroup[A](implicit A: Semigroup[A]): Semigroup[Try[A]] =
     new TrySemigroup[A]
+
+  implicit final val tryInstance: MonadError[Try, Throwable] = new MonadError[Try, Throwable] {
+    final def pure[A](x: A): Try[A] = Return(x)
+      final def flatMap[A, B](fa: Try[A])(f: A => Try[B]): Try[B] = fa.flatMap(f)
+      override final def map[A, B](fa: Try[A])(f: A => B): Try[B] = fa.map(f)
+
+      final def handleErrorWith[A](fa: Try[A])(f: Throwable => Try[A]): Try[A] =
+        fa.rescue {
+          case e => f(e)
+        }
+      final def raiseError[A](e: Throwable): Try[A] = Throw(e)
+  }
 }
 
 private[util] trait TryInstances1 {
