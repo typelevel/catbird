@@ -1,6 +1,6 @@
 package io.catbird.tests.bijection
 
-import cats.Eq
+import algebra.Eq
 import com.twitter.bijection.{ Bijection, ImplicitBijection, Injection }
 import org.scalacheck.Arbitrary
 import org.scalacheck.Prop

@@ -4,15 +4,10 @@ import cats.{ Eq, Monoid, Semigroup }
 import com.twitter.util.{ Return, Throw, Try }
 
 trait TryInstances extends TryInstances1 {
-  /**
-   * Here for the sake of convenience, but needs a better home.
-   */
-  implicit final def throwableEq: Eq[Throwable] = Eq.fromUniversalEquals
-
   implicit final def tryEq[A](implicit A: Eq[A]): Eq[Try[A]] =
     new Eq[Try[A]] {
       def eqv(x: Try[A], y: Try[A]): Boolean = (x, y) match {
-        case (Throw(xError), Throw(yError)) => throwableEq.eqv(xError, yError)
+        case (Throw(xError), Throw(yError)) => xError == yError
         case (Return(xValue), Return(yValue)) => A.eqv(xValue, yValue)
         case _ => false
       }

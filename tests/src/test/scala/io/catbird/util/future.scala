@@ -8,11 +8,12 @@ import cats.laws.discipline.eq._
 import cats.std.int._
 import com.twitter.conversions.time._
 import com.twitter.util.Future
+import io.catbird.tests.EqInstances
 import io.catbird.tests.util.ArbitraryInstances
 import org.scalatest.FunSuite
 import org.typelevel.discipline.scalatest.Discipline
 
-class FutureSuite extends FunSuite with Discipline with FutureInstances with ArbitraryInstances {
+class FutureSuite extends FunSuite with Discipline with FutureInstances with ArbitraryInstances with EqInstances {
   implicit val eqFutureInt: Eq[Future[Int]] = futureEqWithFailure(1.second)
   implicit val eqFutureFutureInt: Eq[Future[Future[Int]]] = futureEqWithFailure(1.second)
   implicit val eqFutureFutureFutureInt: Eq[Future[Future[Future[Int]]]] = futureEqWithFailure(1.second)
