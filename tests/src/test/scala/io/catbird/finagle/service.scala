@@ -9,6 +9,7 @@ import com.twitter.bijection.InversionFailure
 import com.twitter.conversions.time._
 import com.twitter.finagle.Service
 import com.twitter.util.Future
+import io.catbird.bijections.finagle.ServiceConversions
 import io.catbird.tests.finagle.{ ArbitraryInstances, EqInstances }
 import io.catbird.util._
 import org.scalatest.FunSuite

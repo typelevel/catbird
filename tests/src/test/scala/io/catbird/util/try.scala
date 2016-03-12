@@ -6,6 +6,7 @@ import cats.laws.discipline.arbitrary._
 import cats.std.int._
 import cats.std.string._
 import com.twitter.util.{ Return, Throw, Try }
+import io.catbird.bijections.util.TryConversions
 import io.catbird.tests.bijection.BijectionProperties
 import io.catbird.tests.util.ArbitraryInstances
 import org.scalatest.prop.{ Checkers, PropertyChecks }
