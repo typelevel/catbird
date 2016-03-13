@@ -2,6 +2,7 @@ package io.catbird.util
 
 import cats.{ CoflatMap, Comonad, Eq, Eval, MonadError, Monoid, Semigroup }
 import com.twitter.util.{ Await, Duration, Future, FuturePool, Try }
+import scala.annotation.tailrec
 
 abstract class Rerunnable[A] { self =>
   def run: Future[A]
@@ -10,9 +11,7 @@ abstract class Rerunnable[A] { self =>
     final def run: Future[B] = self.run.map(f)
   }
 
-  final def flatMap[B](f: A => Rerunnable[B]): Rerunnable[B] = new Rerunnable[B] {
-    final def run: Future[B] = self.run.flatMap(a => f(a).run)
-  }
+  final def flatMap[B](f: A => Rerunnable[B]): Rerunnable[B] = new Rerunnable.Bind[A, B](this, f)
 
   final def flatMapF[B](f: A => Future[B]): Rerunnable[B] = new Rerunnable[B] {
     final def run: Future[B] = self.run.flatMap(f)
@@ -25,9 +24,25 @@ abstract class Rerunnable[A] { self =>
   final def liftToTry: Rerunnable[Try[A]] = new Rerunnable[Try[A]] {
     final def run: Future[Try[A]] = self.run.liftToTry
   }
+
+  @tailrec
+  final def step: Rerunnable[A] = this match {
+    case outer: Rerunnable.Bind[_, A] => outer.fa match {
+      case inner: Rerunnable.Bind[_, _] => inner.fa.flatMap(x => inner.ff(x).flatMap(outer.ff)).step
+      case _ => this
+    }
+    case _ => this
+  }
 }
 
 final object Rerunnable extends RerunnableInstances1 {
+  private[util] class Bind[A, B](val fa: Rerunnable[A], val ff: A => Rerunnable[B]) extends Rerunnable[B] {
+    final def run: Future[B] = step match {
+      case bind: Bind[A, B] => bind.fa.run.flatMap(a => bind.ff(a).run)
+      case other => other.run
+    }
+  }
+
   def apply[A](a: => A): Rerunnable[A] = new Rerunnable[A] {
     final def run: Future[A] = Future(a)
   }

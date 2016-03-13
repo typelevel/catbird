@@ -67,7 +67,7 @@ lazy val root = project.in(file("."))
       """.stripMargin
   )
   .settings(scalacOptions in (Compile, console) := compilerOptions)
-  .aggregate(util, finagle, bijections, tests)
+  .aggregate(util, finagle, bijections, tests, benchmark)
   .dependsOn(util, finagle, bijections)
 
 lazy val tests = project
@@ -111,6 +111,16 @@ lazy val bijections = project
       "com.twitter" %% "finagle-core" % finagleVersion
     )
   )
+  .dependsOn(util)
+
+lazy val benchmark = project
+  .settings(moduleName := "catbird-benchmark")
+  .settings(allSettings)
+  .settings(noPublishSettings)
+  .settings(
+    libraryDependencies += "org.scalatest" %% "scalatest" % "3.0.0-M9"
+  )
+  .enablePlugins(JmhPlugin)
   .dependsOn(util)
 
 lazy val publishSettings = Seq(
