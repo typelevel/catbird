@@ -27,7 +27,7 @@ trait FutureInstances extends FutureInstances1 {
 
   final def futureEq[A](atMost: Duration)(implicit A: Eq[A]): Eq[Future[A]] = new Eq[Future[A]] {
     def eqv(x: Future[A], y: Future[A]): Boolean = Await.result(
-      (x.join(y)).map {
+      x.join(y).map {
         case (xa, ya) => A.eqv(xa, ya)
       },
       atMost
@@ -51,10 +51,13 @@ private[util] trait FutureInstances1 {
     }
 }
 
-private[util] abstract class FutureCoflatMap extends CoflatMap[Future] {
+private[util] sealed abstract class FutureCoflatMap extends CoflatMap[Future] {
   final def coflatMap[A, B](fa: Future[A])(f: Future[A] => B): Future[B] = Future(f(fa))
 }
 
-private[util] class FutureSemigroup[A](implicit A: Semigroup[A]) extends Semigroup[Future[A]] {
-  final def combine(fx: Future[A], fy: Future[A]): Future[A] = (fx join fy).map((A.combine _).tupled)
-}
+private[util] sealed class FutureSemigroup[A](implicit A: Semigroup[A])
+  extends Semigroup[Future[A]] {
+    final def combine(fx: Future[A], fy: Future[A]): Future[A] = fx.join(fy).map {
+      case (x, y) => A.combine(x, y)
+    }
+  }

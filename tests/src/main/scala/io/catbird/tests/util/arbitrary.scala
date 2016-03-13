@@ -1,6 +1,7 @@
 package io.catbird.tests.util
 
 import com.twitter.util.{ Future, Return, Try, Var }
+import io.catbird.util.Rerunnable
 import org.scalacheck.Arbitrary
 
 trait ArbitraryInstances {
@@ -12,4 +13,7 @@ trait ArbitraryInstances {
 
   implicit def varArbitrary[A](implicit A: Arbitrary[A]): Arbitrary[Var[A]] =
     Arbitrary(A.arbitrary.map(Var.value))
+
+  implicit def rerunnableArbitrary[A](implicit A: Arbitrary[A]): Arbitrary[Rerunnable[A]] =
+    Arbitrary(futureArbitrary[A].arbitrary.map(Rerunnable.fromFuture[A](_)))
 }

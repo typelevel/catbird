@@ -1,0 +1,113 @@
+package io.catbird.util
+
+import cats.{ CoflatMap, Comonad, Eq, Eval, MonadError, Monoid, Semigroup }
+import com.twitter.util.{ Await, Duration, Future, FuturePool, Try }
+
+abstract class Rerunnable[A] { self =>
+  def run: Future[A]
+
+  final def map[B](f: A => B): Rerunnable[B] = new Rerunnable[B] {
+    final def run: Future[B] = self.run.map(f)
+  }
+
+  final def flatMap[B](f: A => Rerunnable[B]): Rerunnable[B] = new Rerunnable[B] {
+    final def run: Future[B] = self.run.flatMap(a => f(a).run)
+  }
+
+  final def flatMapF[B](f: A => Future[B]): Rerunnable[B] = new Rerunnable[B] {
+    final def run: Future[B] = self.run.flatMap(f)
+  }
+
+  final def product[B](other: Rerunnable[B]): Rerunnable[(A, B)] = new Rerunnable[(A, B)] {
+    final def run: Future[(A, B)] = self.run.join(other.run)
+  }
+
+  final def liftToTry: Rerunnable[Try[A]] = new Rerunnable[Try[A]] {
+    final def run: Future[Try[A]] = self.run.liftToTry
+  }
+}
+
+final object Rerunnable extends RerunnableInstances1 {
+  def apply[A](a: => A): Rerunnable[A] = new Rerunnable[A] {
+    final def run: Future[A] = Future(a)
+  }
+
+  def fromFuture[A](fa: => Future[A]): Rerunnable[A] = new Rerunnable[A] {
+    final def run: Future[A] = fa
+  }
+
+  def withFuturePool[A](pool: FuturePool)(a: => A): Rerunnable[A] = new Rerunnable[A] {
+    final def run: Future[A] = pool(a)
+  }
+
+  val Unit: Rerunnable[Unit] = new Rerunnable[Unit] {
+    final def run: Future[Unit] = Future.Unit
+  }
+
+  implicit val rerunnableInstances: MonadError[Rerunnable, Throwable] with CoflatMap[Rerunnable] =
+    new RerunnableCoflatMap with MonadError[Rerunnable, Throwable] {
+      final def pure[A](a: A): Rerunnable[A] = new Rerunnable[A] {
+        final def run: Future[A] = Future.value(a)
+      }
+
+      override final def pureEval[A](a: Eval[A]): Rerunnable[A] = new Rerunnable[A] {
+        final def run: Future[A] = Future(a.value)
+      }
+
+      override final def map[A, B](fa: Rerunnable[A])(f: A => B): Rerunnable[B] = fa.map(f)
+
+      override final def product[A, B](fa: Rerunnable[A], fb: Rerunnable[B]): Rerunnable[(A, B)] =
+        fa.product(fb)
+
+      final def flatMap[A, B](fa: Rerunnable[A])(f: A => Rerunnable[B]): Rerunnable[B] =
+        fa.flatMap(f)
+
+      final def raiseError[A](e: Throwable): Rerunnable[A] = new Rerunnable[A] {
+        final def run: Future[A] = Future.exception[A](e)
+      }
+
+      final def handleErrorWith[A](fa: Rerunnable[A])(
+        f: Throwable => Rerunnable[A]
+      ): Rerunnable[A] = new Rerunnable[A] {
+        final def run: Future[A] = fa.run.rescue {
+          case error => f(error).run
+        }
+      }
+    }
+
+  implicit final def rerunnableMonoid[A](implicit A: Monoid[A]): Monoid[Rerunnable[A]] =
+    new RerunnableSemigroup[A] with Monoid[Rerunnable[A]] {
+      final def empty: Rerunnable[A] = Rerunnable.rerunnableInstances.pure(A.empty)
+    }
+
+  final def rerunnableEq[A](atMost: Duration)(implicit A: Eq[A]): Eq[Rerunnable[A]] =
+    futureEq[A](atMost).on(_.run)
+
+  final def rerunnableEqWithFailure[A](atMost: Duration)(implicit A: Eq[A]): Eq[Rerunnable[A]] =
+    futureEqWithFailure[A](atMost).on(_.run)
+}
+
+private[util] trait RerunnableInstances1 {
+  final def rerunnableComonad(atMost: Duration): Comonad[Rerunnable] =
+    new RerunnableCoflatMap with Comonad[Rerunnable] {
+      final def extract[A](x: Rerunnable[A]): A = Await.result(x.run, atMost)
+      final def map[A, B](fa: Rerunnable[A])(f: A => B): Rerunnable[B] = fa.map(f)
+    }
+
+  implicit def rerunnableSemigroup[A](implicit A: Semigroup[A]): Semigroup[Rerunnable[A]] =
+    new RerunnableSemigroup[A]
+}
+
+private[util] sealed abstract class RerunnableCoflatMap extends CoflatMap[Rerunnable] {
+  final def coflatMap[A, B](fa: Rerunnable[A])(f: Rerunnable[A] => B): Rerunnable[B] =
+    new Rerunnable[B] {
+      final def run: Future[B] = Future(f(fa))
+    }
+}
+
+private[util] sealed class RerunnableSemigroup[A](implicit A: Semigroup[A])
+  extends Semigroup[Rerunnable[A]] {
+    final def combine(fx: Rerunnable[A], fy: Rerunnable[A]): Rerunnable[A] = fx.product(fy).map {
+      case (x, y) => A.combine(x, y)
+    }
+  }
