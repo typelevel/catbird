@@ -40,7 +40,7 @@ lazy val baseSettings = Seq(
   wartremoverWarnings in (Compile, compile) ++= Warts.allBut(
     Wart.NoNeedForMonad
   ),
-  coverageHighlighting := (
+  ScoverageSbtPlugin.ScoverageKeys.coverageHighlighting := (
     CrossVersion.partialVersion(scalaVersion.value) match {
       case Some((2, 10)) => false
       case _ => true
@@ -79,7 +79,7 @@ lazy val tests = project
       "org.typelevel" %% "cats-laws" % catsVersion,
       "org.typelevel" %% "discipline" % "0.4"
     ),
-    coverageExcludedPackages := "io\\.catbird\\.tests\\..*"
+    ScoverageSbtPlugin.ScoverageKeys.coverageExcludedPackages := "io\\.catbird\\.tests\\..*"
   )
   .dependsOn(util, finagle, bijections)
 
