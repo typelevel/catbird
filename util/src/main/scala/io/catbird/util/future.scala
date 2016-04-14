@@ -4,7 +4,7 @@ import cats.{ CoflatMap, Comonad, Eq, Eval, MonadError, Monoid, Semigroup }
 import com.twitter.util.{ Await, Duration, Future, Try }
 
 trait FutureInstances extends FutureInstances1 {
-  implicit final val futureInstance: MonadError[Future, Throwable] with CoflatMap[Future] =
+  implicit final val twitterFutureInstance: MonadError[Future, Throwable] with CoflatMap[Future] =
     new FutureCoflatMap with MonadError[Future, Throwable] {
       final def pure[A](x: A): Future[A] = Future.value(x)
       override final def pureEval[A](x: Eval[A]): Future[A] = Future(x.value)
@@ -22,7 +22,7 @@ trait FutureInstances extends FutureInstances1 {
       final def raiseError[A](e: Throwable): Future[A] = Future.exception(e)
     }
 
-  implicit final def futureSemigroup[A](implicit A: Semigroup[A]): Semigroup[Future[A]] =
+  implicit final def twitterFutureSemigroup[A](implicit A: Semigroup[A]): Semigroup[Future[A]] =
     new FutureSemigroup[A]
 
   final def futureEq[A](atMost: Duration)(implicit A: Eq[A]): Eq[Future[A]] = new Eq[Future[A]] {
@@ -45,7 +45,7 @@ private[util] trait FutureInstances1 {
       def map[A, B](fa: Future[A])(f: A => B): Future[B] = fa.map(f)
     }
 
-  implicit final def futureMonoid[A](implicit A: Monoid[A]): Monoid[Future[A]] =
+  implicit final def twitterFutureMonoid[A](implicit A: Monoid[A]): Monoid[Future[A]] =
     new FutureSemigroup[A] with Monoid[Future[A]] {
       def empty: Future[A] = Future.value(A.empty)
     }

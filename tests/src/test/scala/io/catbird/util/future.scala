@@ -25,6 +25,6 @@ class FutureSuite extends FunSuite with Discipline with FutureInstances with Arb
   checkAll("Future[Int]", MonadErrorTests[Future, Throwable].monadError[Int, Int, Int])
   checkAll("Future[Int]", ComonadTests[Future].comonad[Int, Int, Int])
   checkAll("Future[Int]", FunctorTests[Future](comonad).functor[Int, Int, Int])
-  checkAll("Future[Int]", GroupLaws[Future[Int]].semigroup(futureSemigroup[Int]))
+  checkAll("Future[Int]", GroupLaws[Future[Int]].semigroup(twitterFutureSemigroup[Int]))
   checkAll("Future[Int]", GroupLaws[Future[Int]].monoid)
 }

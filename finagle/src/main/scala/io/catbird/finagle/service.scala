@@ -2,13 +2,13 @@ package io.catbird.finagle
 
 import cats.arrow.Category
 import cats.functor.Profunctor
-import io.catbird.util.futureInstance
+import io.catbird.util.twitterFutureInstance
 import com.twitter.finagle.Service
 
 trait ServiceInstances {
   implicit val serviceInstance: Category[Service] with Profunctor[Service] =
     new Category[Service] with Profunctor[Service] {
-      final def id[A]: Service[A, A] = Service.mk(futureInstance.pure)
+      final def id[A]: Service[A, A] = Service.mk(twitterFutureInstance.pure)
 
       final def compose[A, B, C](f: Service[B, C], g: Service[A, B]): Service[A, C] =
         Service.mk(a => g(a).flatMap(f))
