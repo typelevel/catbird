@@ -1,9 +1,9 @@
 package io.catbird.util
 
 import algebra.laws.GroupLaws
+import algebra.std.tuple._
 import cats.data.Xor
 import cats.laws.discipline.MonadErrorTests
-import cats.laws.discipline.eq._
 import cats.laws.discipline.arbitrary._
 import cats.std.int._
 import cats.std.string._
