@@ -1,6 +1,7 @@
 package io.catbird.util
 
 import algebra.laws.GroupLaws
+import algebra.std.tuple._
 import cats.{ Comonad, Eq }
 import cats.laws.discipline._
 import cats.laws.discipline.eq._
