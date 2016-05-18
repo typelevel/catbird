@@ -1,6 +1,6 @@
 package io.catbird.tests.finagle
 
-import algebra.Eq
+import cats.Eq
 import com.twitter.finagle.Service
 import com.twitter.util.{ Await, Duration }
 
