@@ -1,6 +1,6 @@
 package io.catbird.finagle
 
-import algebra.Eq
+import cats.Eq
 import cats.std.int._
 import cats.data.Kleisli
 import cats.laws.discipline._

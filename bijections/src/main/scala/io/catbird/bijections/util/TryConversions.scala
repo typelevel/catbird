@@ -1,6 +1,6 @@
 package io.catbird.bijections.util
 
-import algebra.Semigroup
+import cats.Semigroup
 import cats.data.Xor
 import com.twitter.bijection.Bijection
 import com.twitter.util.{ Return, Throw, Try }
