@@ -2,13 +2,12 @@ import ReleaseTransformations._
 
 val bijectionVersion = "0.9.2"
 val catsVersion = "0.6.0"
-val utilVersion = "6.34.0"
-val finagleVersion = "6.35.0"
+val utilVersion = "6.35.0"
+val finagleVersion = "6.36.0"
 
 lazy val buildSettings = Seq(
   organization := "io.catbird",
-  scalaVersion := "2.11.8",
-  crossScalaVersions := Seq("2.10.6", "2.11.8")
+  scalaVersion := "2.11.8"
 )
 
 lazy val compilerOptions = Seq(
@@ -21,31 +20,22 @@ lazy val compilerOptions = Seq(
   "-Yno-adapted-args",
   "-Ywarn-dead-code",
   "-Ywarn-numeric-widen",
-  "-Xfuture"
+  "-Xfuture",
+  "-Ywarn-unused-import"
 )
 
 lazy val baseSettings = Seq(
-  scalacOptions ++= compilerOptions ++ (
-    CrossVersion.partialVersion(scalaVersion.value) match {
-      case Some((2, 11)) => Seq("-Ywarn-unused-import")
-      case _ => Nil
-    }
-  ),
+  scalacOptions ++= compilerOptions,
   scalacOptions in (Compile, console) := compilerOptions,
   libraryDependencies ++= Seq(
     "org.typelevel" %% "cats-core" % catsVersion,
-    compilerPlugin("org.spire-math" %% "kind-projector" % "0.7.1")
+    compilerPlugin("org.spire-math" %% "kind-projector" % "0.8.0")
   ),
   resolvers += Resolver.sonatypeRepo("snapshots"),
   wartremoverWarnings in (Compile, compile) ++= Warts.allBut(
     Wart.NoNeedForMonad
   ),
-  ScoverageSbtPlugin.ScoverageKeys.coverageHighlighting := (
-    CrossVersion.partialVersion(scalaVersion.value) match {
-      case Some((2, 10)) => false
-      case _ => true
-    }
-  )
+  ScoverageSbtPlugin.ScoverageKeys.coverageHighlighting := true
 )
 
 lazy val allSettings = buildSettings ++ baseSettings ++ publishSettings
