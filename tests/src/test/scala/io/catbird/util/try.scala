@@ -4,10 +4,10 @@ import cats.data.Xor
 import cats.kernel.laws.GroupLaws
 import cats.laws.discipline.MonadErrorTests
 import cats.laws.discipline.arbitrary._
-import cats.std.int._
-import cats.std.string._
-import cats.std.tuple._
-import cats.std.unit._
+import cats.instances.int._
+import cats.instances.string._
+import cats.instances.tuple._
+import cats.instances.unit._
 import com.twitter.util.{ Return, Throw, Try }
 import io.catbird.bijections.util.TryConversions
 import io.catbird.tests.EqInstances

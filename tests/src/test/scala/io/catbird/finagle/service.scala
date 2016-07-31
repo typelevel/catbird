@@ -1,8 +1,8 @@
 package io.catbird.finagle
 
 import cats.Eq
-import cats.std.int._
 import cats.data.Kleisli
+import cats.instances.int._
 import cats.laws.discipline._
 import cats.laws.discipline.eq._
 import com.twitter.bijection.InversionFailure
@@ -33,7 +33,8 @@ class ServiceSuite extends FunSuite with Discipline with
   }
 
   test("Non-Service Kleisli[Future, Int, String] should fail with an InversionFailure") {
-    val kleisli: Kleisli[Future, Int, String] = Kleisli.kleisliArrow[Future].lift(_.toString)
+    val kleisli: Kleisli[Future, Int, String] =
+      Kleisli.catsDataArrowForKleisli[Future].lift(_.toString)
 
     assert(
       serviceToKleisli.invert(kleisli) match {

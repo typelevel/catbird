@@ -1,10 +1,10 @@
 package io.catbird.util
 
-import cats.std.int._
 import cats.{ Comonad, Eq }
+import cats.instances.int._
+import cats.instances.tuple._
 import cats.kernel.laws.GroupLaws
 import cats.laws.discipline._
-import cats.std.tuple._
 import com.twitter.util.Var
 import io.catbird.tests.util.ArbitraryInstances
 import org.scalatest.FunSuite

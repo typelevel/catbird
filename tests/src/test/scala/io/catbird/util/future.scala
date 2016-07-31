@@ -2,11 +2,11 @@ package io.catbird.util
 
 import cats.{ Comonad, Eq }
 import cats.data.Xor
+import cats.instances.int._
+import cats.instances.tuple._
+import cats.instances.unit._
 import cats.kernel.laws.GroupLaws
 import cats.laws.discipline._
-import cats.laws.discipline.eq._
-import cats.std.int._
-import cats.std.tuple._
 import com.twitter.conversions.time._
 import com.twitter.util.Future
 import io.catbird.tests.EqInstances

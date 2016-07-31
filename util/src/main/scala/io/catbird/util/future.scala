@@ -1,13 +1,12 @@
 package io.catbird.util
 
-import cats.{ CoflatMap, Comonad, Eq, Eval, MonadError, Monoid, Semigroup }
+import cats.{ CoflatMap, Comonad, Eq, MonadError, Monoid, Semigroup }
 import com.twitter.util.{ Await, Duration, Future, Try }
 
 trait FutureInstances extends FutureInstances1 {
   implicit final val twitterFutureInstance: MonadError[Future, Throwable] with CoflatMap[Future] =
     new FutureCoflatMap with MonadError[Future, Throwable] {
       final def pure[A](x: A): Future[A] = Future.value(x)
-      override final def pureEval[A](x: Eval[A]): Future[A] = Future(x.value)
       final def flatMap[A, B](fa: Future[A])(f: A => Future[B]): Future[B] = fa.flatMap(f)
       override final def map[A, B](fa: Future[A])(f: A => B): Future[B] = fa.map(f)
       override final def ap[A, B](f: Future[A => B])(fa: Future[A]): Future[B] = f.join(fa).map {

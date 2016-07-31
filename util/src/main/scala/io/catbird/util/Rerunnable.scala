@@ -1,6 +1,6 @@
 package io.catbird.util
 
-import cats.{ CoflatMap, Comonad, Eq, Eval, MonadError, Monoid, Semigroup }
+import cats.{ CoflatMap, Comonad, Eq, MonadError, Monoid, Semigroup }
 import com.twitter.util.{ Await, Duration, Future, FuturePool, Try }
 import scala.annotation.tailrec
 
@@ -63,10 +63,6 @@ final object Rerunnable extends RerunnableInstances1 {
     new RerunnableCoflatMap with MonadError[Rerunnable, Throwable] {
       final def pure[A](a: A): Rerunnable[A] = new Rerunnable[A] {
         final def run: Future[A] = Future.value(a)
-      }
-
-      override final def pureEval[A](a: Eval[A]): Rerunnable[A] = new Rerunnable[A] {
-        final def run: Future[A] = Future(a.value)
       }
 
       override final def map[A, B](fa: Rerunnable[A])(f: A => B): Rerunnable[B] = fa.map(f)
