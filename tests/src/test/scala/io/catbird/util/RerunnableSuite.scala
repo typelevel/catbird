@@ -18,6 +18,7 @@ class RerunnableSuite extends FunSuite with Discipline with ArbitraryInstances w
   implicit val rerunnableComonad: Comonad[Rerunnable] = Rerunnable.rerunnableComonad(1.second)
 
   checkAll("Rerunnable[Int]", MonadErrorTests[Rerunnable, Throwable].monadError[Int, Int, Int])
+  checkAll("Rerunnable[Int]", MonadRecTests[Rerunnable].monadRec[Int, Int, Int])
   checkAll("Rerunnable[Int]", ComonadTests[Rerunnable].comonad[Int, Int, Int])
   checkAll("Rerunnable[Int]", FunctorTests[Rerunnable](rerunnableComonad).functor[Int, Int, Int])
   checkAll("Rerunnable[Int]", GroupLaws[Rerunnable[Int]].semigroup)

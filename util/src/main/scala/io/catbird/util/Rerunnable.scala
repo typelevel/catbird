@@ -1,6 +1,7 @@
 package io.catbird.util
 
-import cats.{ CoflatMap, Comonad, Eq, MonadError, Monoid, Semigroup }
+import cats.{ CoflatMap, Comonad, Eq, MonadError, MonadRec, Monoid, Semigroup }
+import cats.data.Xor
 import com.twitter.util.{ Await, Duration, Future, FuturePool, Try }
 import scala.annotation.tailrec
 
@@ -59,8 +60,9 @@ final object Rerunnable extends RerunnableInstances1 {
     final def run: Future[Unit] = Future.Unit
   }
 
-  implicit val rerunnableInstances: MonadError[Rerunnable, Throwable] with CoflatMap[Rerunnable] =
-    new RerunnableCoflatMap with MonadError[Rerunnable, Throwable] {
+  implicit val rerunnableInstance: MonadError[Rerunnable, Throwable] with CoflatMap[Rerunnable]
+      with MonadRec[Rerunnable] =
+    new RerunnableCoflatMap with MonadError[Rerunnable, Throwable] with MonadRec[Rerunnable] {
       final def pure[A](a: A): Rerunnable[A] = new Rerunnable[A] {
         final def run: Future[A] = Future.value(a)
       }
@@ -84,11 +86,17 @@ final object Rerunnable extends RerunnableInstances1 {
           case error => f(error).run
         }
       }
+
+      final def tailRecM[A, B](a: A)(f: A => Rerunnable[Xor[A, B]]): Rerunnable[B] =
+        f(a).flatMap {
+          case Xor.Left(a1) => tailRecM(a1)(f)
+          case Xor.Right(b) => pure(b)
+        }
     }
 
   implicit final def rerunnableMonoid[A](implicit A: Monoid[A]): Monoid[Rerunnable[A]] =
     new RerunnableSemigroup[A] with Monoid[Rerunnable[A]] {
-      final def empty: Rerunnable[A] = Rerunnable.rerunnableInstances.pure(A.empty)
+      final def empty: Rerunnable[A] = Rerunnable.rerunnableInstance.pure(A.empty)
     }
 
   final def rerunnableEq[A](atMost: Duration)(implicit A: Eq[A]): Eq[Rerunnable[A]] =

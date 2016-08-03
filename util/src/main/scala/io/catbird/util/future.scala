@@ -1,11 +1,12 @@
 package io.catbird.util
 
-import cats.{ CoflatMap, Comonad, Eq, MonadError, Monoid, Semigroup }
+import cats.{ CoflatMap, Comonad, Eq, MonadError, MonadRec, Monoid, Semigroup }
+import cats.data.Xor
 import com.twitter.util.{ Await, Duration, Future, Try }
 
 trait FutureInstances extends FutureInstances1 {
-  implicit final val twitterFutureInstance: MonadError[Future, Throwable] with CoflatMap[Future] =
-    new FutureCoflatMap with MonadError[Future, Throwable] {
+  implicit final val twitterFutureInstance: MonadError[Future, Throwable] with CoflatMap[Future] with MonadRec[Future] =
+    new FutureCoflatMap with MonadError[Future, Throwable] with MonadRec[Future] {
       final def pure[A](x: A): Future[A] = Future.value(x)
       final def flatMap[A, B](fa: Future[A])(f: A => Future[B]): Future[B] = fa.flatMap(f)
       override final def map[A, B](fa: Future[A])(f: A => B): Future[B] = fa.map(f)
@@ -19,6 +20,12 @@ trait FutureInstances extends FutureInstances1 {
           case e => f(e)
         }
       final def raiseError[A](e: Throwable): Future[A] = Future.exception(e)
+
+      final def tailRecM[A, B](a: A)(f: A => Future[Xor[A, B]]): Future[B] =
+        f(a).flatMap {
+          case Xor.Left(a1) => tailRecM(a1)(f)
+          case Xor.Right(b) => Future.value(b)
+        }
     }
 
   implicit final def twitterFutureSemigroup[A](implicit A: Semigroup[A]): Semigroup[Future[A]] =
