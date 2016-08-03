@@ -26,7 +26,12 @@ lazy val compilerOptions = Seq(
 
 lazy val baseSettings = Seq(
   scalacOptions ++= compilerOptions,
-  scalacOptions in (Compile, console) := compilerOptions,
+  scalacOptions in (Compile, console) ~= {
+    _.filterNot(Set("-Ywarn-unused-import"))
+  },
+  scalacOptions in (Test, console) ~= {
+    _.filterNot(Set("-Ywarn-unused-import"))
+  },
   libraryDependencies ++= Seq(
     "org.typelevel" %% "cats-core" % catsVersion,
     compilerPlugin("org.spire-math" %% "kind-projector" % "0.8.0")
@@ -56,7 +61,6 @@ lazy val root = project.in(file("."))
         |import io.catbird.util._
       """.stripMargin
   )
-  .settings(scalacOptions in (Compile, console) := compilerOptions)
   .aggregate(util, finagle, bijections, tests, benchmark)
   .dependsOn(util, finagle, bijections)
 
