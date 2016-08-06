@@ -2,6 +2,7 @@ package io.catbird.util
 
 import cats.{ CoflatMap, Comonad, Eq, Monad, Monoid, Semigroup }
 import com.twitter.util.Var
+import scala.Boolean
 
 trait VarInstances extends VarInstances1 {
   implicit final val twitterVarInstance: Monad[Var] with CoflatMap[Var] =

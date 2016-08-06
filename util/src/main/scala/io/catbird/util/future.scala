@@ -3,6 +3,8 @@ package io.catbird.util
 import cats.{ CoflatMap, Comonad, Eq, MonadError, MonadRec, Monoid, Semigroup }
 import cats.data.Xor
 import com.twitter.util.{ Await, Duration, Future, Try }
+import java.lang.Throwable
+import scala.Boolean
 
 trait FutureInstances extends FutureInstances1 {
   implicit final val twitterFutureInstance: MonadError[Future, Throwable] with CoflatMap[Future] with MonadRec[Future] =

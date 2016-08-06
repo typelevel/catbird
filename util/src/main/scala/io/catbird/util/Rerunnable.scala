@@ -3,6 +3,8 @@ package io.catbird.util
 import cats.{ CoflatMap, Comonad, Eq, MonadError, MonadRec, Monoid, Semigroup }
 import cats.data.Xor
 import com.twitter.util.{ Await, Duration, Future, FuturePool, Try }
+import java.lang.Throwable
+import scala.Unit
 import scala.annotation.tailrec
 
 abstract class Rerunnable[A] { self =>

@@ -3,6 +3,8 @@ package io.catbird.util
 import cats.{ Applicative, CoflatMap, Eq, Eval, MonadError, MonadRec, Monoid, Semigroup, Traverse }
 import cats.data.Xor
 import com.twitter.util.{ Return, Throw, Try }
+import java.lang.Throwable
+import scala.{ Boolean, inline }
 import scala.annotation.tailrec
 
 trait TryInstances extends TryInstances1 {
