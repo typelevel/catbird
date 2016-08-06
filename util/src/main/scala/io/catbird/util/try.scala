@@ -69,8 +69,5 @@ private[util] trait TryInstances1 {
 }
 
 private[util] class TrySemigroup[A](implicit A: Semigroup[A]) extends Semigroup[Try[A]] {
-  final def combine(fx: Try[A], fy: Try[A]): Try[A] = for {
-    vx <- fx
-    vy <- fy
-  } yield A.combine(vx, vy)
+  final def combine(fx: Try[A], fy: Try[A]): Try[A] = fx.flatMap(x => fy.map(y => A.combine(x, y)))
 }

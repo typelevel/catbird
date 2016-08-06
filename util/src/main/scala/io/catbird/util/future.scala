@@ -34,7 +34,7 @@ trait FutureInstances extends FutureInstances1 {
     new FutureSemigroup[A]
 
   final def futureEq[A](atMost: Duration)(implicit A: Eq[A]): Eq[Future[A]] = new Eq[Future[A]] {
-    def eqv(x: Future[A], y: Future[A]): Boolean = Await.result(
+    final def eqv(x: Future[A], y: Future[A]): Boolean = Await.result(
       x.join(y).map {
         case (xa, ya) => A.eqv(xa, ya)
       },
@@ -49,13 +49,13 @@ trait FutureInstances extends FutureInstances1 {
 private[util] trait FutureInstances1 {
   final def futureComonad(atMost: Duration): Comonad[Future] =
     new FutureCoflatMap with Comonad[Future] {
-      def extract[A](x: Future[A]): A = Await.result(x, atMost)
-      def map[A, B](fa: Future[A])(f: A => B): Future[B] = fa.map(f)
+      final def extract[A](x: Future[A]): A = Await.result(x, atMost)
+      final def map[A, B](fa: Future[A])(f: A => B): Future[B] = fa.map(f)
     }
 
   implicit final def twitterFutureMonoid[A](implicit A: Monoid[A]): Monoid[Future[A]] =
     new FutureSemigroup[A] with Monoid[Future[A]] {
-      def empty: Future[A] = Future.value(A.empty)
+      final def empty: Future[A] = Future.value(A.empty)
     }
 }
 
