@@ -19,6 +19,6 @@ class VarSuite extends FunSuite with Discipline with VarInstances with Arbitrary
 
   checkAll("Var[Int]", MonadTests[Var].monad[Int, Int, Int])
   checkAll("Var[Int]", ComonadTests[Var].comonad[Int, Int, Int])
-  checkAll("Var[Int]", GroupLaws[Var[Int]].semigroup(varSemigroup[Int]))
+  checkAll("Var[Int]", GroupLaws[Var[Int]].semigroup(twitterVarSemigroup[Int]))
   checkAll("Var[Int]", GroupLaws[Var[Int]].monoid)
 }

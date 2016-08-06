@@ -6,7 +6,7 @@ import com.twitter.util.{ Return, Throw, Try }
 import scala.annotation.tailrec
 
 trait TryInstances extends TryInstances1 {
-  implicit final def tryEq[A](implicit A: Eq[A]): Eq[Try[A]] =
+  implicit final def twitterTryEq[A](implicit A: Eq[A]): Eq[Try[A]] =
     new Eq[Try[A]] {
       def eqv(x: Try[A], y: Try[A]): Boolean = (x, y) match {
         case (Throw(xError), Throw(yError)) => xError == yError
@@ -15,10 +15,11 @@ trait TryInstances extends TryInstances1 {
       }
     }
 
-  implicit final def trySemigroup[A](implicit A: Semigroup[A]): Semigroup[Try[A]] =
+  implicit final def twitterTrySemigroup[A](implicit A: Semigroup[A]): Semigroup[Try[A]] =
     new TrySemigroup[A]
 
-  implicit final val tryInstance: MonadError[Try, Throwable] with CoflatMap[Try] with Traverse[Try] with MonadRec[Try] =
+  implicit final val twitterTryInstance: MonadError[Try, Throwable]
+      with CoflatMap[Try] with Traverse[Try] with MonadRec[Try] =
     new MonadError[Try, Throwable] with CoflatMap[Try] with Traverse[Try] with MonadRec[Try] {
       final def pure[A](x: A): Try[A] = Return(x)
       final def flatMap[A, B](fa: Try[A])(f: A => Try[B]): Try[B] = fa.flatMap(f)
@@ -59,7 +60,7 @@ private[util] final object TryInstances {
 }
 
 private[util] trait TryInstances1 {
-  implicit final def tryMonoid[A](implicit A: Monoid[A]): Monoid[Try[A]] =
+  implicit final def twitterTryMonoid[A](implicit A: Monoid[A]): Monoid[Try[A]] =
     new TrySemigroup[A] with Monoid[Try[A]] {
       final def empty: Try[A] = Return(A.empty)
     }

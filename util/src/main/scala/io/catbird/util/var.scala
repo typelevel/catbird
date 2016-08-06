@@ -4,14 +4,14 @@ import cats.{ CoflatMap, Comonad, Eq, Monad, Monoid, Semigroup }
 import com.twitter.util.Var
 
 trait VarInstances extends VarInstances1 {
-  implicit final val varInstance: Monad[Var] with CoflatMap[Var] =
+  implicit final val twitterVarInstance: Monad[Var] with CoflatMap[Var] =
     new VarCoflatMap with Monad[Var] {
       def pure[A](x: A): Var[A] = Var.value(x)
       def flatMap[A, B](fa: Var[A])(f: A => Var[B]): Var[B] = fa.flatMap(f)
       override def map[A, B](fa: Var[A])(f: A => B): Var[B] = fa.map(f)
     }
 
-  implicit final def varSemigroup[A](implicit A: Semigroup[A]): Semigroup[Var[A]] =
+  implicit final def twitterVarSemigroup[A](implicit A: Semigroup[A]): Semigroup[Var[A]] =
     new VarSemigroup[A]
 
   final def varEq[A](implicit A: Eq[A]): Eq[Var[A]] =
@@ -27,7 +27,7 @@ trait VarInstances1 {
       final def map[A, B](fa: Var[A])(f: A => B): Var[B] = fa.map(f)
     }
 
-  implicit final def varMonoid[A](implicit A: Monoid[A]): Monoid[Var[A]] =
+  implicit final def twitterVarMonoid[A](implicit A: Monoid[A]): Monoid[Var[A]] =
     new VarSemigroup[A] with Monoid[Var[A]] {
       final def empty: Var[A] = Var.value(A.empty)
     }
