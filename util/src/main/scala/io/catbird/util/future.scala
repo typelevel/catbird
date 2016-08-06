@@ -42,7 +42,7 @@ trait FutureInstances extends FutureInstances1 {
     )
   }
 
-  final def futureEqWithFailure[A](atMost: Duration)(implicit A: Eq[A]): Eq[Future[A]] =
+  final def futureEqWithFailure[A](atMost: Duration)(implicit A: Eq[A], T: Eq[Throwable]): Eq[Future[A]] =
     futureEq[Try[A]](atMost).on(_.liftToTry)
 }
 

@@ -8,10 +8,10 @@ import scala.{ Boolean, inline }
 import scala.annotation.tailrec
 
 trait TryInstances extends TryInstances1 {
-  implicit final def twitterTryEq[A](implicit A: Eq[A]): Eq[Try[A]] =
+  implicit final def twitterTryEq[A](implicit A: Eq[A], T: Eq[Throwable]): Eq[Try[A]] =
     new Eq[Try[A]] {
       def eqv(x: Try[A], y: Try[A]): Boolean = (x, y) match {
-        case (Throw(xError), Throw(yError)) => xError == yError
+        case (Throw(xError), Throw(yError)) => T.eqv(xError, yError)
         case (Return(xValue), Return(yValue)) => A.eqv(xValue, yValue)
         case _ => false
       }
