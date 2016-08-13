@@ -24,7 +24,6 @@ class FutureSuite extends FunSuite with Discipline with FutureInstances with Arb
   implicit val comonad: Comonad[Future] = futureComonad(1.second)
 
   checkAll("Future[Int]", MonadErrorTests[Future, Throwable].monadError[Int, Int, Int])
-  checkAll("Future[Int]", MonadRecTests[Future].monadRec[Int, Int, Int])
   checkAll("Future[Int]", ComonadTests[Future].comonad[Int, Int, Int])
   checkAll("Future[Int]", FunctorTests[Future](comonad).functor[Int, Int, Int])
   checkAll("Future[Int]", GroupLaws[Future[Int]].semigroup(twitterFutureSemigroup[Int]))

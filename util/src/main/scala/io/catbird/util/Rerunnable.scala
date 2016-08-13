@@ -1,6 +1,6 @@
 package io.catbird.util
 
-import cats.{ CoflatMap, Comonad, Eq, MonadError, MonadRec, Monoid, Semigroup }
+import cats.{ CoflatMap, Comonad, Eq, MonadError, Monoid, Semigroup }
 import cats.data.Xor
 import com.twitter.util.{ Await, Duration, Future, FuturePool, Try }
 import java.lang.Throwable
@@ -62,9 +62,8 @@ final object Rerunnable extends RerunnableInstances1 {
     final def run: Future[Unit] = Future.Unit
   }
 
-  implicit val rerunnableInstance: MonadError[Rerunnable, Throwable] with CoflatMap[Rerunnable]
-      with MonadRec[Rerunnable] =
-    new RerunnableCoflatMap with MonadError[Rerunnable, Throwable] with MonadRec[Rerunnable] {
+  implicit val rerunnableInstance: MonadError[Rerunnable, Throwable] with CoflatMap[Rerunnable] =
+    new RerunnableCoflatMap with MonadError[Rerunnable, Throwable] {
       final def pure[A](a: A): Rerunnable[A] = new Rerunnable[A] {
         final def run: Future[A] = Future.value(a)
       }

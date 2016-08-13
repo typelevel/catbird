@@ -2,7 +2,7 @@ package io.catbird.util
 
 import cats.data.Xor
 import cats.kernel.laws.GroupLaws
-import cats.laws.discipline.{ MonadErrorTests, MonadRecTests, TraverseTests }
+import cats.laws.discipline.{ MonadErrorTests, TraverseTests }
 import cats.laws.discipline.arbitrary._
 import cats.instances.int._
 import cats.instances.option._
@@ -22,7 +22,6 @@ trait TryTest extends ArbitraryInstances with EqInstances with TryConversions wi
 
 class TrySuite extends FunSuite with TryTest with Discipline {
   checkAll("Try[Int]", MonadErrorTests[Try, Throwable].monadError[Int, Int, Int])
-  checkAll("Try[Int]", MonadRecTests[Try].monadRec[Int, Int, Int])
   checkAll("Try[Int]", TraverseTests[Try].traverse[Int, Int, Int, Int, Option, Option])
   checkAll("Try[Int]", GroupLaws[Try[Int]].semigroup(twitterTrySemigroup[Int]))
   checkAll("Try[Int]", GroupLaws[Try[Int]].monoid)

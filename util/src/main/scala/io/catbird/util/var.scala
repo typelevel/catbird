@@ -1,6 +1,7 @@
 package io.catbird.util
 
 import cats.{ CoflatMap, Comonad, Eq, Monad, Monoid, Semigroup }
+import cats.data.Xor
 import com.twitter.util.Var
 import scala.Boolean
 
@@ -39,6 +40,12 @@ trait VarInstances1 {
 
 private[util] abstract class VarCoflatMap extends CoflatMap[Var] {
   final def coflatMap[A, B](fa: Var[A])(f: Var[A] => B): Var[B] = Var(f(fa))
+
+  final def tailRecM[A, B](a: A)(f: A => Var[Xor[A, B]]): Var[B] =
+    f(a).flatMap {
+      case Xor.Left(a1) => tailRecM(a1)(f)
+      case Xor.Right(b) => Var.value(b)
+    }
 }
 
 private[util] class VarSemigroup[A](implicit A: Semigroup[A]) extends Semigroup[Var[A]] {
