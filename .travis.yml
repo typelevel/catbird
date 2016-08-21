@@ -9,5 +9,6 @@ jdk:
 
 script:
   - sbt ++$TRAVIS_SCALA_VERSION coverage test scalastyle coverageReport
+  - sbt ++$TRAVIS_SCALA_VERSION coverageAggregate
 
 after_success: bash <(curl -s https://codecov.io/bash)
