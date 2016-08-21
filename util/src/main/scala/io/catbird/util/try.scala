@@ -1,11 +1,11 @@
 package io.catbird.util
 
-import cats.{ Applicative, CoflatMap, Eq, Eval, MonadError, Monoid, Semigroup, Traverse }
-import cats.data.Xor
+import cats.{ Applicative, CoflatMap, Eq, Eval, MonadError, Monoid, RecursiveTailRecM, Semigroup, Traverse }
 import com.twitter.util.{ Return, Throw, Try }
 import java.lang.Throwable
 import scala.{ Boolean, inline }
 import scala.annotation.tailrec
+import scala.util.{ Either, Left, Right }
 
 trait TryInstances extends TryInstances1 {
   implicit final def twitterTryEq[A](implicit A: Eq[A], T: Eq[Throwable]): Eq[Try[A]] =
@@ -20,8 +20,9 @@ trait TryInstances extends TryInstances1 {
   implicit final def twitterTrySemigroup[A](implicit A: Semigroup[A]): Semigroup[Try[A]] =
     new TrySemigroup[A]
 
-  implicit final val twitterTryInstance: MonadError[Try, Throwable] with CoflatMap[Try] with Traverse[Try] =
-    new MonadError[Try, Throwable] with CoflatMap[Try] with Traverse[Try] {
+  implicit final val twitterTryInstance: MonadError[Try, Throwable] with CoflatMap[Try] with Traverse[Try]
+      with RecursiveTailRecM[Try] =
+    new MonadError[Try, Throwable] with CoflatMap[Try] with Traverse[Try] with RecursiveTailRecM[Try] {
       final def pure[A](x: A): Try[A] = Return(x)
       final def flatMap[A, B](fa: Try[A])(f: A => Try[B]): Try[B] = fa.flatMap(f)
       override final def map[A, B](fa: Try[A])(f: A => B): Try[B] = fa.map(f)
@@ -48,10 +49,10 @@ trait TryInstances extends TryInstances1 {
         case t: Throw[_] => G.pure(TryInstances.castThrow[B](t))
       }
 
-      @tailrec final def tailRecM[A, B](a: A)(f: A => Try[Xor[A, B]]): Try[B] = f(a) match {
+      @tailrec final def tailRecM[A, B](a: A)(f: A => Try[Either[A, B]]): Try[B] = f(a) match {
         case t: Throw[_] => TryInstances.castThrow[B](t)
-        case Return(Xor.Left(a1)) => tailRecM(a1)(f)
-        case Return(Xor.Right(b)) => Return(b)
+        case Return(Left(a1)) => tailRecM(a1)(f)
+        case Return(Right(b)) => Return(b)
       }
     }
 }
