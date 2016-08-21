@@ -1,7 +1,7 @@
 import ReleaseTransformations._
 
 val bijectionVersion = "0.9.2"
-val catsVersion = "0.6.0"
+val catsVersion = "0.7.0"
 val utilVersion = "6.35.0"
 val finagleVersion = "6.36.0"
 
@@ -21,16 +21,18 @@ lazy val compilerOptions = Seq(
   "-Ywarn-dead-code",
   "-Ywarn-numeric-widen",
   "-Xfuture",
-  "-Ywarn-unused-import"
+  "-Ywarn-unused-import",
+  "-Yno-imports",
+  "-Yno-predef"
 )
 
 lazy val baseSettings = Seq(
   scalacOptions ++= compilerOptions,
   scalacOptions in (Compile, console) ~= {
-    _.filterNot(Set("-Ywarn-unused-import"))
+    _.filterNot(Set("-Ywarn-unused-import", "-Yno-imports", "-Yno-predef"))
   },
   scalacOptions in (Test, console) ~= {
-    _.filterNot(Set("-Ywarn-unused-import"))
+    _.filterNot(Set("-Ywarn-unused-import", "-Yno-imports", "-Yno-predef"))
   },
   libraryDependencies ++= Seq(
     "org.typelevel" %% "cats-core" % catsVersion,
@@ -73,6 +75,9 @@ lazy val tests = project
       "org.typelevel" %% "cats-laws" % catsVersion,
       "org.typelevel" %% "discipline" % "0.4"
     ),
+    scalacOptions ~= {
+      _.filterNot(Set("-Yno-imports", "-Yno-predef"))
+    },
     ScoverageSbtPlugin.ScoverageKeys.coverageExcludedPackages := "io\\.catbird\\.tests\\..*"
   )
   .dependsOn(util, finagle, bijections)
@@ -112,7 +117,10 @@ lazy val benchmark = project
   .settings(allSettings)
   .settings(noPublishSettings)
   .settings(
-    libraryDependencies += "org.scalatest" %% "scalatest" % "3.0.0-M9"
+    libraryDependencies += "org.scalatest" %% "scalatest" % "3.0.0-M9",
+    scalacOptions ~= {
+      _.filterNot(Set("-Yno-imports", "-Yno-predef"))
+    }
   )
   .enablePlugins(JmhPlugin)
   .dependsOn(util)

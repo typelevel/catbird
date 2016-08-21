@@ -4,6 +4,7 @@ import cats.Semigroup
 import cats.data.Xor
 import com.twitter.bijection.Bijection
 import com.twitter.util.{ Return, Throw, Try }
+import java.lang.Throwable
 
 trait TryConversions {
   implicit def tryToXor[A]: Bijection[Try[A], Xor[Throwable, A]] =

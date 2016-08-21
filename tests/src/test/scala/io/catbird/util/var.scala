@@ -1,10 +1,10 @@
 package io.catbird.util
 
-import cats.std.int._
 import cats.{ Comonad, Eq }
+import cats.instances.int._
+import cats.instances.tuple._
 import cats.kernel.laws.GroupLaws
 import cats.laws.discipline._
-import cats.std.tuple._
 import com.twitter.util.Var
 import io.catbird.tests.util.ArbitraryInstances
 import org.scalatest.FunSuite
@@ -19,6 +19,6 @@ class VarSuite extends FunSuite with Discipline with VarInstances with Arbitrary
 
   checkAll("Var[Int]", MonadTests[Var].monad[Int, Int, Int])
   checkAll("Var[Int]", ComonadTests[Var].comonad[Int, Int, Int])
-  checkAll("Var[Int]", GroupLaws[Var[Int]].semigroup(varSemigroup[Int]))
+  checkAll("Var[Int]", GroupLaws[Var[Int]].semigroup(twitterVarSemigroup[Int]))
   checkAll("Var[Int]", GroupLaws[Var[Int]].monoid)
 }

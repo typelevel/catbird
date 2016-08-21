@@ -1,13 +1,16 @@
 package io.catbird.util
 
-import cats.{ CoflatMap, Comonad, Eq, Eval, MonadError, Monoid, Semigroup }
+import cats.{ CoflatMap, Comonad, Eq, MonadError, Monoid, RecursiveTailRecM, Semigroup }
 import com.twitter.util.{ Await, Duration, Future, Try }
+import java.lang.Throwable
+import scala.Boolean
+import scala.util.{ Either, Left, Right }
 
 trait FutureInstances extends FutureInstances1 {
-  implicit final val twitterFutureInstance: MonadError[Future, Throwable] with CoflatMap[Future] =
-    new FutureCoflatMap with MonadError[Future, Throwable] {
+  implicit final val twitterFutureInstance: MonadError[Future, Throwable] with CoflatMap[Future]
+      with RecursiveTailRecM[Future] =
+    new FutureCoflatMap with MonadError[Future, Throwable] with RecursiveTailRecM[Future] {
       final def pure[A](x: A): Future[A] = Future.value(x)
-      override final def pureEval[A](x: Eval[A]): Future[A] = Future(x.value)
       final def flatMap[A, B](fa: Future[A])(f: A => Future[B]): Future[B] = fa.flatMap(f)
       override final def map[A, B](fa: Future[A])(f: A => B): Future[B] = fa.map(f)
       override final def ap[A, B](f: Future[A => B])(fa: Future[A]): Future[B] = f.join(fa).map {
@@ -20,13 +23,15 @@ trait FutureInstances extends FutureInstances1 {
           case e => f(e)
         }
       final def raiseError[A](e: Throwable): Future[A] = Future.exception(e)
+
+      final def tailRecM[A, B](a: A)(f: A => Future[Either[A, B]]): Future[B] = defaultTailRecM(a)(f)
     }
 
   implicit final def twitterFutureSemigroup[A](implicit A: Semigroup[A]): Semigroup[Future[A]] =
     new FutureSemigroup[A]
 
   final def futureEq[A](atMost: Duration)(implicit A: Eq[A]): Eq[Future[A]] = new Eq[Future[A]] {
-    def eqv(x: Future[A], y: Future[A]): Boolean = Await.result(
+    final def eqv(x: Future[A], y: Future[A]): Boolean = Await.result(
       x.join(y).map {
         case (xa, ya) => A.eqv(xa, ya)
       },
@@ -34,20 +39,20 @@ trait FutureInstances extends FutureInstances1 {
     )
   }
 
-  final def futureEqWithFailure[A](atMost: Duration)(implicit A: Eq[A]): Eq[Future[A]] =
+  final def futureEqWithFailure[A](atMost: Duration)(implicit A: Eq[A], T: Eq[Throwable]): Eq[Future[A]] =
     futureEq[Try[A]](atMost).on(_.liftToTry)
 }
 
 private[util] trait FutureInstances1 {
   final def futureComonad(atMost: Duration): Comonad[Future] =
     new FutureCoflatMap with Comonad[Future] {
-      def extract[A](x: Future[A]): A = Await.result(x, atMost)
-      def map[A, B](fa: Future[A])(f: A => B): Future[B] = fa.map(f)
+      final def extract[A](x: Future[A]): A = Await.result(x, atMost)
+      final def map[A, B](fa: Future[A])(f: A => B): Future[B] = fa.map(f)
     }
 
   implicit final def twitterFutureMonoid[A](implicit A: Monoid[A]): Monoid[Future[A]] =
     new FutureSemigroup[A] with Monoid[Future[A]] {
-      def empty: Future[A] = Future.value(A.empty)
+      final def empty: Future[A] = Future.value(A.empty)
     }
 }
 

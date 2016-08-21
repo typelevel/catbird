@@ -1,8 +1,11 @@
 package io.catbird.util
 
-import cats.{ CoflatMap, Comonad, Eq, Eval, MonadError, Monoid, Semigroup }
+import cats.{ CoflatMap, Comonad, Eq, MonadError, Monoid, RecursiveTailRecM, Semigroup }
 import com.twitter.util.{ Await, Duration, Future, FuturePool, Try }
+import java.lang.Throwable
+import scala.Unit
 import scala.annotation.tailrec
+import scala.util.{ Either, Left, Right }
 
 abstract class Rerunnable[A] { self =>
   def run: Future[A]
@@ -59,14 +62,11 @@ final object Rerunnable extends RerunnableInstances1 {
     final def run: Future[Unit] = Future.Unit
   }
 
-  implicit val rerunnableInstances: MonadError[Rerunnable, Throwable] with CoflatMap[Rerunnable] =
-    new RerunnableCoflatMap with MonadError[Rerunnable, Throwable] {
+  implicit val rerunnableInstance: MonadError[Rerunnable, Throwable] with CoflatMap[Rerunnable]
+      with RecursiveTailRecM[Rerunnable] =
+    new RerunnableCoflatMap with MonadError[Rerunnable, Throwable] with RecursiveTailRecM[Rerunnable] {
       final def pure[A](a: A): Rerunnable[A] = new Rerunnable[A] {
         final def run: Future[A] = Future.value(a)
-      }
-
-      override final def pureEval[A](a: Eval[A]): Rerunnable[A] = new Rerunnable[A] {
-        final def run: Future[A] = Future(a.value)
       }
 
       override final def map[A, B](fa: Rerunnable[A])(f: A => B): Rerunnable[B] = fa.map(f)
@@ -88,17 +88,19 @@ final object Rerunnable extends RerunnableInstances1 {
           case error => f(error).run
         }
       }
+
+      final def tailRecM[A, B](a: A)(f: A => Rerunnable[Either[A, B]]): Rerunnable[B] = defaultTailRecM(a)(f)
     }
 
   implicit final def rerunnableMonoid[A](implicit A: Monoid[A]): Monoid[Rerunnable[A]] =
     new RerunnableSemigroup[A] with Monoid[Rerunnable[A]] {
-      final def empty: Rerunnable[A] = Rerunnable.rerunnableInstances.pure(A.empty)
+      final def empty: Rerunnable[A] = Rerunnable.rerunnableInstance.pure(A.empty)
     }
 
   final def rerunnableEq[A](atMost: Duration)(implicit A: Eq[A]): Eq[Rerunnable[A]] =
     futureEq[A](atMost).on(_.run)
 
-  final def rerunnableEqWithFailure[A](atMost: Duration)(implicit A: Eq[A]): Eq[Rerunnable[A]] =
+  final def rerunnableEqWithFailure[A](atMost: Duration)(implicit A: Eq[A], T: Eq[Throwable]): Eq[Rerunnable[A]] =
     futureEqWithFailure[A](atMost).on(_.run)
 }
 
