@@ -2,12 +2,13 @@ import ReleaseTransformations._
 
 val bijectionVersion = "0.9.2"
 val catsVersion = "0.7.0"
-val utilVersion = "6.35.0"
-val finagleVersion = "6.36.0"
+val utilVersion = "6.34.0"
+val finagleVersion = "6.35.0"
 
 lazy val buildSettings = Seq(
   organization := "io.catbird",
-  scalaVersion := "2.11.8"
+  scalaVersion := "2.11.8",
+  crossScalaVersions := Seq("2.10.6", "2.11.8")
 )
 
 lazy val compilerOptions = Seq(
@@ -21,7 +22,6 @@ lazy val compilerOptions = Seq(
   "-Ywarn-dead-code",
   "-Ywarn-numeric-widen",
   "-Xfuture",
-  "-Ywarn-unused-import",
   "-Yno-imports",
   "-Yno-predef"
 )
@@ -83,7 +83,7 @@ lazy val tests = project
   .dependsOn(util, finagle, bijections)
 
 lazy val util = project
-  .settings(moduleName := "catbird-util")
+  .settings(moduleName := "catbird-util634")
   .settings(allSettings)
   .settings(
     libraryDependencies ++= Seq(
