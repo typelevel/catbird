@@ -1,3 +1,4 @@
+import sbtunidoc.Plugin.UnidocKeys.{ unidoc, unidocProjectFilter }
 import ReleaseTransformations._
 
 val bijectionVersion = "0.9.2"
@@ -51,6 +52,7 @@ lazy val root = project.in(file("."))
   .settings(allSettings ++ noPublishSettings)
   .settings(unidocSettings ++ site.settings ++ ghpages.settings)
   .settings(
+    unidocProjectFilter in (ScalaUnidoc, unidoc) := inAnyProject -- inProjects(tests, benchmark),
     site.addMappingsToSiteDir(mappings in (ScalaUnidoc, packageDoc), "api"),
     git.remoteRepo := "git@github.com:travisbrown/catbird.git"
   )
