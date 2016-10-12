@@ -1,9 +1,9 @@
 import ReleaseTransformations._
 
 val bijectionVersion = "0.9.2"
-val catsVersion = "0.7.0"
-val utilVersion = "6.35.0"
-val finagleVersion = "6.36.0"
+val catsVersion = "0.7.2"
+val utilVersion = "6.38.0"
+val finagleVersion = "6.39.0"
 
 lazy val buildSettings = Seq(
   organization := "io.catbird",
@@ -42,7 +42,7 @@ lazy val baseSettings = Seq(
   wartremoverWarnings in (Compile, compile) ++= Warts.allBut(
     Wart.NoNeedForMonad
   ),
-  ScoverageSbtPlugin.ScoverageKeys.coverageHighlighting := true
+  coverageHighlighting := true
 )
 
 lazy val allSettings = buildSettings ++ baseSettings ++ publishSettings
@@ -78,7 +78,7 @@ lazy val tests = project
     scalacOptions ~= {
       _.filterNot(Set("-Yno-imports", "-Yno-predef"))
     },
-    ScoverageSbtPlugin.ScoverageKeys.coverageExcludedPackages := "io\\.catbird\\.tests\\..*"
+    coverageExcludedPackages := "io\\.catbird\\.tests\\..*"
   )
   .dependsOn(util, finagle, bijections)
 
