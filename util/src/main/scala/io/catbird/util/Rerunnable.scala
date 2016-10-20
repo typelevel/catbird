@@ -1,6 +1,6 @@
 package io.catbird.util
 
-import cats.{ CoflatMap, Comonad, Eq, MonadError, Monoid, RecursiveTailRecM, Semigroup }
+import cats.{ CoflatMap, Comonad, Eq, MonadError, Monoid, Semigroup }
 import com.twitter.util.{ Await, Duration, Future, FuturePool, Try }
 import java.lang.Throwable
 import scala.Unit
@@ -62,9 +62,8 @@ final object Rerunnable extends RerunnableInstances1 {
     final def run: Future[Unit] = Future.Unit
   }
 
-  implicit val rerunnableInstance: MonadError[Rerunnable, Throwable] with CoflatMap[Rerunnable]
-      with RecursiveTailRecM[Rerunnable] =
-    new RerunnableCoflatMap with MonadError[Rerunnable, Throwable] with RecursiveTailRecM[Rerunnable] {
+  implicit val rerunnableInstance: MonadError[Rerunnable, Throwable] with CoflatMap[Rerunnable] =
+    new RerunnableCoflatMap with MonadError[Rerunnable, Throwable] {
       final def pure[A](a: A): Rerunnable[A] = new Rerunnable[A] {
         final def run: Future[A] = Future.value(a)
       }
@@ -89,7 +88,10 @@ final object Rerunnable extends RerunnableInstances1 {
         }
       }
 
-      final def tailRecM[A, B](a: A)(f: A => Rerunnable[Either[A, B]]): Rerunnable[B] = defaultTailRecM(a)(f)
+      final def tailRecM[A, B](a: A)(f: A => Rerunnable[Either[A, B]]): Rerunnable[B] = f(a).flatMap {
+        case Right(b) => pure(b)
+        case Left(nextA) => tailRecM(nextA)(f)
+      }
     }
 
   implicit final def rerunnableMonoid[A](implicit A: Monoid[A]): Monoid[Rerunnable[A]] =

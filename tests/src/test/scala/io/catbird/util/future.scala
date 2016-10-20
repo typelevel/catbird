@@ -1,12 +1,13 @@
 package io.catbird.util
 
 import cats.{ Comonad, Eq }
-import cats.data.Xor
+import cats.instances.either._
 import cats.instances.int._
 import cats.instances.tuple._
 import cats.instances.unit._
 import cats.kernel.laws.GroupLaws
 import cats.laws.discipline._
+import cats.laws.discipline.arbitrary._
 import com.twitter.conversions.time._
 import com.twitter.util.Future
 import io.catbird.tests.EqInstances
@@ -19,8 +20,8 @@ class FutureSuite extends FunSuite with Discipline with FutureInstances with Arb
   implicit val eqFutureFutureInt: Eq[Future[Future[Int]]] = futureEqWithFailure(1.second)
   implicit val eqFutureFutureFutureInt: Eq[Future[Future[Future[Int]]]] = futureEqWithFailure(1.second)
   implicit val eqFutureInt3: Eq[Future[(Int, Int, Int)]] = futureEqWithFailure(1.second)
-  implicit val eqFutureXorUnit: Eq[Future[Xor[Throwable, Unit]]] = futureEqWithFailure(1.second)
-  implicit val eqFutureXorInt: Eq[Future[Xor[Throwable, Int]]] = futureEqWithFailure(1.second)
+  implicit val eqFutureEitherUnit: Eq[Future[Either[Throwable, Unit]]] = futureEqWithFailure(1.second)
+  implicit val eqFutureEitherInt: Eq[Future[Either[Throwable, Int]]] = futureEqWithFailure(1.second)
   implicit val comonad: Comonad[Future] = futureComonad(1.second)
 
   checkAll("Future[Int]", MonadErrorTests[Future, Throwable].monadError[Int, Int, Int])

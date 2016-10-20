@@ -1,6 +1,6 @@
 package io.catbird.util
 
-import cats.{ Applicative, CoflatMap, Eq, Eval, MonadError, Monoid, RecursiveTailRecM, Semigroup, Traverse }
+import cats.{ Applicative, CoflatMap, Eq, Eval, MonadError, Monoid, Semigroup, Traverse }
 import com.twitter.util.{ Return, Throw, Try }
 import java.lang.Throwable
 import scala.{ Boolean, inline }
@@ -20,9 +20,8 @@ trait TryInstances extends TryInstances1 {
   implicit final def twitterTrySemigroup[A](implicit A: Semigroup[A]): Semigroup[Try[A]] =
     new TrySemigroup[A]
 
-  implicit final val twitterTryInstance: MonadError[Try, Throwable] with CoflatMap[Try] with Traverse[Try]
-      with RecursiveTailRecM[Try] =
-    new MonadError[Try, Throwable] with CoflatMap[Try] with Traverse[Try] with RecursiveTailRecM[Try] {
+  implicit final val twitterTryInstance: MonadError[Try, Throwable] with CoflatMap[Try] with Traverse[Try] =
+    new MonadError[Try, Throwable] with CoflatMap[Try] with Traverse[Try] {
       final def pure[A](x: A): Try[A] = Return(x)
       final def flatMap[A, B](fa: Try[A])(f: A => Try[B]): Try[B] = fa.flatMap(f)
       override final def map[A, B](fa: Try[A])(f: A => B): Try[B] = fa.map(f)

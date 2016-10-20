@@ -1,7 +1,8 @@
 import ReleaseTransformations._
+import sbtunidoc.Plugin.UnidocKeys.{ unidoc, unidocProjectFilter }
 
 val bijectionVersion = "0.9.2"
-val catsVersion = "0.7.2"
+val catsVersion = "0.8.0-SNAPSHOT"
 val utilVersion = "6.38.0"
 val finagleVersion = "6.39.0"
 
@@ -36,7 +37,7 @@ lazy val baseSettings = Seq(
   },
   libraryDependencies ++= Seq(
     "org.typelevel" %% "cats-core" % catsVersion,
-    compilerPlugin("org.spire-math" %% "kind-projector" % "0.8.0")
+    compilerPlugin("org.spire-math" %% "kind-projector" % "0.9.2")
   ),
   resolvers += Resolver.sonatypeRepo("snapshots"),
   wartremoverWarnings in (Compile, compile) ++= Warts.allBut(
@@ -51,6 +52,7 @@ lazy val root = project.in(file("."))
   .settings(allSettings ++ noPublishSettings)
   .settings(unidocSettings ++ site.settings ++ ghpages.settings)
   .settings(
+    unidocProjectFilter in (ScalaUnidoc, unidoc) := inAnyProject -- inProjects(tests, benchmark),
     site.addMappingsToSiteDir(mappings in (ScalaUnidoc, packageDoc), "api"),
     git.remoteRepo := "git@github.com:travisbrown/catbird.git"
   )
@@ -70,10 +72,10 @@ lazy val tests = project
   .settings(allSettings ++ noPublishSettings)
   .settings(
     libraryDependencies ++= Seq(
-      "org.scalacheck" %% "scalacheck" % "1.12.5",
-      "org.scalatest" %% "scalatest" % "3.0.0-M9",
+      "org.scalacheck" %% "scalacheck" % "1.13.3",
+      "org.scalatest" %% "scalatest" % "3.0.0",
       "org.typelevel" %% "cats-laws" % catsVersion,
-      "org.typelevel" %% "discipline" % "0.4"
+      "org.typelevel" %% "discipline" % "0.7.1"
     ),
     scalacOptions ~= {
       _.filterNot(Set("-Yno-imports", "-Yno-predef"))
@@ -117,7 +119,7 @@ lazy val benchmark = project
   .settings(allSettings)
   .settings(noPublishSettings)
   .settings(
-    libraryDependencies += "org.scalatest" %% "scalatest" % "3.0.0-M9",
+    libraryDependencies += "org.scalatest" %% "scalatest" % "3.0.0",
     scalacOptions ~= {
       _.filterNot(Set("-Yno-imports", "-Yno-predef"))
     }
