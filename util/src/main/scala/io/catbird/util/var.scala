@@ -41,6 +41,9 @@ trait VarInstances1 {
 private[util] abstract class VarCoflatMap extends CoflatMap[Var] {
   final def coflatMap[A, B](fa: Var[A])(f: Var[A] => B): Var[B] = Var(f(fa))
 
+  /**
+   * Note that this implementation is not stack-safe.
+   */
   final def tailRecM[A, B](a: A)(f: A => Var[Either[A, B]]): Var[B] = f(a).flatMap {
     case Left(a1) => tailRecM(a1)(f)
     case Right(b) => Var.value(b)
