@@ -42,8 +42,7 @@ lazy val baseSettings = Seq(
   resolvers += Resolver.sonatypeRepo("snapshots"),
   wartremoverWarnings in (Compile, compile) ++= Warts.allBut(
     Wart.NoNeedForMonad
-  ),
-  coverageHighlighting := true
+  )
 )
 
 lazy val allSettings = buildSettings ++ baseSettings ++ publishSettings
