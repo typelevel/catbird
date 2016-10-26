@@ -1,15 +1,14 @@
 package io.catbird.util
 
-import cats.{ CoflatMap, Comonad, Eq, MonadError, Monoid, RecursiveTailRecM, Semigroup }
+import cats.{ CoflatMap, Comonad, Eq, MonadError, Monoid, Semigroup }
 import com.twitter.util.{ Await, Duration, Future, Try }
 import java.lang.Throwable
 import scala.Boolean
 import scala.util.{ Either, Left, Right }
 
 trait FutureInstances extends FutureInstances1 {
-  implicit final val twitterFutureInstance: MonadError[Future, Throwable] with CoflatMap[Future]
-      with RecursiveTailRecM[Future] =
-    new FutureCoflatMap with MonadError[Future, Throwable] with RecursiveTailRecM[Future] {
+  implicit final val twitterFutureInstance: MonadError[Future, Throwable] with CoflatMap[Future] =
+    new FutureCoflatMap with MonadError[Future, Throwable] {
       final def pure[A](x: A): Future[A] = Future.value(x)
       final def flatMap[A, B](fa: Future[A])(f: A => Future[B]): Future[B] = fa.flatMap(f)
       override final def map[A, B](fa: Future[A])(f: A => B): Future[B] = fa.map(f)
@@ -24,7 +23,10 @@ trait FutureInstances extends FutureInstances1 {
         }
       final def raiseError[A](e: Throwable): Future[A] = Future.exception(e)
 
-      final def tailRecM[A, B](a: A)(f: A => Future[Either[A, B]]): Future[B] = defaultTailRecM(a)(f)
+      final def tailRecM[A, B](a: A)(f: A => Future[Either[A, B]]): Future[B] = f(a).flatMap {
+        case Right(b) => pure(b)
+        case Left(nextA) => tailRecM(nextA)(f)
+      }
     }
 
   implicit final def twitterFutureSemigroup[A](implicit A: Semigroup[A]): Semigroup[Future[A]] =

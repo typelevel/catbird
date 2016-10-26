@@ -1,8 +1,9 @@
 package io.catbird.tests.util
 
+import com.twitter.conversions.time._
 import com.twitter.util.{ Future, Return, Try, Var }
-import io.catbird.util.Rerunnable
-import org.scalacheck.Arbitrary
+import io.catbird.util.{ Rerunnable, futureComonad, varComonad }
+import org.scalacheck.{ Arbitrary, Cogen }
 
 trait ArbitraryInstances {
   implicit def futureArbitrary[A](implicit A: Arbitrary[A]): Arbitrary[Future[A]] =
@@ -16,4 +17,13 @@ trait ArbitraryInstances {
 
   implicit def rerunnableArbitrary[A](implicit A: Arbitrary[A]): Arbitrary[Rerunnable[A]] =
     Arbitrary(futureArbitrary[A].arbitrary.map(Rerunnable.fromFuture[A](_)))
+
+  implicit def cogenFuture[A](implicit A: Cogen[A]): Cogen[Future[A]] =
+    A.contramap(futureComonad(1.second).extract)
+
+  implicit def cogenVar[A](implicit A: Cogen[A]): Cogen[Var[A]] =
+    A.contramap(varComonad.extract)
+
+  implicit def cogenRerunnable[A](implicit A: Cogen[A]): Cogen[Rerunnable[A]] =
+    A.contramap(Rerunnable.rerunnableComonad(1.second).extract)
 }

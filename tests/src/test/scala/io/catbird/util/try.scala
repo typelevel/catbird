@@ -1,16 +1,14 @@
 package io.catbird.util
 
-import cats.data.Xor
+import cats.instances.either._
+import cats.instances.int._
+import cats.instances.option._
+import cats.instances.tuple._
+import cats.instances.unit._
 import cats.kernel.laws.GroupLaws
 import cats.laws.discipline.{ MonadErrorTests, TraverseTests }
 import cats.laws.discipline.arbitrary._
-import cats.instances.int._
-import cats.instances.option._
-import cats.instances.string._
-import cats.instances.tuple._
-import cats.instances.unit._
 import com.twitter.util.{ Return, Throw, Try }
-import io.catbird.bijections.util.TryConversions
 import io.catbird.tests.EqInstances
 import io.catbird.tests.bijection.BijectionProperties
 import io.catbird.tests.util.ArbitraryInstances
@@ -18,7 +16,7 @@ import org.scalatest.prop.{ Checkers, PropertyChecks }
 import org.scalatest.{ FunSuite, PropSpec }
 import org.typelevel.discipline.scalatest.Discipline
 
-trait TryTest extends ArbitraryInstances with EqInstances with TryConversions with TryInstances
+trait TryTest extends ArbitraryInstances with EqInstances with TryInstances
 
 class TrySuite extends FunSuite with TryTest with Discipline {
   checkAll("Try[Int]", MonadErrorTests[Try, Throwable].monadError[Int, Int, Int])
@@ -28,11 +26,7 @@ class TrySuite extends FunSuite with TryTest with Discipline {
 }
 
 class TrySpec extends PropSpec with PropertyChecks with Checkers
-  with TryTest with BijectionProperties {
-  check {
-    isBijection[Try[String], Xor[Throwable, String]]
-  }
-
+    with TryTest with BijectionProperties {
   property("Equality for Try should use universal equality for Throw") {
     case class SomeError(message: String) extends Exception(message)
 
