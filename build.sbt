@@ -2,7 +2,7 @@ import ReleaseTransformations._
 import sbtunidoc.Plugin.UnidocKeys.{ unidoc, unidocProjectFilter }
 
 val bijectionVersion = "0.9.2"
-val catsVersion = "0.8.0-SNAPSHOT"
+val catsVersion = "0.8.0"
 val utilVersion = "6.38.0"
 val finagleVersion = "6.39.0"
 
