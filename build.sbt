@@ -2,7 +2,7 @@ import ReleaseTransformations._
 import sbtunidoc.Plugin.UnidocKeys.{ unidoc, unidocProjectFilter }
 
 val bijectionVersion = "0.9.2"
-val catsVersion = "0.8.0"
+val catsVersion = "0.8.1"
 val utilVersion = "6.38.0"
 val finagleVersion = "6.39.0"
 
@@ -37,7 +37,7 @@ lazy val baseSettings = Seq(
   },
   libraryDependencies ++= Seq(
     "org.typelevel" %% "cats-core" % catsVersion,
-    compilerPlugin("org.spire-math" %% "kind-projector" % "0.9.2")
+    compilerPlugin("org.spire-math" %% "kind-projector" % "0.9.3")
   ),
   resolvers += Resolver.sonatypeRepo("snapshots"),
   wartremoverWarnings in (Compile, compile) ++= Warts.allBut(
@@ -71,10 +71,10 @@ lazy val tests = project
   .settings(allSettings ++ noPublishSettings)
   .settings(
     libraryDependencies ++= Seq(
-      "org.scalacheck" %% "scalacheck" % "1.13.3",
+      "org.scalacheck" %% "scalacheck" % "1.13.4",
       "org.scalatest" %% "scalatest" % "3.0.0",
       "org.typelevel" %% "cats-laws" % catsVersion,
-      "org.typelevel" %% "discipline" % "0.7.1"
+      "org.typelevel" %% "discipline" % "0.7.2"
     ),
     scalacOptions ~= {
       _.filterNot(Set("-Yno-imports", "-Yno-predef"))
