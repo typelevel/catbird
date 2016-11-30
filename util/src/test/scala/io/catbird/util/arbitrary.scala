@@ -1,8 +1,7 @@
-package io.catbird.tests.util
+package io.catbird.util
 
 import com.twitter.conversions.time._
 import com.twitter.util.{ Future, Return, Try, Var }
-import io.catbird.util.{ Rerunnable, futureComonad, varComonad }
 import org.scalacheck.{ Arbitrary, Cogen }
 
 trait ArbitraryInstances {

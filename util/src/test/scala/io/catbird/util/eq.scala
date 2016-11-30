@@ -1,4 +1,4 @@
-package io.catbird.tests
+package io.catbird.util
 
 import cats.Eq
 
