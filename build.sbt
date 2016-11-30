@@ -1,10 +1,11 @@
 import ReleaseTransformations._
 import sbtunidoc.Plugin.UnidocKeys.{ unidoc, unidocProjectFilter }
 
-val bijectionVersion = "0.9.2"
+val scalaVersions = Seq("2.11.8", "2.12.0")
+
 val catsVersion = "0.8.1"
-val utilVersion = "6.38.0"
-val finagleVersion = "6.39.0"
+val utilVersion = "6.39.0"
+val finagleVersion = "6.40.0"
 
 lazy val buildSettings = Seq(
   organization := "io.catbird",
@@ -37,6 +38,10 @@ lazy val baseSettings = Seq(
   },
   libraryDependencies ++= Seq(
     "org.typelevel" %% "cats-core" % catsVersion,
+    "org.scalacheck" %% "scalacheck" % "1.13.4" % "test",
+    "org.scalatest" %% "scalatest" % "3.0.0" % "test",
+    "org.typelevel" %% "cats-laws" % catsVersion % "test",
+    "org.typelevel" %% "discipline" % "0.7.2" % "test",
     compilerPlugin("org.spire-math" %% "kind-projector" % "0.9.3")
   ),
   resolvers += Resolver.sonatypeRepo("snapshots"),
@@ -48,10 +53,11 @@ lazy val baseSettings = Seq(
 lazy val allSettings = buildSettings ++ baseSettings ++ publishSettings
 
 lazy val root = project.in(file("."))
+  .enablePlugins(CrossPerProjectPlugin)
   .settings(allSettings ++ noPublishSettings)
   .settings(unidocSettings ++ site.settings ++ ghpages.settings)
   .settings(
-    unidocProjectFilter in (ScalaUnidoc, unidoc) := inAnyProject -- inProjects(tests, benchmark),
+    unidocProjectFilter in (ScalaUnidoc, unidoc) := inAnyProject -- inProjects(benchmark),
     site.addMappingsToSiteDir(mappings in (ScalaUnidoc, packageDoc), "api"),
     git.remoteRepo := "git@github.com:travisbrown/catbird.git"
   )
@@ -64,60 +70,45 @@ lazy val root = project.in(file("."))
         |import io.catbird.util._
       """.stripMargin
   )
-  .aggregate(util, finagle, bijections, tests, benchmark)
-  .dependsOn(util, finagle, bijections)
-
-lazy val tests = project
-  .settings(allSettings ++ noPublishSettings)
-  .settings(
-    libraryDependencies ++= Seq(
-      "org.scalacheck" %% "scalacheck" % "1.13.4",
-      "org.scalatest" %% "scalatest" % "3.0.0",
-      "org.typelevel" %% "cats-laws" % catsVersion,
-      "org.typelevel" %% "discipline" % "0.7.2"
-    ),
-    scalacOptions ~= {
-      _.filterNot(Set("-Yno-imports", "-Yno-predef"))
-    },
-    coverageExcludedPackages := "io\\.catbird\\.tests\\..*"
-  )
-  .dependsOn(util, finagle, bijections)
+  .aggregate(util, finagle, benchmark)
+  .dependsOn(util, finagle)
 
 lazy val util = project
+  .enablePlugins(CrossPerProjectPlugin)
   .settings(moduleName := "catbird-util")
   .settings(allSettings)
   .settings(
+    crossScalaVersions := scalaVersions,
     libraryDependencies ++= Seq(
       "com.twitter" %% "util-core" % utilVersion
-    )
+    ),
+    scalacOptions in Test ~= {
+      _.filterNot(Set("-Yno-imports", "-Yno-predef"))
+    }
   )
 
 lazy val finagle = project
+  .enablePlugins(CrossPerProjectPlugin)
   .settings(moduleName := "catbird-finagle")
   .settings(allSettings)
   .settings(
+    crossScalaVersions := scalaVersions.init,
     libraryDependencies ++= Seq(
       "com.twitter" %% "finagle-core" % finagleVersion
-    )
-  )
-  .dependsOn(util)
-
-lazy val bijections = project
-  .settings(moduleName := "catbird-bijections")
-  .settings(allSettings)
-  .settings(
-    libraryDependencies ++= Seq(
-      "com.twitter" %% "bijection-core" % bijectionVersion,
-      "com.twitter" %% "finagle-core" % finagleVersion
-    )
+    ),
+    scalacOptions in Test ~= {
+      _.filterNot(Set("-Yno-imports", "-Yno-predef"))
+    }
   )
   .dependsOn(util)
 
 lazy val benchmark = project
+  .enablePlugins(CrossPerProjectPlugin)
   .settings(moduleName := "catbird-benchmark")
   .settings(allSettings)
   .settings(noPublishSettings)
   .settings(
+    crossScalaVersions := scalaVersions,
     libraryDependencies += "org.scalatest" %% "scalatest" % "3.0.0",
     scalacOptions ~= {
       _.filterNot(Set("-Yno-imports", "-Yno-predef"))

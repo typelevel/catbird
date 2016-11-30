@@ -9,9 +9,6 @@ import cats.kernel.laws.GroupLaws
 import cats.laws.discipline.{ MonadErrorTests, TraverseTests }
 import cats.laws.discipline.arbitrary._
 import com.twitter.util.{ Return, Throw, Try }
-import io.catbird.tests.EqInstances
-import io.catbird.tests.bijection.BijectionProperties
-import io.catbird.tests.util.ArbitraryInstances
 import org.scalatest.prop.{ Checkers, PropertyChecks }
 import org.scalatest.{ FunSuite, PropSpec }
 import org.typelevel.discipline.scalatest.Discipline
@@ -25,8 +22,7 @@ class TrySuite extends FunSuite with TryTest with Discipline {
   checkAll("Try[Int]", GroupLaws[Try[Int]].monoid)
 }
 
-class TrySpec extends PropSpec with PropertyChecks with Checkers
-    with TryTest with BijectionProperties {
+class TrySpec extends PropSpec with PropertyChecks with Checkers with TryTest {
   property("Equality for Try should use universal equality for Throw") {
     case class SomeError(message: String) extends Exception(message)
 

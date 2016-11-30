@@ -6,7 +6,6 @@ import cats.instances.tuple._
 import cats.kernel.laws.GroupLaws
 import cats.laws.discipline._
 import com.twitter.util.Var
-import io.catbird.tests.util.ArbitraryInstances
 import org.scalatest.FunSuite
 import org.typelevel.discipline.scalatest.Discipline
 

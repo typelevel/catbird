@@ -10,8 +10,6 @@ import cats.laws.discipline._
 import cats.laws.discipline.arbitrary._
 import com.twitter.conversions.time._
 import com.twitter.util.Future
-import io.catbird.tests.EqInstances
-import io.catbird.tests.util.ArbitraryInstances
 import org.scalatest.FunSuite
 import org.typelevel.discipline.scalatest.Discipline
 

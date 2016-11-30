@@ -3,11 +3,21 @@ language: scala
 
 scala:
   - 2.11.8
+  - 2.12.0
 
 jdk:
   - oraclejdk8
 
-script:
-  - sbt ++$TRAVIS_SCALA_VERSION coverage test scalastyle unidoc coverageReport
+install:
+  - pip install --user codecov
 
-after_success: bash <(curl -s https://codecov.io/bash)
+script:
+  - if [[ "$TRAVIS_SCALA_VERSION" == 2.11.* ]];
+    then
+      sbt ++$TRAVIS_SCALA_VERSION clean coverage test scalastyle unidoc coverageReport && codecov;
+    fi
+  - if [[ "$TRAVIS_SCALA_VERSION" == 2.12.* ]];
+    then
+      sbt ++$TRAVIS_SCALA_VERSION clean coverage util/test;
+    else echo "Skipping catbird-finagle tests and coverage reporting on 2.12";
+    fi
