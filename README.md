@@ -13,9 +13,7 @@ It currently includes the following:
 
 * Type class instances for `Future`, `Var`, and `Try` (including `Monad` or `MonadError`, `Semigroup`, and equality)
 * Category and profunctor instances for `Service`
-* An injection from [Finagle](https://github.com/twitter/finagle) services to Kleisli arrows over
-  `Future`
-* A bijection from `Try[A]` to `Xor[Throwable, A]`
+* A `Rerunnable` type that wraps `Future` but provides semantics more like Scalaz's `Task`
 
 These are reasonably well-tested (thanks to [discipline](https://github.com/typelevel/discipline)).
 
