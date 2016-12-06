@@ -46,6 +46,10 @@ final object Rerunnable extends RerunnableInstances1 {
     }
   }
 
+  def const[A](a: A): Rerunnable[A] = new Rerunnable[A] {
+    final def run: Future[A] = Future.value(a)
+  }
+
   def apply[A](a: => A): Rerunnable[A] = new Rerunnable[A] {
     final def run: Future[A] = Future(a)
   }
@@ -64,9 +68,7 @@ final object Rerunnable extends RerunnableInstances1 {
 
   implicit val rerunnableInstance: MonadError[Rerunnable, Throwable] with CoflatMap[Rerunnable] =
     new RerunnableCoflatMap with MonadError[Rerunnable, Throwable] {
-      final def pure[A](a: A): Rerunnable[A] = new Rerunnable[A] {
-        final def run: Future[A] = Future.value(a)
-      }
+      final def pure[A](a: A): Rerunnable[A] = Rerunnable.const(a)
 
       override final def map[A, B](fa: Rerunnable[A])(f: A => B): Rerunnable[B] = fa.map(f)
 
