@@ -1,7 +1,7 @@
 import ReleaseTransformations._
 import sbtunidoc.Plugin.UnidocKeys.{ unidoc, unidocProjectFilter }
 
-val scalaVersions = Seq("2.11.8", "2.12.0")
+val scalaVersions = Seq("2.11.8", "2.12.1")
 
 val catsVersion = "0.8.1"
 val utilVersion = "6.39.0"
@@ -39,7 +39,7 @@ lazy val baseSettings = Seq(
   libraryDependencies ++= Seq(
     "org.typelevel" %% "cats-core" % catsVersion,
     "org.scalacheck" %% "scalacheck" % "1.13.4" % "test",
-    "org.scalatest" %% "scalatest" % "3.0.0" % "test",
+    "org.scalatest" %% "scalatest" % "3.0.1" % "test",
     "org.typelevel" %% "cats-laws" % catsVersion % "test",
     "org.typelevel" %% "discipline" % "0.7.2" % "test",
     compilerPlugin("org.spire-math" %% "kind-projector" % "0.9.3")
