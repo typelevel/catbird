@@ -1,16 +1,11 @@
 import ReleaseTransformations._
 import sbtunidoc.Plugin.UnidocKeys.{ unidoc, unidocProjectFilter }
 
-val scalaVersions = Seq("2.11.8", "2.12.1")
-
 val catsVersion = "0.8.1"
-val utilVersion = "6.39.0"
-val finagleVersion = "6.40.0"
+val utilVersion = "6.40.0"
+val finagleVersion = "6.41.0"
 
-lazy val buildSettings = Seq(
-  organization := "io.catbird",
-  scalaVersion := "2.11.8"
-)
+organization in ThisBuild := "io.catbird"
 
 lazy val compilerOptions = Seq(
   "-deprecation",
@@ -50,10 +45,9 @@ lazy val baseSettings = Seq(
   )
 )
 
-lazy val allSettings = buildSettings ++ baseSettings ++ publishSettings
+lazy val allSettings = baseSettings ++ publishSettings
 
 lazy val root = project.in(file("."))
-  .enablePlugins(CrossPerProjectPlugin)
   .settings(allSettings ++ noPublishSettings)
   .settings(unidocSettings ++ site.settings ++ ghpages.settings)
   .settings(
@@ -74,11 +68,9 @@ lazy val root = project.in(file("."))
   .dependsOn(util, finagle)
 
 lazy val util = project
-  .enablePlugins(CrossPerProjectPlugin)
   .settings(moduleName := "catbird-util")
   .settings(allSettings)
   .settings(
-    crossScalaVersions := scalaVersions,
     libraryDependencies ++= Seq(
       "com.twitter" %% "util-core" % utilVersion
     ),
@@ -88,11 +80,9 @@ lazy val util = project
   )
 
 lazy val finagle = project
-  .enablePlugins(CrossPerProjectPlugin)
   .settings(moduleName := "catbird-finagle")
   .settings(allSettings)
   .settings(
-    crossScalaVersions := scalaVersions.init,
     libraryDependencies ++= Seq(
       "com.twitter" %% "finagle-core" % finagleVersion
     ),
@@ -103,13 +93,11 @@ lazy val finagle = project
   .dependsOn(util)
 
 lazy val benchmark = project
-  .enablePlugins(CrossPerProjectPlugin)
   .settings(moduleName := "catbird-benchmark")
   .settings(allSettings)
   .settings(noPublishSettings)
   .settings(
-    crossScalaVersions := scalaVersions,
-    libraryDependencies += "org.scalatest" %% "scalatest" % "3.0.0",
+    libraryDependencies += "org.scalatest" %% "scalatest" % "3.0.1",
     scalacOptions ~= {
       _.filterNot(Set("-Yno-imports", "-Yno-predef"))
     }

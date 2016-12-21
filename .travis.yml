@@ -12,12 +12,4 @@ install:
   - pip install --user codecov
 
 script:
-  - if [[ "$TRAVIS_SCALA_VERSION" == 2.11.* ]];
-    then
-      sbt ++$TRAVIS_SCALA_VERSION clean coverage test scalastyle unidoc coverageReport && codecov;
-    fi
-  - if [[ "$TRAVIS_SCALA_VERSION" == 2.12.* ]];
-    then
-      sbt ++$TRAVIS_SCALA_VERSION clean coverage util/test;
-    else echo "Skipping catbird-finagle tests and coverage reporting on 2.12";
-    fi
+  sbt ++$TRAVIS_SCALA_VERSION clean coverage test scalastyle unidoc coverageReport && codecov;
