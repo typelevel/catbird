@@ -1,7 +1,7 @@
 import ReleaseTransformations._
 import sbtunidoc.Plugin.UnidocKeys.{ unidoc, unidocProjectFilter }
 
-val catsVersion = "0.8.1"
+val catsVersion = "0.9.0"
 val utilVersion = "6.40.0"
 val finagleVersion = "6.41.0"
 
@@ -36,7 +36,7 @@ lazy val baseSettings = Seq(
     "org.scalacheck" %% "scalacheck" % "1.13.4" % "test",
     "org.scalatest" %% "scalatest" % "3.0.1" % "test",
     "org.typelevel" %% "cats-laws" % catsVersion % "test",
-    "org.typelevel" %% "discipline" % "0.7.2" % "test",
+    "org.typelevel" %% "discipline" % "0.7.3" % "test",
     compilerPlugin("org.spire-math" %% "kind-projector" % "0.9.3")
   ),
   resolvers += Resolver.sonatypeRepo("snapshots"),
