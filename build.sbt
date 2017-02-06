@@ -2,8 +2,8 @@ import ReleaseTransformations._
 import sbtunidoc.Plugin.UnidocKeys.{ unidoc, unidocProjectFilter }
 
 val catsVersion = "0.9.0"
-val utilVersion = "6.40.0"
-val finagleVersion = "6.41.0"
+val utilVersion = "6.41.0"
+val finagleVersion = "6.42.0"
 
 organization in ThisBuild := "io.catbird"
 
