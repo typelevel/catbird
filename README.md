@@ -5,7 +5,7 @@
 [![Maven Central](https://img.shields.io/maven-central/v/io.catbird/catbird-finagle_2.11.svg)](https://maven-badges.herokuapp.com/maven-central/io.catbird/catbird-finagle_2.11)
 
 
-This project provides [cats](https://github.com/non/cats) type class instances (and other useful
+This project provides [cats](https://github.com/typelevel/cats) type class instances (and other useful
 cats-related stuff) for various [Twitter Open Source](https://twitter.com/twitteross) Scala
 projects.
 
