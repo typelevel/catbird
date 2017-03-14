@@ -1,13 +1,12 @@
 import ReleaseTransformations._
-import sbtunidoc.Plugin.UnidocKeys.{ unidoc, unidocProjectFilter }
 
 val catsVersion = "0.9.0"
-val utilVersion = "6.41.0"
-val finagleVersion = "6.42.0"
+val utilVersion = "6.42.0"
+val finagleVersion = "6.43.0"
 
 organization in ThisBuild := "io.catbird"
 
-lazy val compilerOptions = Seq(
+val compilerOptions = Seq(
   "-deprecation",
   "-encoding", "UTF-8",
   "-feature",
@@ -22,6 +21,8 @@ lazy val compilerOptions = Seq(
   "-Yno-imports",
   "-Yno-predef"
 )
+
+val docMappingsApiDir = settingKey[String]("Subdirectory in site target directory for API docs")
 
 lazy val baseSettings = Seq(
   scalacOptions ++= compilerOptions,
@@ -40,6 +41,7 @@ lazy val baseSettings = Seq(
     compilerPlugin("org.spire-math" %% "kind-projector" % "0.9.3")
   ),
   resolvers += Resolver.sonatypeRepo("snapshots"),
+  docMappingsApiDir := "api",
   wartremoverWarnings in (Compile, compile) ++= Warts.allBut(
     Wart.NoNeedForMonad
   )
@@ -48,11 +50,11 @@ lazy val baseSettings = Seq(
 lazy val allSettings = baseSettings ++ publishSettings
 
 lazy val root = project.in(file("."))
+  .enablePlugins(GhpagesPlugin, ScalaUnidocPlugin)
   .settings(allSettings ++ noPublishSettings)
-  .settings(unidocSettings ++ site.settings ++ ghpages.settings)
   .settings(
     unidocProjectFilter in (ScalaUnidoc, unidoc) := inAnyProject -- inProjects(benchmark),
-    site.addMappingsToSiteDir(mappings in (ScalaUnidoc, packageDoc), "api"),
+    addMappingsToSiteDir(mappings in (ScalaUnidoc, packageDoc), docMappingsApiDir),
     git.remoteRepo := "git@github.com:travisbrown/catbird.git"
   )
   .settings(
