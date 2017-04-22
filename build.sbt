@@ -1,8 +1,8 @@
 import ReleaseTransformations._
 
 val catsVersion = "0.9.0"
-val utilVersion = "6.42.0"
-val finagleVersion = "6.43.0"
+val utilVersion = "6.43.0"
+val finagleVersion = "6.44.0"
 
 organization in ThisBuild := "io.catbird"
 
@@ -34,17 +34,15 @@ lazy val baseSettings = Seq(
   },
   libraryDependencies ++= Seq(
     "org.typelevel" %% "cats-core" % catsVersion,
-    "org.scalacheck" %% "scalacheck" % "1.13.4" % "test",
-    "org.scalatest" %% "scalatest" % "3.0.1" % "test",
+    "org.scalacheck" %% "scalacheck" % "1.13.5" % "test",
+    "org.scalatest" %% "scalatest" % "3.0.2" % "test",
     "org.typelevel" %% "cats-laws" % catsVersion % "test",
     "org.typelevel" %% "discipline" % "0.7.3" % "test",
     compilerPlugin("org.spire-math" %% "kind-projector" % "0.9.3")
   ),
   resolvers += Resolver.sonatypeRepo("snapshots"),
   docMappingsApiDir := "api",
-  wartremoverWarnings in (Compile, compile) ++= Warts.allBut(
-    Wart.NoNeedForMonad
-  )
+  wartremoverWarnings in (Compile, compile) ++= Warts.all
 )
 
 lazy val allSettings = baseSettings ++ publishSettings
@@ -99,7 +97,7 @@ lazy val benchmark = project
   .settings(allSettings)
   .settings(noPublishSettings)
   .settings(
-    libraryDependencies += "org.scalatest" %% "scalatest" % "3.0.1",
+    libraryDependencies += "org.scalatest" %% "scalatest" % "3.0.2",
     scalacOptions ~= {
       _.filterNot(Set("-Yno-imports", "-Yno-predef"))
     }
