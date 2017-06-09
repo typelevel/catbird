@@ -1,8 +1,8 @@
 import ReleaseTransformations._
 
 val catsVersion = "0.9.0"
-val utilVersion = "6.43.0"
-val finagleVersion = "6.44.0"
+val utilVersion = "6.45.0"
+val finagleVersion = "6.45.0"
 
 organization in ThisBuild := "io.catbird"
 
@@ -35,10 +35,10 @@ lazy val baseSettings = Seq(
   libraryDependencies ++= Seq(
     "org.typelevel" %% "cats-core" % catsVersion,
     "org.scalacheck" %% "scalacheck" % "1.13.5" % "test",
-    "org.scalatest" %% "scalatest" % "3.0.2" % "test",
+    "org.scalatest" %% "scalatest" % "3.0.3" % "test",
     "org.typelevel" %% "cats-laws" % catsVersion % "test",
     "org.typelevel" %% "discipline" % "0.7.3" % "test",
-    compilerPlugin("org.spire-math" %% "kind-projector" % "0.9.3")
+    compilerPlugin("org.spire-math" %% "kind-projector" % "0.9.4")
   ),
   resolvers += Resolver.sonatypeRepo("snapshots"),
   docMappingsApiDir := "api",
@@ -97,7 +97,7 @@ lazy val benchmark = project
   .settings(allSettings)
   .settings(noPublishSettings)
   .settings(
-    libraryDependencies += "org.scalatest" %% "scalatest" % "3.0.2",
+    libraryDependencies += "org.scalatest" %% "scalatest" % "3.0.3",
     scalacOptions ~= {
       _.filterNot(Set("-Yno-imports", "-Yno-predef"))
     }
@@ -143,23 +143,6 @@ lazy val noPublishSettings = Seq(
   publish := (),
   publishLocal := (),
   publishArtifact := false
-)
-
-lazy val sharedReleaseProcess = Seq(
-  releaseProcess := Seq[ReleaseStep](
-    checkSnapshotDependencies,
-    inquireVersions,
-    runClean,
-    runTest,
-    setReleaseVersion,
-    commitReleaseVersion,
-    tagRelease,
-    publishArtifacts,
-    setNextVersion,
-    commitNextVersion,
-    ReleaseStep(action = Command.process("sonatypeReleaseAll", _)),
-    pushChanges
-  )
 )
 
 credentials ++= (
