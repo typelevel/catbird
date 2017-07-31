@@ -1,7 +1,7 @@
 package io.catbird.finagle
 
-import cats.Eq
 import cats.instances.int._
+import cats.kernel.Eq
 import cats.laws.discipline._
 import cats.laws.discipline.eq._
 import com.twitter.conversions.time._
