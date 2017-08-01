@@ -31,15 +31,16 @@ abstract class Rerunnable[A] { self =>
   final def liftToTry: Rerunnable[Try[A]] = new Rerunnable.Bind[Try[A]] {
     type P = A
     final def fa: Rerunnable[A] = self
-    final def success(a: A): Rerunnable[Try[A]] = Rerunnable.const(Return(a))
-    final def failure(error: Throwable): Rerunnable[Try[A]] = Rerunnable.const(Throw(error))
+    final def success(a: A): Rerunnable[Try[A]] = Rerunnable.const[Try[A]](Return[A](a))
+    final def failure(error: Throwable): Rerunnable[Try[A]] = Rerunnable.const[Try[A]](Throw[A](error))
   }
 }
 
 final object Rerunnable extends RerunnableInstances1 {
   @tailrec
-  private[this] def reassociate[B](bind: Bind[B]): Bind[B] = bind.fa match {
-    case inner: Bind[_] =>
+  private[this] def reassociate[B](bind: Bind[B]): Bind[B] = {
+    if (bind.fa.isInstanceOf[Bind[_]]) {
+      val inner = bind.fa.asInstanceOf[Bind[bind.P]]
       val next = new Bind[B] {
         final type P = inner.P
 
@@ -48,20 +49,20 @@ final object Rerunnable extends RerunnableInstances1 {
           final type P = bind.P
 
           final val fa: Rerunnable[P] = inner.success(a)
-          final def success(a: bind.P): Rerunnable[B] = bind.success(a)
+          final def success(a: P): Rerunnable[B] = bind.success(a)
           final def failure(error: Throwable): Rerunnable[B] = bind.failure(error)
         }
         final def failure(error: Throwable): Rerunnable[B] = new Bind[B] {
           final type P = bind.P
 
           final val fa: Rerunnable[P] = inner.failure(error)
-          final def success(a: bind.P): Rerunnable[B] = bind.success(a)
+          final def success(a: P): Rerunnable[B] = bind.success(a)
           final def failure(error: Throwable): Rerunnable[B] = bind.failure(error)
         }
       }
 
       reassociate(next)
-    case _ => bind
+    } else bind
   }
 
   private[util] abstract class Bind[B] extends Rerunnable[B] { self =>
@@ -73,7 +74,7 @@ final object Rerunnable extends RerunnableInstances1 {
     def failure(error: Throwable): Rerunnable[B]
 
     final def run: Future[B] = {
-      val next = reassociate(this)
+      val next = reassociate[B](this)
 
       next.fa.run.transform {
         case Return(a) => next.success(a).run
@@ -87,7 +88,7 @@ final object Rerunnable extends RerunnableInstances1 {
   }
 
   def raiseError[A](error: Throwable): Rerunnable[A] = new Rerunnable[A] {
-    final def run: Future[A] = Future.exception(error)
+    final def run: Future[A] = Future.exception[A](error)
   }
 
   def apply[A](a: => A): Rerunnable[A] = new Rerunnable[A] {
@@ -160,8 +161,8 @@ private[util] class RerunnableMonadError extends MonadError[Rerunnable, Throwabl
   }
 
   override final def attempt[A](fa: Rerunnable[A]): Rerunnable[Either[Throwable, A]] = fa.liftToTry.map {
-    case Return(a) => Right(a)
-    case Throw(err) => Left(err)
+    case Return(a) => Right[Throwable, A](a)
+    case Throw(err) => Left[Throwable, A](err)
   }
 
   final def tailRecM[A, B](a: A)(f: A => Rerunnable[Either[A, B]]): Rerunnable[B] = f(a).flatMap {
