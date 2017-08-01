@@ -1,7 +1,7 @@
 package io.catbird.util
 
 import cats.{ CoflatMap, Comonad, Eq, MonadError, Monoid, Semigroup }
-import com.twitter.util.{ Await, Duration, Future, FuturePool, Try }
+import com.twitter.util.{ Await, Duration, Future, FuturePool, Return, Throw, Try }
 import java.lang.Throwable
 import scala.Unit
 import scala.annotation.tailrec
@@ -10,11 +10,15 @@ import scala.util.{ Either, Left, Right }
 abstract class Rerunnable[A] { self =>
   def run: Future[A]
 
-  final def map[B](f: A => B): Rerunnable[B] = new Rerunnable[B] {
-    final def run: Future[B] = self.run.map(f)
-  }
+  final def map[B](f: A => B): Rerunnable[B] = flatMap(a => Rerunnable(f(a)))
 
-  final def flatMap[B](f: A => Rerunnable[B]): Rerunnable[B] = new Rerunnable.Bind[A, B](this, f)
+  final def flatMap[B](f: A => Rerunnable[B]): Rerunnable[B] = new Rerunnable.Bind[B] {
+    type P = A
+
+    final def fa: Rerunnable[A] = self
+    final def success(a: A): Rerunnable[B] = f(a)
+    final def failure(error: Throwable): Rerunnable[B] = Rerunnable.raiseError(error)
+  }
 
   final def flatMapF[B](f: A => Future[B]): Rerunnable[B] = new Rerunnable[B] {
     final def run: Future[B] = self.run.flatMap(f)
@@ -24,25 +28,58 @@ abstract class Rerunnable[A] { self =>
     final def run: Future[(A, B)] = self.run.join(other.run)
   }
 
-  final def liftToTry: Rerunnable[Try[A]] = new Rerunnable[Try[A]] {
-    final def run: Future[Try[A]] = self.run.liftToTry
-  }
-
-  @tailrec
-  final def step: Rerunnable[A] = this match {
-    case outer: Rerunnable.Bind[_, A] => outer.fa match {
-      case inner: Rerunnable.Bind[_, _] => inner.fa.flatMap(x => inner.ff(x).flatMap(outer.ff)).step
-      case _ => this
-    }
-    case _ => this
+  final def liftToTry: Rerunnable[Try[A]] = new Rerunnable.Bind[Try[A]] {
+    type P = A
+    final def fa: Rerunnable[A] = self
+    final def success(a: A): Rerunnable[Try[A]] = Rerunnable.const[Try[A]](Return[A](a))
+    final def failure(error: Throwable): Rerunnable[Try[A]] = Rerunnable.const[Try[A]](Throw[A](error))
   }
 }
 
 final object Rerunnable extends RerunnableInstances1 {
-  private[util] class Bind[A, B](val fa: Rerunnable[A], val ff: A => Rerunnable[B]) extends Rerunnable[B] {
-    final def run: Future[B] = step match {
-      case bind: Bind[A, B] => bind.fa.run.flatMap(a => bind.ff(a).run)
-      case other => other.run
+  @tailrec
+  private[this] def reassociate[B](bind: Bind[B]): Bind[B] = {
+    if (bind.fa.isInstanceOf[Bind[_]]) {
+      val inner = bind.fa.asInstanceOf[Bind[bind.P]]
+      val next = new Bind[B] {
+        final type P = inner.P
+
+        final def fa: Rerunnable[P] = inner.fa
+        final def success(a: inner.P): Rerunnable[B] = new Bind[B] {
+          final type P = bind.P
+
+          final val fa: Rerunnable[P] = inner.success(a)
+          final def success(a: P): Rerunnable[B] = bind.success(a)
+          final def failure(error: Throwable): Rerunnable[B] = bind.failure(error)
+        }
+        final def failure(error: Throwable): Rerunnable[B] = new Bind[B] {
+          final type P = bind.P
+
+          final val fa: Rerunnable[P] = inner.failure(error)
+          final def success(a: P): Rerunnable[B] = bind.success(a)
+          final def failure(error: Throwable): Rerunnable[B] = bind.failure(error)
+        }
+      }
+
+      reassociate(next)
+    } else bind
+  }
+
+  private[util] abstract class Bind[B] extends Rerunnable[B] { self =>
+    type P
+
+    def fa: Rerunnable[P]
+
+    def success(a: P): Rerunnable[B]
+    def failure(error: Throwable): Rerunnable[B]
+
+    final def run: Future[B] = {
+      val next = reassociate[B](this)
+
+      next.fa.run.transform {
+        case Return(a) => next.success(a).run
+        case Throw(error) => next.failure(error).run
+      }
     }
   }
 
@@ -50,8 +87,16 @@ final object Rerunnable extends RerunnableInstances1 {
     final def run: Future[A] = Future.value(a)
   }
 
+  def raiseError[A](error: Throwable): Rerunnable[A] = new Rerunnable[A] {
+    final def run: Future[A] = Future.exception[A](error)
+  }
+
   def apply[A](a: => A): Rerunnable[A] = new Rerunnable[A] {
     final def run: Future[A] = Future(a)
+  }
+
+  def suspend[A](fa: => Rerunnable[A]): Rerunnable[A] = new Rerunnable[A] {
+    final def run: Future[A] = Future(fa).flatMap(_.run)
   }
 
   def fromFuture[A](fa: => Future[A]): Rerunnable[A] = new Rerunnable[A] {
@@ -67,34 +112,7 @@ final object Rerunnable extends RerunnableInstances1 {
   }
 
   implicit val rerunnableInstance: MonadError[Rerunnable, Throwable] with CoflatMap[Rerunnable] =
-    new RerunnableCoflatMap with MonadError[Rerunnable, Throwable] {
-      final def pure[A](a: A): Rerunnable[A] = Rerunnable.const(a)
-
-      override final def map[A, B](fa: Rerunnable[A])(f: A => B): Rerunnable[B] = fa.map(f)
-
-      override final def product[A, B](fa: Rerunnable[A], fb: Rerunnable[B]): Rerunnable[(A, B)] =
-        fa.product(fb)
-
-      final def flatMap[A, B](fa: Rerunnable[A])(f: A => Rerunnable[B]): Rerunnable[B] =
-        fa.flatMap(f)
-
-      final def raiseError[A](e: Throwable): Rerunnable[A] = new Rerunnable[A] {
-        final def run: Future[A] = Future.exception[A](e)
-      }
-
-      final def handleErrorWith[A](fa: Rerunnable[A])(
-        f: Throwable => Rerunnable[A]
-      ): Rerunnable[A] = new Rerunnable[A] {
-        final def run: Future[A] = fa.run.rescue {
-          case error => f(error).run
-        }
-      }
-
-      final def tailRecM[A, B](a: A)(f: A => Rerunnable[Either[A, B]]): Rerunnable[B] = f(a).flatMap {
-        case Right(b) => pure(b)
-        case Left(nextA) => tailRecM(nextA)(f)
-      }
-    }
+    new RerunnableMonadError with RerunnableCoflatMap
 
   implicit final def rerunnableMonoid[A](implicit A: Monoid[A]): Monoid[Rerunnable[A]] =
     new RerunnableSemigroup[A] with Monoid[Rerunnable[A]] {
@@ -119,11 +137,38 @@ private[util] trait RerunnableInstances1 {
     new RerunnableSemigroup[A]
 }
 
-private[util] sealed abstract class RerunnableCoflatMap extends CoflatMap[Rerunnable] {
+private[util] sealed trait RerunnableCoflatMap extends CoflatMap[Rerunnable] {
   final def coflatMap[A, B](fa: Rerunnable[A])(f: Rerunnable[A] => B): Rerunnable[B] =
     new Rerunnable[B] {
       final def run: Future[B] = Future(f(fa))
     }
+}
+
+private[util] class RerunnableMonadError extends MonadError[Rerunnable, Throwable] {
+  final def pure[A](a: A): Rerunnable[A] = Rerunnable.const(a)
+
+  override final def map[A, B](fa: Rerunnable[A])(f: A => B): Rerunnable[B] = fa.map(f)
+  override final def product[A, B](fa: Rerunnable[A], fb: Rerunnable[B]): Rerunnable[(A, B)] = fa.product(fb)
+
+  final def flatMap[A, B](fa: Rerunnable[A])(f: A => Rerunnable[B]): Rerunnable[B] = fa.flatMap(f)
+
+  final def raiseError[A](e: Throwable): Rerunnable[A] = Rerunnable.raiseError(e)
+
+  final def handleErrorWith[A](fa: Rerunnable[A])(f: Throwable => Rerunnable[A]): Rerunnable[A] = new Rerunnable[A] {
+    final def run: Future[A] = fa.run.rescue {
+      case error => f(error).run
+    }
+  }
+
+  override final def attempt[A](fa: Rerunnable[A]): Rerunnable[Either[Throwable, A]] = fa.liftToTry.map {
+    case Return(a) => Right[Throwable, A](a)
+    case Throw(err) => Left[Throwable, A](err)
+  }
+
+  final def tailRecM[A, B](a: A)(f: A => Rerunnable[Either[A, B]]): Rerunnable[B] = f(a).flatMap {
+    case Right(b) => pure(b)
+    case Left(nextA) => tailRecM(nextA)(f)
+  }
 }
 
 private[util] sealed class RerunnableSemigroup[A](implicit A: Semigroup[A])

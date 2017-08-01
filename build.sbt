@@ -1,6 +1,7 @@
 import ReleaseTransformations._
 
 val catsVersion = "1.0.0-MF"
+val catsEffectVersion = "0.4"
 val utilVersion = "6.45.0"
 val finagleVersion = "6.45.0"
 
@@ -34,10 +35,10 @@ lazy val baseSettings = Seq(
   },
   libraryDependencies ++= Seq(
     "org.typelevel" %% "cats-core" % catsVersion,
-    "org.scalacheck" %% "scalacheck" % "1.13.5" % "test",
-    "org.scalatest" %% "scalatest" % "3.0.3" % "test",
-    "org.typelevel" %% "cats-laws" % catsVersion % "test",
-    "org.typelevel" %% "discipline" % "0.8" % "test",
+    "org.scalacheck" %% "scalacheck" % "1.13.5" % Test,
+    "org.scalatest" %% "scalatest" % "3.0.3" % Test,
+    "org.typelevel" %% "cats-laws" % catsVersion % Test,
+    "org.typelevel" %% "discipline" % "0.8" % Test,
     compilerPlugin("org.spire-math" %% "kind-projector" % "0.9.4")
   ),
   resolvers += Resolver.sonatypeRepo("snapshots"),
@@ -64,28 +65,38 @@ lazy val root = project.in(file("."))
         |import io.catbird.util._
       """.stripMargin
   )
-  .aggregate(util, finagle, benchmark)
-  .dependsOn(util, finagle)
+  .aggregate(util, effect, finagle, benchmark)
+  .dependsOn(util, effect, finagle)
 
 lazy val util = project
   .settings(moduleName := "catbird-util")
   .settings(allSettings)
   .settings(
-    libraryDependencies ++= Seq(
-      "com.twitter" %% "util-core" % utilVersion
-    ),
+    libraryDependencies += "com.twitter" %% "util-core" % utilVersion,
     scalacOptions in Test ~= {
       _.filterNot(Set("-Yno-imports", "-Yno-predef"))
     }
   )
 
+lazy val effect = project
+  .settings(moduleName := "catbird-effect")
+  .settings(allSettings)
+  .settings(
+    libraryDependencies ++= Seq(
+      "org.typelevel" %% "cats-effect" % catsEffectVersion,
+      "org.typelevel" %% "cats-effect-laws" % catsEffectVersion % Test
+    ),
+    scalacOptions in Test ~= {
+      _.filterNot(Set("-Yno-imports", "-Yno-predef"))
+    }
+  )
+  .dependsOn(util, util % "test->test")
+
 lazy val finagle = project
   .settings(moduleName := "catbird-finagle")
   .settings(allSettings)
   .settings(
-    libraryDependencies ++= Seq(
-      "com.twitter" %% "finagle-core" % finagleVersion
-    ),
+    libraryDependencies += "com.twitter" %% "finagle-core" % finagleVersion,
     scalacOptions in Test ~= {
       _.filterNot(Set("-Yno-imports", "-Yno-predef"))
     }
