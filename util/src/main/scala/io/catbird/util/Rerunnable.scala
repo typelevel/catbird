@@ -10,29 +10,52 @@ import scala.util.{ Either, Left, Right }
 abstract class Rerunnable[A] { self =>
   def run: Future[A]
 
-  final def map[B](f: A => B): Rerunnable[B] = flatMap(a => Rerunnable(f(a)))
+  final def map[B](f: A => B): Rerunnable[B] = new Rerunnable.Bind[B] {
+    type P = A
+
+    final def fa: Rerunnable[A] = self
+    final def ff: Try[A] => Rerunnable[B] = {
+      case Return(a) => Rerunnable.const[B](f(a))
+      case Throw(error) => Rerunnable.raiseError[B](error)
+    }
+  }
 
   final def flatMap[B](f: A => Rerunnable[B]): Rerunnable[B] = new Rerunnable.Bind[B] {
     type P = A
 
     final def fa: Rerunnable[A] = self
-    final def success(a: A): Rerunnable[B] = f(a)
-    final def failure(error: Throwable): Rerunnable[B] = Rerunnable.raiseError(error)
+    final def ff: Try[A] => Rerunnable[B] = {
+      case Return(a) => f(a)
+      case Throw(error) => Rerunnable.raiseError[B](error)
+    }
   }
 
   final def flatMapF[B](f: A => Future[B]): Rerunnable[B] = new Rerunnable[B] {
     final def run: Future[B] = self.run.flatMap(f)
   }
 
-  final def product[B](other: Rerunnable[B]): Rerunnable[(A, B)] = new Rerunnable[(A, B)] {
-    final def run: Future[(A, B)] = self.run.join(other.run)
+  final def product[B](other: Rerunnable[B]): Rerunnable[(A, B)] = new Rerunnable.Bind[(A, B)] {
+    type P = A
+
+    final def fa: Rerunnable[A] = self
+    final def ff: Try[A] => Rerunnable[(A, B)] = {
+      case Return(a) => new Rerunnable.Bind[(A, B)] {
+        type P = B
+
+        final def fa: Rerunnable[B] = other
+        final def ff: Try[B] => Rerunnable[(A, B)] = {
+          case Return(b) => Rerunnable.const((a, b))
+          case Throw(error) => Rerunnable.raiseError[(A, B)](error)
+        }
+      }
+      case Throw(error) => Rerunnable.raiseError[(A, B)](error)
+    }
   }
 
   final def liftToTry: Rerunnable[Try[A]] = new Rerunnable.Bind[Try[A]] {
     type P = A
     final def fa: Rerunnable[A] = self
-    final def success(a: A): Rerunnable[Try[A]] = Rerunnable.const[Try[A]](Return[A](a))
-    final def failure(error: Throwable): Rerunnable[Try[A]] = Rerunnable.const[Try[A]](Throw[A](error))
+    final def ff: Try[A] => Rerunnable[Try[A]] = Rerunnable.const(_)
   }
 }
 
@@ -45,19 +68,11 @@ final object Rerunnable extends RerunnableInstances1 {
         final type P = inner.P
 
         final def fa: Rerunnable[P] = inner.fa
-        final def success(a: inner.P): Rerunnable[B] = new Bind[B] {
+        final def ff: Try[P] => Rerunnable[B] = p => new Bind[B] {
           final type P = bind.P
 
-          final val fa: Rerunnable[P] = inner.success(a)
-          final def success(a: P): Rerunnable[B] = bind.success(a)
-          final def failure(error: Throwable): Rerunnable[B] = bind.failure(error)
-        }
-        final def failure(error: Throwable): Rerunnable[B] = new Bind[B] {
-          final type P = bind.P
-
-          final val fa: Rerunnable[P] = inner.failure(error)
-          final def success(a: P): Rerunnable[B] = bind.success(a)
-          final def failure(error: Throwable): Rerunnable[B] = bind.failure(error)
+          final val fa: Rerunnable[P] = inner.ff(p)
+          final val ff: Try[P] => Rerunnable[B] = bind.ff
         }
       }
 
@@ -69,49 +84,44 @@ final object Rerunnable extends RerunnableInstances1 {
     type P
 
     def fa: Rerunnable[P]
-
-    def success(a: P): Rerunnable[B]
-    def failure(error: Throwable): Rerunnable[B]
+    def ff: Try[P] => Rerunnable[B]
 
     final def run: Future[B] = {
       val next = reassociate[B](this)
 
-      next.fa.run.transform {
-        case Return(a) => next.success(a).run
-        case Throw(error) => next.failure(error).run
-      }
+      next.fa.run.transform(t => next.ff(t).run)
     }
   }
 
-  def const[A](a: A): Rerunnable[A] = new Rerunnable[A] {
+  final def const[A](a: A): Rerunnable[A] = new Rerunnable[A] {
     final def run: Future[A] = Future.value(a)
   }
 
-  def raiseError[A](error: Throwable): Rerunnable[A] = new Rerunnable[A] {
+  final def raiseError[A](error: Throwable): Rerunnable[A] = new Rerunnable[A] {
     final def run: Future[A] = Future.exception[A](error)
   }
 
-  def apply[A](a: => A): Rerunnable[A] = new Rerunnable[A] {
+  final def apply[A](a: => A): Rerunnable[A] = new Rerunnable[A] {
     final def run: Future[A] = Future(a)
   }
 
-  def suspend[A](fa: => Rerunnable[A]): Rerunnable[A] = new Rerunnable[A] {
+  final def suspend[A](fa: => Rerunnable[A]): Rerunnable[A] = new Rerunnable[A] {
     final def run: Future[A] = Future(fa).flatMap(_.run)
   }
 
-  def fromFuture[A](fa: => Future[A]): Rerunnable[A] = new Rerunnable[A] {
+  final def fromFuture[A](fa: => Future[A]): Rerunnable[A] = new Rerunnable[A] {
     final def run: Future[A] = fa
   }
 
-  def withFuturePool[A](pool: FuturePool)(a: => A): Rerunnable[A] = new Rerunnable[A] {
+  final def withFuturePool[A](pool: FuturePool)(a: => A): Rerunnable[A] = new Rerunnable[A] {
     final def run: Future[A] = pool(a)
   }
 
-  val Unit: Rerunnable[Unit] = new Rerunnable[Unit] {
+  final val Unit: Rerunnable[Unit] = new Rerunnable[Unit] {
     final def run: Future[Unit] = Future.Unit
   }
 
-  implicit val rerunnableInstance: MonadError[Rerunnable, Throwable] with CoflatMap[Rerunnable] =
+  implicit final val rerunnableInstance: MonadError[Rerunnable, Throwable] with CoflatMap[Rerunnable] =
     new RerunnableMonadError with RerunnableCoflatMap
 
   implicit final def rerunnableMonoid[A](implicit A: Monoid[A]): Monoid[Rerunnable[A]] =
