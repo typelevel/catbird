@@ -42,8 +42,7 @@ lazy val baseSettings = Seq(
     compilerPlugin("org.spire-math" %% "kind-projector" % "0.9.4")
   ),
   resolvers += Resolver.sonatypeRepo("snapshots"),
-  docMappingsApiDir := "api",
-  wartremoverWarnings in (Compile, compile) ++= Warts.all
+  docMappingsApiDir := "api"
 )
 
 lazy val allSettings = baseSettings ++ publishSettings
@@ -151,8 +150,8 @@ lazy val publishSettings = Seq(
 )
 
 lazy val noPublishSettings = Seq(
-  publish := (),
-  publishLocal := (),
+  publish := (()),
+  publishLocal := (()),
   publishArtifact := false
 )
 
