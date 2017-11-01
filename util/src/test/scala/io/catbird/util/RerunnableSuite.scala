@@ -5,7 +5,7 @@ import cats.instances.either._
 import cats.instances.int._
 import cats.instances.tuple._
 import cats.instances.unit._
-import cats.kernel.laws.GroupLaws
+import cats.kernel.laws.discipline.MonoidTests
 import cats.laws.discipline._
 import cats.laws.discipline.arbitrary._
 import com.twitter.conversions.time._
@@ -20,6 +20,5 @@ class RerunnableSuite extends FunSuite with Discipline with ArbitraryInstances w
   checkAll("Rerunnable[Int]", MonadErrorTests[Rerunnable, Throwable].monadError[Int, Int, Int])
   checkAll("Rerunnable[Int]", ComonadTests[Rerunnable].comonad[Int, Int, Int])
   checkAll("Rerunnable[Int]", FunctorTests[Rerunnable](rerunnableComonad).functor[Int, Int, Int])
-  checkAll("Rerunnable[Int]", GroupLaws[Rerunnable[Int]].semigroup)
-  checkAll("Rerunnable[Int]", GroupLaws[Rerunnable[Int]].monoid)
+  checkAll("Rerunnable[Int]", MonoidTests[Rerunnable[Int]].monoid)
 }

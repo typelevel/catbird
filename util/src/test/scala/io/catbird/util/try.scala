@@ -5,7 +5,7 @@ import cats.instances.int._
 import cats.instances.option._
 import cats.instances.tuple._
 import cats.instances.unit._
-import cats.kernel.laws.GroupLaws
+import cats.kernel.laws.discipline.{ MonoidTests, SemigroupTests }
 import cats.laws.discipline.{ MonadErrorTests, TraverseTests }
 import cats.laws.discipline.arbitrary._
 import com.twitter.util.{ Return, Throw, Try }
@@ -18,8 +18,8 @@ trait TryTest extends ArbitraryInstances with EqInstances with TryInstances
 class TrySuite extends FunSuite with TryTest with Discipline {
   checkAll("Try[Int]", MonadErrorTests[Try, Throwable].monadError[Int, Int, Int])
   checkAll("Try[Int]", TraverseTests[Try].traverse[Int, Int, Int, Int, Option, Option])
-  checkAll("Try[Int]", GroupLaws[Try[Int]].semigroup(twitterTrySemigroup[Int]))
-  checkAll("Try[Int]", GroupLaws[Try[Int]].monoid)
+  checkAll("Try[Int]", SemigroupTests[Try[Int]](twitterTrySemigroup[Int]).semigroup)
+  checkAll("Try[Int]", MonoidTests[Try[Int]].monoid)
 }
 
 class TrySpec extends PropSpec with PropertyChecks with Checkers with TryTest {

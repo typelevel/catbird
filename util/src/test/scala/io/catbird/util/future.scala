@@ -5,7 +5,7 @@ import cats.instances.either._
 import cats.instances.int._
 import cats.instances.tuple._
 import cats.instances.unit._
-import cats.kernel.laws.GroupLaws
+import cats.kernel.laws.discipline.{ MonoidTests, SemigroupTests }
 import cats.laws.discipline._
 import cats.laws.discipline.arbitrary._
 import com.twitter.conversions.time._
@@ -25,6 +25,6 @@ class FutureSuite extends FunSuite with Discipline with FutureInstances with Arb
   checkAll("Future[Int]", MonadErrorTests[Future, Throwable].monadError[Int, Int, Int])
   checkAll("Future[Int]", ComonadTests[Future].comonad[Int, Int, Int])
   checkAll("Future[Int]", FunctorTests[Future](comonad).functor[Int, Int, Int])
-  checkAll("Future[Int]", GroupLaws[Future[Int]].semigroup(twitterFutureSemigroup[Int]))
-  checkAll("Future[Int]", GroupLaws[Future[Int]].monoid)
+  checkAll("Future[Int]", SemigroupTests[Future[Int]](twitterFutureSemigroup[Int]).semigroup)
+  checkAll("Future[Int]", MonoidTests[Future[Int]].monoid)
 }

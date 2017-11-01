@@ -3,7 +3,7 @@ package io.catbird.util
 import cats.{ Comonad, Eq }
 import cats.instances.int._
 import cats.instances.tuple._
-import cats.kernel.laws.GroupLaws
+import cats.kernel.laws.discipline.{ MonoidTests, SemigroupTests }
 import cats.laws.discipline._
 import com.twitter.util.Var
 import org.scalatest.FunSuite
@@ -18,6 +18,6 @@ class VarSuite extends FunSuite with Discipline with VarInstances with Arbitrary
 
   checkAll("Var[Int]", MonadTests[Var].stackUnsafeMonad[Int, Int, Int])
   checkAll("Var[Int]", ComonadTests[Var].comonad[Int, Int, Int])
-  checkAll("Var[Int]", GroupLaws[Var[Int]].semigroup(twitterVarSemigroup[Int]))
-  checkAll("Var[Int]", GroupLaws[Var[Int]].monoid)
+  checkAll("Var[Int]", SemigroupTests[Var[Int]](twitterVarSemigroup[Int]).semigroup)
+  checkAll("Var[Int]", MonoidTests[Var[Int]].monoid)
 }
