@@ -1,7 +1,6 @@
 package io.catbird.finagle
 
-import cats.arrow.Category
-import cats.functor.Profunctor
+import cats.arrow.{ Category, Profunctor }
 import io.catbird.util.twitterFutureInstance
 import com.twitter.finagle.Service
 

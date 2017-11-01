@@ -130,10 +130,10 @@ final object Rerunnable extends RerunnableInstances1 {
     }
 
   final def rerunnableEq[A](atMost: Duration)(implicit A: Eq[A]): Eq[Rerunnable[A]] =
-    futureEq[A](atMost).on(_.run)
+    Eq.by[Rerunnable[A], Future[A]](_.run)(futureEq[A](atMost))
 
   final def rerunnableEqWithFailure[A](atMost: Duration)(implicit A: Eq[A], T: Eq[Throwable]): Eq[Rerunnable[A]] =
-    futureEqWithFailure[A](atMost).on(_.run)
+    Eq.by[Rerunnable[A], Future[A]](_.run)(futureEqWithFailure[A](atMost))
 }
 
 private[util] trait RerunnableInstances1 {
