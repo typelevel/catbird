@@ -1,7 +1,7 @@
 import ReleaseTransformations._
 
-val catsVersion = "1.0.0-RC1"
-val catsEffectVersion = "0.5"
+val catsVersion = "1.0.0-RC2"
+val catsEffectVersion = "0.6"
 val utilVersion = "17.12.0"
 val finagleVersion = "17.12.0"
 
@@ -39,7 +39,7 @@ lazy val baseSettings = Seq(
     "org.scalatest" %% "scalatest" % "3.0.4" % Test,
     "org.typelevel" %% "cats-laws" % catsVersion % Test,
     "org.typelevel" %% "discipline" % "0.8" % Test,
-    compilerPlugin("org.spire-math" %% "kind-projector" % "0.9.4")
+    compilerPlugin("org.spire-math" %% "kind-projector" % "0.9.5")
   ),
   resolvers += Resolver.sonatypeRepo("snapshots"),
   docMappingsApiDir := "api"
