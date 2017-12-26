@@ -1,6 +1,6 @@
 import ReleaseTransformations._
 
-val catsVersion = "1.0.0-RC2"
+val catsVersion = "1.0.0"
 val catsEffectVersion = "0.6"
 val utilVersion = "17.12.0"
 val finagleVersion = "17.12.0"
