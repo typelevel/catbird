@@ -36,7 +36,7 @@ lazy val baseSettings = Seq(
   libraryDependencies ++= Seq(
     "org.typelevel" %% "cats-core" % catsVersion,
     "org.scalacheck" %% "scalacheck" % "1.13.5" % Test,
-    "org.scalatest" %% "scalatest" % "3.0.4" % Test,
+    "org.scalatest" %% "scalatest" % "3.0.5" % Test,
     "org.typelevel" %% "cats-laws" % catsVersion % Test,
     "org.typelevel" %% "discipline" % "0.8" % Test,
     compilerPlugin("org.spire-math" %% "kind-projector" % "0.9.5")
@@ -107,7 +107,7 @@ lazy val benchmark = project
   .settings(allSettings)
   .settings(noPublishSettings)
   .settings(
-    libraryDependencies += "org.scalatest" %% "scalatest" % "3.0.4",
+    libraryDependencies += "org.scalatest" %% "scalatest" % "3.0.5",
     scalacOptions ~= {
       _.filterNot(Set("-Yno-imports", "-Yno-predef"))
     }
@@ -150,8 +150,8 @@ lazy val publishSettings = Seq(
 )
 
 lazy val noPublishSettings = Seq(
-  publish := (()),
-  publishLocal := (()),
+  publish := {},
+  publishLocal := {},
   publishArtifact := false
 )
 
