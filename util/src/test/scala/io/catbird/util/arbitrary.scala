@@ -1,5 +1,6 @@
 package io.catbird.util
 
+import com.twitter.concurrent.AsyncStream
 import com.twitter.conversions.time._
 import com.twitter.util.{ Future, Return, Try, Var }
 import org.scalacheck.{ Arbitrary, Cogen }
@@ -13,6 +14,9 @@ trait ArbitraryInstances {
 
   implicit def varArbitrary[A](implicit A: Arbitrary[A]): Arbitrary[Var[A]] =
     Arbitrary(A.arbitrary.map(Var.value))
+
+  implicit def asyncStreamArbitrary[A](implicit A: Arbitrary[A]): Arbitrary[AsyncStream[A]] =
+    Arbitrary(A.arbitrary.map(AsyncStream.of))
 
   implicit def rerunnableArbitrary[A](implicit A: Arbitrary[A]): Arbitrary[Rerunnable[A]] =
     Arbitrary(futureArbitrary[A].arbitrary.map(Rerunnable.fromFuture[A](_)))
