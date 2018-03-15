@@ -1,15 +1,14 @@
 package io.catbird
 package util
 
-import cats.{ CoflatMap, Eq, Monad, Semigroup }
+import cats.{ CoflatMap, Eq, StackSafeMonad, Semigroup }
 import com.twitter.concurrent._
 import com.twitter.util._
-import scala.util.{ Either, Right, Left }
 
 trait AsyncStreamInstances extends AsyncStreamInstances1 {
 
-  implicit final val asyncStreamInstances: Monad[AsyncStream] with CoflatMap[AsyncStream] =
-    new AsyncStreamCoflatMap with Monad[AsyncStream] {
+  implicit final val asyncStreamInstances: StackSafeMonad[AsyncStream] with CoflatMap[AsyncStream] =
+    new AsyncStreamCoflatMap with StackSafeMonad[AsyncStream] {
       final def pure[A](a: A): AsyncStream[A] = AsyncStream.of(a)
       final def flatMap[A, B](fa: AsyncStream[A])(f: A => AsyncStream[B]): AsyncStream[B] = fa.flatMap(f)
       override final def map[A, B](fa: AsyncStream[A])(f: A => B): AsyncStream[B] = fa.map(f)
@@ -34,13 +33,6 @@ trait AsyncStreamInstances1 {
 private[util] abstract class AsyncStreamCoflatMap extends CoflatMap[AsyncStream] {
   final def coflatMap[A, B](fa: AsyncStream[A])(f: AsyncStream[A] => B): AsyncStream[B] = AsyncStream(f(fa))
 
-  /**
-    * Note that this implementation is not stack-safe.
-    */
-  final def tailRecM[A, B](a: A)(f: A => AsyncStream[Either[A,B]]): AsyncStream[B] = f(a).flatMap {
-    case Left(a1) => tailRecM(a1)(f)
-    case Right(b) => AsyncStream.of(b)
-  }
 }
 
 private[util] class AsyncStreamSemigroup[A](implicit A: Semigroup[A]) extends Semigroup[AsyncStream[A]] {
