@@ -1,7 +1,7 @@
 package io.catbird
 package util
 
-import cats.{ CoflatMap, Eq, StackSafeMonad, Semigroup }
+import cats.{ CoflatMap, Eq, Monoid, StackSafeMonad, Semigroup }
 import com.twitter.concurrent._
 import com.twitter.util._
 
@@ -28,6 +28,10 @@ trait AsyncStreamInstances extends AsyncStreamInstances1 {
 
 trait AsyncStreamInstances1 {
 
+  implicit final def asyncStreamMonoid[A](implicit M: Monoid[A]): Monoid[AsyncStream[A]] =
+    new AsyncStreamSemigroup[A] with Monoid[AsyncStream[A]] {
+      final def empty: AsyncStream[A] = AsyncStream(M.empty)
+    }
 }
 
 private[util] abstract class AsyncStreamCoflatMap extends CoflatMap[AsyncStream] {
