@@ -13,7 +13,7 @@ import io.catbird.util.{ ArbitraryInstances, EqInstances, Rerunnable }
 import org.scalatest.FunSuite
 import org.typelevel.discipline.scalatest.Discipline
 
-class RerunnableSuite extends FunSuite with Discipline with ArbitraryInstances with EqInstances with TestInstances {
+class RerunnableSuite extends FunSuite with Discipline with ArbitraryInstances with TestInstances {
   implicit val context: TestContext = TestContext()
   implicit def rerunnableEq[A](implicit A: Eq[A]): Eq[Rerunnable[A]] = Rerunnable.rerunnableEqWithFailure[A](1.second)
 
