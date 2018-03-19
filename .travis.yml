@@ -8,7 +8,7 @@ scala:
 jdk:
   - oraclejdk8
 
-sbt_args: -J-Xmx4096M
+sbt_args: -J-Xmx8192M
 
 install:
   - pip install --user codecov
