@@ -16,7 +16,7 @@ trait ArbitraryInstances {
     Arbitrary(A.arbitrary.map(Var.value))
 
   implicit def asyncStreamArbitrary[A](implicit A: Arbitrary[A]): Arbitrary[AsyncStream[A]] =
-    Arbitrary(Arbitrary.arbitrary[Stream[A]].map(AsyncStream.fromSeq))
+    Arbitrary(A.arbitrary.map(AsyncStream.of))
 
   implicit def rerunnableArbitrary[A](implicit A: Arbitrary[A]): Arbitrary[Rerunnable[A]] =
     Arbitrary(futureArbitrary[A].arbitrary.map(Rerunnable.fromFuture[A](_)))

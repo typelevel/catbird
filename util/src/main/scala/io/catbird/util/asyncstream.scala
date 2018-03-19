@@ -1,14 +1,14 @@
 package io.catbird
 package util
 
-import cats.{ CoflatMap, Eq, Monoid, StackSafeMonad, Semigroup }
+import cats.{ Eq, Monad, Monoid, StackSafeMonad, Semigroup }
 import com.twitter.concurrent._
 import com.twitter.util._
 
 trait AsyncStreamInstances extends AsyncStreamInstances1 {
 
-  implicit final val asyncStreamInstances: StackSafeMonad[AsyncStream] with CoflatMap[AsyncStream] =
-    new AsyncStreamCoflatMap with StackSafeMonad[AsyncStream] {
+  implicit final val asyncStreamInstances: Monad[AsyncStream] =
+    new StackSafeMonad[AsyncStream] {
       final def pure[A](a: A): AsyncStream[A] = AsyncStream.of(a)
       final def flatMap[A, B](fa: AsyncStream[A])(f: A => AsyncStream[B]): AsyncStream[B] = fa.flatMap(f)
       override final def map[A, B](fa: AsyncStream[A])(f: A => B): AsyncStream[B] = fa.map(f)
@@ -32,11 +32,6 @@ trait AsyncStreamInstances1 {
     new AsyncStreamSemigroup[A] with Monoid[AsyncStream[A]] {
       final def empty: AsyncStream[A] = AsyncStream(M.empty)
     }
-}
-
-private[util] abstract class AsyncStreamCoflatMap extends CoflatMap[AsyncStream] {
-  final def coflatMap[A, B](fa: AsyncStream[A])(f: AsyncStream[A] => B): AsyncStream[B] = AsyncStream(f(fa))
-
 }
 
 private[util] class AsyncStreamSemigroup[A](implicit A: Semigroup[A]) extends Semigroup[AsyncStream[A]] {
