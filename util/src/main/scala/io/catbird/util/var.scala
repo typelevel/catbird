@@ -1,12 +1,13 @@
 package io.catbird.util
 
-import cats.{ CoflatMap, Comonad, Eq, StackSafeMonad, Monoid, Semigroup }
+import cats.{ CoflatMap, Comonad, Eq, Monad, Monoid, Semigroup }
 import com.twitter.util.Var
 import scala.Boolean
+import scala.util.{ Either, Left, Right }
 
 trait VarInstances extends VarInstances1 {
-  implicit final val twitterVarInstance: StackSafeMonad[Var] with CoflatMap[Var] =
-    new VarCoflatMap with StackSafeMonad[Var] {
+  implicit final val twitterVarInstance: Monad[Var] with CoflatMap[Var] =
+    new VarCoflatMap with Monad[Var] {
       final def pure[A](x: A): Var[A] = Var.value(x)
       final def flatMap[A, B](fa: Var[A])(f: A => Var[B]): Var[B] = fa.flatMap(f)
       override final def map[A, B](fa: Var[A])(f: A => B): Var[B] = fa.map(f)
@@ -41,6 +42,13 @@ private[util] abstract class VarCoflatMap extends CoflatMap[Var] {
 
   final def coflatMap[A, B](fa: Var[A])(f: Var[A] => B): Var[B] = Var(f(fa))
 
+  /**
+   * Note that this implementation is not stack-safe.
+   */
+  final def tailRecM[A, B](a: A)(f: A => Var[Either[A, B]]): Var[B] = f(a).flatMap {
+    case Left(a1) => tailRecM(a1)(f)
+    case Right(b) => Var.value(b)
+  }
 }
 
 private[util] class VarSemigroup[A](implicit A: Semigroup[A]) extends Semigroup[Var[A]] {
