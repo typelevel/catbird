@@ -1,6 +1,7 @@
 package io.catbird.util.effect
 
 import cats.effect._
+import cats.instances.either._
 import com.twitter.util.{ Future, Promise }
 import io.catbird.util._
 import java.lang.Throwable
@@ -46,7 +47,12 @@ trait RerunnableInstances {
     final def runAsync[A](fa: Rerunnable[A])(cb: Either[Throwable, A] => IO[Unit]): IO[Unit] =
       rerunnableToIO[A](fa).runAsync(cb)
 
-    final def runSyncStep[A](fa: Rerunnable[A]): IO[Either[Rerunnable[A],A]] = rerunnableToIO(fa).map { Right(_) }
+    final def runSyncStep[A](fa: Rerunnable[A]): IO[Either[Rerunnable[A],A]] = rerunnableToIO {
+      val att: Rerunnable[Either[Throwable,A]] = for {
+        e <- attempt(fa)
+      } yield e
+      att map { _.left.map { Rerunnable.raiseError[A](_) } }
+    }
 
     final def bracketCase[A, B](acquire: io.catbird.util.Rerunnable[A])(use: A => io.catbird.util.Rerunnable[B])
       (release: (A, cats.effect.ExitCase[Throwable]) => io.catbird.util.Rerunnable[Unit]): io.catbird.util.Rerunnable[B] = {
