@@ -124,7 +124,7 @@ lazy val benchmark = project
     }
   )
   .enablePlugins(JmhPlugin)
-  .dependsOn(util)
+  .dependsOn(util, arrows)
 
 lazy val publishSettings = Seq(
   releaseCrossBuild := true,

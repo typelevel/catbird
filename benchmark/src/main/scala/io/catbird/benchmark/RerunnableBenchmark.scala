@@ -1,5 +1,6 @@
 package io.catbird.benchmark
 
+import _root_.arrows.twitter.Task
 import com.twitter.util.{ Await, Future, FuturePool }
 import io.catbird.util.Rerunnable
 import java.util.concurrent.{ ExecutorService, Executors, TimeUnit }
@@ -45,6 +46,13 @@ class RerunnableBenchmark {
   )
 
   @Benchmark
+  def sumIntsT: Int = Await.result(
+    numbers.foldLeft(Task(0)) {
+      case (acc, i) => acc.flatMap(prev => Task(prev + i))
+    }.run
+  )
+
+  @Benchmark
   def sumIntsPF: Int = Await.result(
     numbers.foldLeft(pool(0)) {
       case (acc, i) => acc.flatMap(prev => pool(prev + i))
@@ -55,6 +63,13 @@ class RerunnableBenchmark {
   def sumIntsPR: Int = Await.result(
     numbers.foldLeft(Rerunnable.withFuturePool(pool)(0)) {
       case (acc, i) => acc.flatMap(prev => Rerunnable.withFuturePool(pool)(prev + i))
+    }.run
+  )
+
+  @Benchmark
+  def sumIntsPT: Int = Await.result(
+    numbers.foldLeft(Task.fork(pool)(Task(0))) {
+      case (acc, i) => acc.flatMap(prev => Task.fork(pool)(Task(prev + i)))
     }.run
   )
 }
