@@ -4,6 +4,7 @@ val catsVersion = "1.1.0"
 val catsEffectVersion = "0.10.1"
 val utilVersion = "18.7.0"
 val finagleVersion = "18.7.0"
+val arrowsVersion = "0.1.21"
 
 organization in ThisBuild := "io.catbird"
 
@@ -76,6 +77,16 @@ lazy val util = project
       _.filterNot(Set("-Yno-imports", "-Yno-predef"))
     }
   )
+
+lazy val arrows = project
+  .settings(moduleName := "catbird-arrows")
+  .settings(allSettings)
+  .settings(
+    libraryDependencies += "io.trane" %% "arrows-twitter" % arrowsVersion,
+    scalacOptions in Test ~= {
+      _.filterNot(Set("-Yno-imports", "-Yno-predef"))
+    }
+  ).dependsOn(util % "test->test")
 
 lazy val effect = project
   .settings(moduleName := "catbird-effect")
