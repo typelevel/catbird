@@ -2,8 +2,8 @@ import ReleaseTransformations._
 
 val catsVersion = "1.3.1"
 val catsEffectVersion = "1.0.0"
-val utilVersion = "18.8.0"
-val finagleVersion = "18.8.0"
+val utilVersion = "18.9.0"
+val finagleVersion = "18.9.0"
 
 organization in ThisBuild := "io.catbird"
 
