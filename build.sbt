@@ -39,7 +39,7 @@ lazy val baseSettings = Seq(
     "org.scalatest" %% "scalatest" % "3.0.5" % Test,
     "org.typelevel" %% "cats-laws" % catsVersion % Test,
     "org.typelevel" %% "discipline" % "0.9.0" % Test,
-    compilerPlugin("org.spire-math" %% "kind-projector" % "0.9.7")
+    compilerPlugin("org.spire-math" %% "kind-projector" % "0.9.8")
   ),
   resolvers += Resolver.sonatypeRepo("snapshots"),
   docMappingsApiDir := "api"
