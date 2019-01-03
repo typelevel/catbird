@@ -7,7 +7,7 @@ import scala.Unit
 import scala.annotation.tailrec
 import scala.util.{ Either, Left, Right }
 
-abstract class Rerunnable[A] { self =>
+abstract class Rerunnable[+A] { self =>
   def run: Future[A]
 
   final def map[B](f: A => B): Rerunnable[B] = new Rerunnable.Bind[B] {
@@ -86,20 +86,20 @@ final object Rerunnable extends RerunnableInstances1 {
     def fa: Rerunnable[P]
     def ff: Try[P] => Rerunnable[B]
 
+    private[this] lazy val next = reassociate[B](this)
     final def run: Future[B] = {
-      val next = reassociate[B](this)
-
-      next.fa.run.transform(t => next.ff(t).run)
+      val localff = next.ff // don't close over this or next in closure
+      next.fa.run.transform(t => localff(t).run)
     }
   }
 
-  final def const[A](a: A): Rerunnable[A] = new Rerunnable[A] {
-    final def run: Future[A] = Future.value(a)
-  }
+  private[util] case class ConstRerunnable[A](run: Future[A]) extends Rerunnable[A]
 
-  final def raiseError[A](error: Throwable): Rerunnable[A] = new Rerunnable[A] {
-    final def run: Future[A] = Future.exception[A](error)
-  }
+  final def const[A](a: A): Rerunnable[A] =
+    ConstRerunnable(Future.value(a))
+
+  final def raiseError[A](error: Throwable): Rerunnable[A] =
+    ConstRerunnable(Future.exception[A](error))
 
   final def apply[A](a: => A): Rerunnable[A] = new Rerunnable[A] {
     final def run: Future[A] = Future(a)
@@ -117,16 +117,15 @@ final object Rerunnable extends RerunnableInstances1 {
     final def run: Future[A] = pool(a)
   }
 
-  final val Unit: Rerunnable[Unit] = new Rerunnable[Unit] {
-    final def run: Future[Unit] = Future.Unit
-  }
+  final val Unit: Rerunnable[Unit] =
+    ConstRerunnable(Future.Unit)
 
   implicit final val rerunnableInstance: MonadError[Rerunnable, Throwable] with CoflatMap[Rerunnable] =
     new RerunnableMonadError with RerunnableCoflatMap
 
   implicit final def rerunnableMonoid[A](implicit A: Monoid[A]): Monoid[Rerunnable[A]] =
     new RerunnableSemigroup[A] with Monoid[Rerunnable[A]] {
-      final def empty: Rerunnable[A] = Rerunnable.rerunnableInstance.pure(A.empty)
+      final val empty: Rerunnable[A] = Rerunnable.rerunnableInstance.pure(A.empty)
     }
 
   final def rerunnableEq[A](atMost: Duration)(implicit A: Eq[A]): Eq[Rerunnable[A]] =
