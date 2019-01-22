@@ -38,7 +38,7 @@ lazy val baseSettings = Seq(
     "org.scalacheck" %% "scalacheck" % "1.13.5" % Test,
     "org.scalatest" %% "scalatest" % "3.0.5" % Test,
     "org.typelevel" %% "cats-laws" % catsVersion % Test,
-    "org.typelevel" %% "discipline" % "0.9.0" % Test,
+    "org.typelevel" %% "discipline" % "0.10.0" % Test,
     compilerPlugin("org.spire-math" %% "kind-projector" % "0.9.9")
   ),
   resolvers += Resolver.sonatypeRepo("snapshots"),
