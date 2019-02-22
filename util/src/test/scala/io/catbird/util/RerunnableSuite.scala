@@ -8,7 +8,7 @@ import cats.instances.unit._
 import cats.kernel.laws.discipline.MonoidTests
 import cats.laws.discipline._
 import cats.laws.discipline.arbitrary._
-import com.twitter.conversions.time._
+import com.twitter.conversions.DurationOps._
 import org.scalatest.FunSuite
 import org.typelevel.discipline.scalatest.Discipline
 

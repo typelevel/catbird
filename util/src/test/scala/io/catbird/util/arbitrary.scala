@@ -1,7 +1,7 @@
 package io.catbird.util
 
 import com.twitter.concurrent.AsyncStream
-import com.twitter.conversions.time._
+import com.twitter.conversions.DurationOps._
 import com.twitter.util.{ Future, Return, Try, Var }
 import org.scalacheck.{ Arbitrary, Cogen }
 

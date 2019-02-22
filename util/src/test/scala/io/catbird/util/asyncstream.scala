@@ -7,7 +7,7 @@ import cats.instances.tuple._
 import cats.kernel.laws.discipline.{MonoidTests, SemigroupTests}
 import cats.laws.discipline._
 import com.twitter.concurrent.AsyncStream
-import com.twitter.conversions.time._
+import com.twitter.conversions.DurationOps._
 import org.scalatest.FunSuite
 import org.typelevel.discipline.scalatest.Discipline
 
