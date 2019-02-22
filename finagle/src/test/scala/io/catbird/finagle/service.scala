@@ -4,7 +4,7 @@ import cats.instances.int._
 import cats.kernel.Eq
 import cats.laws.discipline._
 import cats.laws.discipline.eq._
-import com.twitter.conversions.time._
+import com.twitter.conversions.DurationOps._
 import com.twitter.finagle.Service
 import org.scalatest.FunSuite
 import org.typelevel.discipline.scalatest.Discipline
