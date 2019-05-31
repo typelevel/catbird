@@ -15,20 +15,22 @@ trait RerunnableInstances {
       override final def delay[A](thunk: => A): Rerunnable[A] = Rerunnable[A](thunk)
 
       final def async[A](k: (Either[Throwable, A] => Unit) => Unit): Rerunnable[A] =
-      new Rerunnable[A] {
-        final def run: Future[A] = {
-          val promise = new Promise[A]
+        new Rerunnable[A] {
+          final def run: Future[A] = {
+            val promise = new Promise[A]
 
-          k { e =>
-            if (promise.isDefined) () else e match {
-              case Right(a) => promise.setValue(a)
-              case Left(err) => promise.setException(err)
+            k { e =>
+              if (promise.isDefined) ()
+              else
+                e match {
+                  case Right(a)  => promise.setValue(a)
+                  case Left(err) => promise.setException(err)
+                }
             }
-          }
 
-          promise
+            promise
+          }
         }
-      }
 
       final def asyncF[A](k: (Either[Throwable, A] => Unit) => Rerunnable[Unit]): Rerunnable[A] =
         new Rerunnable[A] {
@@ -36,10 +38,12 @@ trait RerunnableInstances {
             val promise = new Promise[A]
 
             val rerunnable = k { e =>
-              if (promise.isDefined) () else e match {
-                case Right(a) => promise.setValue(a)
-                case Left(err) => promise.setException(err)
-              }
+              if (promise.isDefined) ()
+              else
+                e match {
+                  case Right(a)  => promise.setValue(a)
+                  case Left(err) => promise.setException(err)
+                }
             }
 
             rerunnable.run.flatMap(_ => promise)
@@ -56,7 +60,7 @@ trait RerunnableInstances {
           acquire.run.flatMap { a =>
             val future = use(a).run
             future.transform {
-              case Return(b) => release(a, ExitCase.complete).run.flatMap(_ => future)
+              case Return(b)  => release(a, ExitCase.complete).run.flatMap(_ => future)
               case Throw(err) => release(a, ExitCase.error(err)).run.flatMap(_ => future)
             }
           }

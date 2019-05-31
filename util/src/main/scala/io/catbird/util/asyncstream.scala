@@ -36,7 +36,7 @@ trait AsyncStreamInstances1 {
 
 private[util] class AsyncStreamSemigroup[A](implicit A: Semigroup[A]) extends Semigroup[AsyncStream[A]] {
   final def combine(fa: AsyncStream[A], fb: AsyncStream[A]): AsyncStream[A] = fa.flatMap { a =>
-    fb.map( b => A.combine(a,b) )
+    fb.map(b => A.combine(a, b))
   }
 
 }

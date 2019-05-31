@@ -8,7 +8,7 @@ import scala.util.{ Left, Right }
 package object effect extends RerunnableInstances {
   def futureToAsync[F[_], A](fa: => Future[A])(implicit F: Async[F]): F[A] = F.async { k =>
     fa.respond {
-      case Return(a) => k(Right[Throwable, A](a))
+      case Return(a)  => k(Right[Throwable, A](a))
       case Throw(err) => k(Left[Throwable, A](err))
     }
   }

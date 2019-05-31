@@ -11,9 +11,9 @@ trait TryInstances extends TryInstances1 {
   implicit final def twitterTryEq[A](implicit A: Eq[A], T: Eq[Throwable]): Eq[Try[A]] =
     new Eq[Try[A]] {
       def eqv(x: Try[A], y: Try[A]): Boolean = (x, y) match {
-        case (Throw(xError), Throw(yError)) => T.eqv(xError, yError)
+        case (Throw(xError), Throw(yError))   => T.eqv(xError, yError)
         case (Return(xValue), Return(yValue)) => A.eqv(xValue, yValue)
-        case _ => false
+        case _                                => false
       }
     }
 
@@ -35,21 +35,21 @@ trait TryInstances extends TryInstances1 {
 
       final def foldLeft[A, B](fa: Try[A], b: B)(f: (B, A) => B): B = fa match {
         case Return(a) => f(b, a)
-        case Throw(_) => b
+        case Throw(_)  => b
       }
 
       final def foldRight[A, B](fa: Try[A], lb: Eval[B])(f: (A, Eval[B]) => Eval[B]): Eval[B] = fa match {
         case Return(a) => f(a, lb)
-        case Throw(_) => lb
+        case Throw(_)  => lb
       }
 
       final def traverse[G[_], A, B](fa: Try[A])(f: A => G[B])(implicit G: Applicative[G]): G[Try[B]] = fa match {
-        case Return(a) => G.map(f(a))(Return(_))
+        case Return(a)   => G.map(f(a))(Return(_))
         case t: Throw[_] => G.pure(TryInstances.castThrow[B](t))
       }
 
       @tailrec final def tailRecM[A, B](a: A)(f: A => Try[Either[A, B]]): Try[B] = f(a) match {
-        case t: Throw[_] => TryInstances.castThrow[B](t)
+        case t: Throw[_]      => TryInstances.castThrow[B](t)
         case Return(Left(a1)) => tailRecM(a1)(f)
         case Return(Right(b)) => Return(b)
       }

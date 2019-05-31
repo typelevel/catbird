@@ -9,7 +9,8 @@ organization in ThisBuild := "io.catbird"
 
 val compilerOptions = Seq(
   "-deprecation",
-  "-encoding", "UTF-8",
+  "-encoding",
+  "UTF-8",
   "-feature",
   "-language:existentials",
   "-language:higherKinds",
@@ -47,7 +48,8 @@ lazy val baseSettings = Seq(
 
 lazy val allSettings = baseSettings ++ publishSettings
 
-lazy val root = project.in(file("."))
+lazy val root = project
+  .in(file("."))
   .enablePlugins(GhpagesPlugin, ScalaUnidocPlugin)
   .settings(allSettings ++ noPublishSettings)
   .settings(
@@ -122,13 +124,15 @@ lazy val publishSettings = Seq(
   licenses := Seq("Apache 2.0" -> url("http://www.apache.org/licenses/LICENSE-2.0")),
   publishMavenStyle := true,
   publishArtifact in Test := false,
-  pomIncludeRepository := { _ => false },
+  pomIncludeRepository := { _ =>
+    false
+  },
   publishTo := {
     val nexus = "https://oss.sonatype.org/"
     if (isSnapshot.value)
       Some("snapshots" at nexus + "content/repositories/snapshots")
     else
-      Some("releases"  at nexus + "service/local/staging/deploy/maven2")
+      Some("releases" at nexus + "service/local/staging/deploy/maven2")
   },
   autoAPIMappings := true,
   apiURL := Some(url("https://travisbrown.github.io/catbird/api/")),
@@ -159,10 +163,11 @@ credentials ++= (
   for {
     username <- Option(System.getenv().get("SONATYPE_USERNAME"))
     password <- Option(System.getenv().get("SONATYPE_PASSWORD"))
-  } yield Credentials(
-    "Sonatype Nexus Repository Manager",
-    "oss.sonatype.org",
-    username,
-    password
-  )
+  } yield
+    Credentials(
+      "Sonatype Nexus Repository Manager",
+      "oss.sonatype.org",
+      username,
+      password
+    )
 ).toSeq

@@ -24,7 +24,7 @@ trait FutureInstances extends FutureInstances1 {
       final def raiseError[A](e: Throwable): Future[A] = Future.exception(e)
 
       final def tailRecM[A, B](a: A)(f: A => Future[Either[A, B]]): Future[B] = f(a).flatMap {
-        case Right(b) => pure(b)
+        case Right(b)    => pure(b)
         case Left(nextA) => tailRecM(nextA)(f)
       }
     }
@@ -62,9 +62,8 @@ private[util] sealed abstract class FutureCoflatMap extends CoflatMap[Future] {
   final def coflatMap[A, B](fa: Future[A])(f: Future[A] => B): Future[B] = Future(f(fa))
 }
 
-private[util] sealed class FutureSemigroup[A](implicit A: Semigroup[A])
-  extends Semigroup[Future[A]] {
-    final def combine(fx: Future[A], fy: Future[A]): Future[A] = fx.join(fy).map {
-      case (x, y) => A.combine(x, y)
-    }
+private[util] sealed class FutureSemigroup[A](implicit A: Semigroup[A]) extends Semigroup[Future[A]] {
+  final def combine(fx: Future[A], fy: Future[A]): Future[A] = fx.join(fy).map {
+    case (x, y) => A.combine(x, y)
   }
+}
