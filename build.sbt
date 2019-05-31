@@ -39,7 +39,7 @@ lazy val baseSettings = Seq(
     "org.scalatest" %% "scalatest" % "3.0.8-RC5" % Test,
     "org.typelevel" %% "cats-laws" % catsVersion % Test,
     "org.typelevel" %% "discipline" % "0.9.0" % Test,
-    compilerPlugin("org.typelevel" %% "kind-projector" % "0.10.1")
+    compilerPlugin("org.typelevel" %% "kind-projector" % "0.10.2")
   ),
   resolvers += Resolver.sonatypeRepo("snapshots"),
   docMappingsApiDir := "api"
