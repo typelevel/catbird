@@ -14,4 +14,4 @@ install:
   - pip install --user codecov
 
 script:
-  sbt ++$TRAVIS_SCALA_VERSION clean coverage test scalastyle unidoc coverageReport && codecov;
+  sbt ++$TRAVIS_SCALA_VERSION clean coverage test scalastyle scalafmtCheck scalafmtSbtCheck test:scalafmtCheck unidoc coverageReport && codecov;
