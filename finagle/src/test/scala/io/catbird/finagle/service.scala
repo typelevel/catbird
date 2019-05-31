@@ -9,8 +9,7 @@ import com.twitter.finagle.Service
 import org.scalatest.FunSuite
 import org.typelevel.discipline.scalatest.Discipline
 
-class ServiceSuite extends FunSuite with Discipline with
-  ServiceInstances with ArbitraryInstances with EqInstances {
+class ServiceSuite extends FunSuite with Discipline with ServiceInstances with ArbitraryInstances with EqInstances {
   implicit val eq: Eq[Service[Int, Int]] = serviceEq(1.second)
 
   checkAll("Service", CategoryTests[Service].compose[Int, Int, Int, Int])

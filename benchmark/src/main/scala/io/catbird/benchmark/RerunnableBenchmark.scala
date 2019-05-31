@@ -39,9 +39,11 @@ class RerunnableBenchmark {
 
   @Benchmark
   def sumIntsR: Int = Await.result(
-    numbers.foldLeft(Rerunnable(0)) {
-      case (acc, i) => acc.flatMap(prev => Rerunnable(prev + i))
-    }.run
+    numbers
+      .foldLeft(Rerunnable(0)) {
+        case (acc, i) => acc.flatMap(prev => Rerunnable(prev + i))
+      }
+      .run
   )
 
   @Benchmark
@@ -53,8 +55,10 @@ class RerunnableBenchmark {
 
   @Benchmark
   def sumIntsPR: Int = Await.result(
-    numbers.foldLeft(Rerunnable.withFuturePool(pool)(0)) {
-      case (acc, i) => acc.flatMap(prev => Rerunnable.withFuturePool(pool)(prev + i))
-    }.run
+    numbers
+      .foldLeft(Rerunnable.withFuturePool(pool)(0)) {
+        case (acc, i) => acc.flatMap(prev => Rerunnable.withFuturePool(pool)(prev + i))
+      }
+      .run
   )
 }

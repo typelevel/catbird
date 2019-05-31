@@ -15,7 +15,7 @@ abstract class Rerunnable[+A] { self =>
 
     final def fa: Rerunnable[A] = self
     final def ff: Try[A] => Rerunnable[B] = {
-      case Return(a) => Rerunnable.const[B](f(a))
+      case Return(a)    => Rerunnable.const[B](f(a))
       case Throw(error) => Rerunnable.raiseError[B](error)
     }
   }
@@ -25,7 +25,7 @@ abstract class Rerunnable[+A] { self =>
 
     final def fa: Rerunnable[A] = self
     final def ff: Try[A] => Rerunnable[B] = {
-      case Return(a) => f(a)
+      case Return(a)    => f(a)
       case Throw(error) => Rerunnable.raiseError[B](error)
     }
   }
@@ -39,15 +39,16 @@ abstract class Rerunnable[+A] { self =>
 
     final def fa: Rerunnable[A] = self
     final def ff: Try[A] => Rerunnable[(A, B)] = {
-      case Return(a) => new Rerunnable.Bind[(A, B)] {
-        type P = B
+      case Return(a) =>
+        new Rerunnable.Bind[(A, B)] {
+          type P = B
 
-        final def fa: Rerunnable[B] = other
-        final def ff: Try[B] => Rerunnable[(A, B)] = {
-          case Return(b) => Rerunnable.const((a, b))
-          case Throw(error) => Rerunnable.raiseError[(A, B)](error)
+          final def fa: Rerunnable[B] = other
+          final def ff: Try[B] => Rerunnable[(A, B)] = {
+            case Return(b)    => Rerunnable.const((a, b))
+            case Throw(error) => Rerunnable.raiseError[(A, B)](error)
+          }
         }
-      }
       case Throw(error) => Rerunnable.raiseError[(A, B)](error)
     }
   }
@@ -68,12 +69,13 @@ final object Rerunnable extends RerunnableInstances1 {
         final type P = inner.P
 
         final def fa: Rerunnable[P] = inner.fa
-        final def ff: Try[P] => Rerunnable[B] = p => new Bind[B] {
-          final type P = bind.P
+        final def ff: Try[P] => Rerunnable[B] = p =>
+          new Bind[B] {
+            final type P = bind.P
 
-          final val fa: Rerunnable[P] = inner.ff(p)
-          final val ff: Try[P] => Rerunnable[B] = bind.ff
-        }
+            final val fa: Rerunnable[P] = inner.ff(p)
+            final val ff: Try[P] => Rerunnable[B] = bind.ff
+          }
       }
 
       reassociate(next)
@@ -170,19 +172,18 @@ private[util] class RerunnableMonadError extends MonadError[Rerunnable, Throwabl
   }
 
   override final def attempt[A](fa: Rerunnable[A]): Rerunnable[Either[Throwable, A]] = fa.liftToTry.map {
-    case Return(a) => Right[Throwable, A](a)
+    case Return(a)  => Right[Throwable, A](a)
     case Throw(err) => Left[Throwable, A](err)
   }
 
   final def tailRecM[A, B](a: A)(f: A => Rerunnable[Either[A, B]]): Rerunnable[B] = f(a).flatMap {
-    case Right(b) => pure(b)
+    case Right(b)    => pure(b)
     case Left(nextA) => tailRecM(nextA)(f)
   }
 }
 
-private[util] sealed class RerunnableSemigroup[A](implicit A: Semigroup[A])
-  extends Semigroup[Rerunnable[A]] {
-    final def combine(fx: Rerunnable[A], fy: Rerunnable[A]): Rerunnable[A] = fx.product(fy).map {
-      case (x, y) => A.combine(x, y)
-    }
+private[util] sealed class RerunnableSemigroup[A](implicit A: Semigroup[A]) extends Semigroup[Rerunnable[A]] {
+  final def combine(fx: Rerunnable[A], fy: Rerunnable[A]): Rerunnable[A] = fx.product(fy).map {
+    case (x, y) => A.combine(x, y)
   }
+}
