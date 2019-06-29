@@ -130,9 +130,9 @@ lazy val publishSettings = Seq(
   publishTo := {
     val nexus = "https://oss.sonatype.org/"
     if (isSnapshot.value)
-      Some("snapshots" at nexus + "content/repositories/snapshots")
+      Some("snapshots".at(nexus + "content/repositories/snapshots"))
     else
-      Some("releases" at nexus + "service/local/staging/deploy/maven2")
+      Some("releases".at(nexus + "service/local/staging/deploy/maven2"))
   },
   autoAPIMappings := true,
   apiURL := Some(url("https://travisbrown.github.io/catbird/api/")),
@@ -163,11 +163,10 @@ credentials ++= (
   for {
     username <- Option(System.getenv().get("SONATYPE_USERNAME"))
     password <- Option(System.getenv().get("SONATYPE_PASSWORD"))
-  } yield
-    Credentials(
-      "Sonatype Nexus Repository Manager",
-      "oss.sonatype.org",
-      username,
-      password
-    )
+  } yield Credentials(
+    "Sonatype Nexus Repository Manager",
+    "oss.sonatype.org",
+    username,
+    password
+  )
 ).toSeq

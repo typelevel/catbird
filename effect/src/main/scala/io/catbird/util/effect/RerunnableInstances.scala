@@ -56,7 +56,7 @@ trait RerunnableInstances {
       final def bracketCase[A, B](acquire: Rerunnable[A])(use: A => Rerunnable[B])(
         release: (A, ExitCase[Throwable]) => Rerunnable[Unit]
       ): Rerunnable[B] = new Rerunnable[B] {
-        final def run: Future[B] = {
+        final def run: Future[B] =
           acquire.run.flatMap { a =>
             val future = use(a).run
             future.transform {
@@ -64,7 +64,6 @@ trait RerunnableInstances {
               case Throw(err) => release(a, ExitCase.error(err)).run.flatMap(_ => future)
             }
           }
-        }
       }
     }
 }
