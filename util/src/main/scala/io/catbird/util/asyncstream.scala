@@ -1,7 +1,7 @@
 package io.catbird
 package util
 
-import cats.{ Eq, Monad, Monoid, StackSafeMonad, Semigroup }
+import cats.{ Eq, Monad, Monoid, Semigroup, StackSafeMonad }
 import com.twitter.concurrent._
 import com.twitter.util._
 

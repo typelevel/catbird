@@ -62,7 +62,7 @@ abstract class Rerunnable[+A] { self =>
 
 final object Rerunnable extends RerunnableInstances1 {
   @tailrec
-  private[this] def reassociate[B](bind: Bind[B]): Bind[B] = {
+  private[this] def reassociate[B](bind: Bind[B]): Bind[B] =
     if (bind.fa.isInstanceOf[Bind[_]]) {
       val inner = bind.fa.asInstanceOf[Bind[bind.P]]
       val next = new Bind[B] {
@@ -80,7 +80,6 @@ final object Rerunnable extends RerunnableInstances1 {
 
       reassociate(next)
     } else bind
-  }
 
   private[util] abstract class Bind[B] extends Rerunnable[B] { self =>
     type P
