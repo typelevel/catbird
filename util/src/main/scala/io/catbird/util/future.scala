@@ -1,8 +1,21 @@
 package io.catbird.util
 
-import cats.{ CoflatMap, Comonad, Eq, MonadError, Monoid, Semigroup }
+import cats.{
+  Applicative,
+  CoflatMap,
+  CommutativeApplicative,
+  Comonad,
+  Eq,
+  Monad,
+  MonadError,
+  Monoid,
+  Parallel,
+  Semigroup,
+  ~>
+}
 import com.twitter.util.{ Await, Duration, Future, Try }
 import java.lang.Throwable
+
 import scala.Boolean
 import scala.util.{ Either, Left, Right }
 
@@ -43,9 +56,22 @@ trait FutureInstances extends FutureInstances1 {
 
   final def futureEqWithFailure[A](atMost: Duration)(implicit A: Eq[A], T: Eq[Throwable]): Eq[Future[A]] =
     Eq.by[Future[A], Future[Try[A]]](_.liftToTry)(futureEq[Try[A]](atMost))
+
+  implicit final val twitterFutureParallelInstance: Parallel[Future, FuturePar] =
+    new Parallel[Future, FuturePar] {
+      final override val applicative: Applicative[FuturePar] =
+        futureParCommutativeApplicative
+
+      final override val monad: Monad[Future] =
+        twitterFutureInstance
+
+      final override val sequential: FuturePar ~> Future = λ[FuturePar ~> Future](FuturePar.unwrap(_))
+
+      final override val parallel: Future ~> FuturePar = λ[Future ~> FuturePar](FuturePar(_))
+    }
 }
 
-private[util] trait FutureInstances1 {
+private[util] trait FutureInstances1 extends FutureParallelNewtype {
   final def futureComonad(atMost: Duration): Comonad[Future] =
     new FutureCoflatMap with Comonad[Future] {
       final def extract[A](x: Future[A]): A = Await.result(x, atMost)
@@ -55,6 +81,46 @@ private[util] trait FutureInstances1 {
   implicit final def twitterFutureMonoid[A](implicit A: Monoid[A]): Monoid[Future[A]] =
     new FutureSemigroup[A] with Monoid[Future[A]] {
       final def empty: Future[A] = Future.value(A.empty)
+    }
+}
+
+private[util] trait FutureParallelNewtype {
+
+  type FuturePar[+A] = FuturePar.Type[A]
+
+  object FuturePar extends internal.Newtype1[Future]
+
+  implicit final val futureParCommutativeApplicative: CommutativeApplicative[FuturePar] =
+    new CommutativeApplicative[FuturePar] {
+      import FuturePar.{ unwrap, apply => par }
+
+      final override def pure[A](x: A): FuturePar[A] =
+        par(Future.value(x))
+      final override def map2[A, B, Z](fa: FuturePar[A], fb: FuturePar[B])(f: (A, B) => Z): FuturePar[Z] =
+        par(Future.join(unwrap(fa), unwrap(fb)).map(f.tupled)) // Future.join runs futures in parallel
+      final override def ap[A, B](ff: FuturePar[A => B])(fa: FuturePar[A]): FuturePar[B] =
+        map2(ff, fa)(_(_))
+      final override def product[A, B](fa: FuturePar[A], fb: FuturePar[B]): FuturePar[(A, B)] =
+        map2(fa, fb)((_, _))
+      final override def map[A, B](fa: FuturePar[A])(f: A => B): FuturePar[B] =
+        par(unwrap(fa).map(f))
+      final override def unit: FuturePar[scala.Unit] =
+        par(Future.Unit)
+    }
+
+  final def futureParEq[A](atMost: Duration)(implicit A: Eq[A]): Eq[FuturePar[A]] = new Eq[FuturePar[A]] {
+    import FuturePar.unwrap
+
+    final override def eqv(x: FuturePar[A], y: FuturePar[A]): Boolean =
+      futureEq(atMost).eqv(unwrap(x), unwrap(y))
+  }
+
+  final def futureParEqWithFailure[A](atMost: Duration)(implicit A: Eq[A], T: Eq[Throwable]): Eq[FuturePar[A]] =
+    new Eq[FuturePar[A]] {
+      import FuturePar.unwrap
+
+      final override def eqv(x: FuturePar[A], y: FuturePar[A]): Boolean =
+        futureEqWithFailure(atMost)(A, T).eqv(unwrap(x), unwrap(y))
     }
 }
 
