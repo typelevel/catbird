@@ -1,7 +1,7 @@
 package io.catbird.util.effect
 
 import cats.kernel.Eq
-import cats.effect.IO
+import cats.effect.{ Bracket, IO }
 import cats.effect.laws.discipline.EffectTests
 import cats.effect.laws.discipline.arbitrary.catsEffectLawsArbitraryForIO
 import cats.effect.laws.util.{ TestContext, TestInstances }
@@ -10,6 +10,7 @@ import cats.instances.int._
 import cats.instances.tuple._
 import cats.instances.unit._
 import cats.laws.discipline.arbitrary._
+import com.twitter.util.{ Await, Monitor, Throw }
 import io.catbird.util.{ ArbitraryInstances, Rerunnable }
 import org.scalatest.FunSuite
 import org.typelevel.discipline.scalatest.Discipline
@@ -20,4 +21,25 @@ class RerunnableSuite extends FunSuite with Discipline with ArbitraryInstances w
     Eq.by[Rerunnable[A], IO[A]](rerunnableToIO)
 
   checkAll("Rerunnable[Int]", EffectTests[Rerunnable].effect[Int, Int, Int])
+
+  test("Exceptions thrown by release are handled by Monitor") {
+    val useException = new Exception("thrown by use")
+    val releaseException = new Exception("thrown by release")
+
+    var monitoredException: Throwable = null
+    val monitor = Monitor.mk { case e => monitoredException = e; true; }
+
+    val rerunnable = Bracket[Rerunnable, Throwable]
+      .bracket(Rerunnable.Unit)(
+        _ => Rerunnable.raiseError(useException)
+      )(
+        _ => Rerunnable.raiseError(releaseException)
+      )
+      .liftToTry
+
+    val result = Await.result(Monitor.using(monitor)(rerunnable.run))
+
+    assert(result == Throw(useException))
+    assert(monitoredException == releaseException)
+  }
 }
