@@ -1,7 +1,7 @@
 package io.catbird.util.effect
 
 import cats.effect.{ Effect, ExitCase, IO, SyncIO }
-import com.twitter.util.{ Future, Promise, Return, Throw }
+import com.twitter.util.{ Future, Monitor, Promise, Return, Throw }
 import io.catbird.util.{ Rerunnable, RerunnableMonadError }
 import java.lang.Throwable
 import scala.Unit
@@ -60,8 +60,8 @@ trait RerunnableInstances {
           acquire.run.flatMap { a =>
             val future = use(a).run
             future.transform {
-              case Return(b)  => release(a, ExitCase.complete).run.flatMap(_ => future)
-              case Throw(err) => release(a, ExitCase.error(err)).run.flatMap(_ => future)
+              case Return(b)  => release(a, ExitCase.complete).run.handle(Monitor.catcher).flatMap(_ => future)
+              case Throw(err) => release(a, ExitCase.error(err)).run.handle(Monitor.catcher).flatMap(_ => future)
             }
           }
       }
