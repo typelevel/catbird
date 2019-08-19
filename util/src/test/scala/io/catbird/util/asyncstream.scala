@@ -17,7 +17,7 @@ class AsyncStreamSuite extends FunSuite with Discipline with AsyncStreamInstance
   implicit val eqAsyncStreamAsyncStreamInt: Eq[AsyncStream[AsyncStream[Int]]] = asyncStreamEq(1.second)
   implicit val eqAsyncStreamIntIntInt: Eq[AsyncStream[(Int, Int, Int)]] = asyncStreamEq[(Int, Int, Int)](1.second)
 
-  checkAll("AsyncStream[Int]", MonadTests[AsyncStream].stackUnsafeMonad[Int, Int, Int])
+  checkAll("AsyncStream[Int]", MonadTests[AsyncStream].monad[Int, Int, Int])
   checkAll("AsyncStream[Int]", SemigroupTests[AsyncStream[Int]](asyncStreamSemigroup[Int]).semigroup)
   checkAll("AsyncStream[Int]", MonoidTests[AsyncStream[Int]].monoid)
 
