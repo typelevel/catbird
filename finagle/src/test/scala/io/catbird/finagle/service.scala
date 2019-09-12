@@ -6,13 +6,13 @@ import cats.laws.discipline._
 import cats.laws.discipline.eq._
 import com.twitter.conversions.DurationOps._
 import com.twitter.finagle.Service
-import org.scalatest.FunSuite
+import org.scalatest.funsuite.AnyFunSuite
 import org.typelevel.discipline.scalatest.Discipline
 
-class ServiceSuite extends FunSuite with Discipline with ServiceInstances with ArbitraryInstances with EqInstances {
-  implicit val eq: Eq[Service[Int, Int]] = serviceEq(1.second)
+class ServiceSuite extends AnyFunSuite with Discipline with ServiceInstances with ArbitraryInstances with EqInstances {
+  implicit val eq: Eq[Service[Boolean, Int]] = serviceEq(1.second)
 
-  checkAll("Service", CategoryTests[Service].compose[Int, Int, Int, Int])
-  checkAll("Service", CategoryTests[Service].category[Int, Int, Int, Int])
-  checkAll("Service", ProfunctorTests[Service].profunctor[Int, Int, Int, Int, Int, Int])
+  checkAll("Service", CategoryTests[Service].compose[Boolean, Int, Boolean, Int])
+  checkAll("Service", CategoryTests[Service].category[Boolean, Int, Boolean, Int])
+  checkAll("Service", ProfunctorTests[Service].profunctor[Boolean, Int, Boolean, Int, Boolean, Int])
 }

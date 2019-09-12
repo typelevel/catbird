@@ -4,7 +4,8 @@ language: scala
 
 scala:
   - 2.11.12
-  - 2.12.8
+  - 2.12.10
+  - 2.13.0
 
 jdk:
   - openjdk8
@@ -16,3 +17,9 @@ install:
 
 script:
   sbt ++$TRAVIS_SCALA_VERSION clean coverage test scalastyle scalafmtCheck scalafmtSbtCheck test:scalafmtCheck unidoc coverageReport && codecov;
+
+cache:
+  directories:
+    - $HOME/.ivy2/cache
+    - $HOME/.sbt
+    - $HOME/.coursier
