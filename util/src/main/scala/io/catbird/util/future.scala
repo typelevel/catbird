@@ -57,8 +57,10 @@ trait FutureInstances extends FutureInstances1 {
   final def futureEqWithFailure[A](atMost: Duration)(implicit A: Eq[A], T: Eq[Throwable]): Eq[Future[A]] =
     Eq.by[Future[A], Future[Try[A]]](_.liftToTry)(futureEq[Try[A]](atMost))
 
-  implicit final val twitterFutureParallelInstance: Parallel[Future, FuturePar] =
-    new Parallel[Future, FuturePar] {
+  implicit final val twitterFutureParallelInstance: Parallel.Aux[Future, FuturePar] =
+    new Parallel[Future] {
+      type F[x] = FuturePar[x]
+
       final override val applicative: Applicative[FuturePar] =
         futureParCommutativeApplicative
 
