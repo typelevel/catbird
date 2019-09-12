@@ -1,8 +1,9 @@
 package io.catbird.benchmark
 
-import org.scalatest.{ BeforeAndAfter, FlatSpec }
+import org.scalatest.BeforeAndAfter
+import org.scalatest.flatspec.AnyFlatSpec
 
-class RerunnableBenchmarkSpec extends FlatSpec with BeforeAndAfter {
+class RerunnableBenchmarkSpec extends AnyFlatSpec with BeforeAndAfter {
   val benchmark: RerunnableBenchmark = new RerunnableBenchmark
   val sum = benchmark.numbers.sum
 

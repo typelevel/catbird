@@ -8,10 +8,10 @@ import cats.kernel.laws.discipline.{ MonoidTests, SemigroupTests }
 import cats.laws.discipline._
 import com.twitter.concurrent.AsyncStream
 import com.twitter.conversions.DurationOps._
-import org.scalatest.FunSuite
+import org.scalatest.funsuite.AnyFunSuite
 import org.typelevel.discipline.scalatest.Discipline
 
-class AsyncStreamSuite extends FunSuite with Discipline with AsyncStreamInstances with ArbitraryInstances {
+class AsyncStreamSuite extends AnyFunSuite with Discipline with AsyncStreamInstances with ArbitraryInstances {
 
   implicit val eqAsyncStreamInt: Eq[AsyncStream[Int]] = asyncStreamEq(1.second)
   implicit val eqAsyncStreamAsyncStreamInt: Eq[AsyncStream[AsyncStream[Int]]] = asyncStreamEq(1.second)

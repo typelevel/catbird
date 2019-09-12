@@ -1,13 +1,11 @@
-import ReleaseTransformations._
-
-val catsVersion = "1.6.1"
-val catsEffectVersion = "1.4.0"
+val catsVersion = "2.0.0"
+val catsEffectVersion = "2.0.0"
 val utilVersion = "19.9.0"
-val finagleVersion = "19.8.0"
+val finagleVersion = "19.9.0"
 
 organization in ThisBuild := "io.catbird"
 
-val compilerOptions = Seq(
+def compilerOptions(scalaVersion: String): Seq[String] = Seq(
   "-deprecation",
   "-encoding",
   "UTF-8",
@@ -15,31 +13,40 @@ val compilerOptions = Seq(
   "-language:existentials",
   "-language:higherKinds",
   "-unchecked",
-  "-Yno-adapted-args",
   "-Ywarn-dead-code",
   "-Ywarn-numeric-widen",
-  "-Xfuture",
-  "-Ywarn-unused-import",
   "-Yno-imports",
   "-Yno-predef"
-)
+) ++ (if (priorTo2_13(scalaVersion))
+        Seq(
+          "-Ywarn-unused-import",
+          "-Yno-adapted-args",
+          "-Xfuture"
+        )
+      else
+        Seq(
+          "-Ywarn-unused:imports",
+          "-Ymacro-annotations"
+        ))
 
 val docMappingsApiDir = settingKey[String]("Subdirectory in site target directory for API docs")
 
 lazy val baseSettings = Seq(
-  scalacOptions ++= compilerOptions,
+  crossScalaVersions := Seq("2.11.12", "2.12.10", "2.13.0"),
+  scalacOptions ++= compilerOptions(scalaVersion.value),
   scalacOptions in (Compile, console) ~= {
-    _.filterNot(Set("-Ywarn-unused-import", "-Yno-imports", "-Yno-predef"))
+    _.filterNot(Set("-Ywarn-unused-import", "-Ywarn-unused:imports", "-Yno-imports", "-Yno-predef"))
   },
   scalacOptions in (Test, console) ~= {
-    _.filterNot(Set("-Ywarn-unused-import", "-Yno-imports", "-Yno-predef"))
+    _.filterNot(Set("-Ywarn-unused-import", "-Ywarn-unused:imports", "-Yno-imports", "-Yno-predef"))
   },
   libraryDependencies ++= Seq(
     "org.typelevel" %% "cats-core" % catsVersion,
-    "org.scalacheck" %% "scalacheck" % "1.13.5" % Test,
+    "org.scalacheck" %% "scalacheck" % "1.14.0" % Test,
     "org.scalatest" %% "scalatest" % "3.0.8" % Test,
     "org.typelevel" %% "cats-laws" % catsVersion % Test,
-    "org.typelevel" %% "discipline" % "0.9.0" % Test,
+    "org.typelevel" %% "discipline-core" % "1.0.0" % Test,
+    "org.typelevel" %% "discipline-scalatest" % "1.0.0-M1" % Test,
     compilerPlugin("org.typelevel" %% "kind-projector" % "0.10.3")
   ),
   resolvers += Resolver.sonatypeRepo("snapshots"),
@@ -170,3 +177,9 @@ credentials ++= (
     password
   )
 ).toSeq
+
+def priorTo2_13(scalaVersion: String): Boolean =
+  CrossVersion.partialVersion(scalaVersion) match {
+    case Some((2, minor)) if minor < 13 => true
+    case _                              => false
+  }

@@ -1,6 +1,5 @@
 package io.catbird.util
 
-import cats.{ Comonad, Eq }
 import cats.instances.either._
 import cats.instances.int._
 import cats.instances.tuple._
@@ -8,13 +7,14 @@ import cats.instances.unit._
 import cats.kernel.laws.discipline.{ MonoidTests, SemigroupTests }
 import cats.laws.discipline._
 import cats.laws.discipline.arbitrary._
+import cats.{ Comonad, Eq }
 import com.twitter.conversions.DurationOps._
 import com.twitter.util.Future
 import org.scalacheck.Arbitrary
-import org.scalatest.FunSuite
+import org.scalatest.funsuite.AnyFunSuite
 import org.typelevel.discipline.scalatest.Discipline
 
-class FutureSuite extends FunSuite with Discipline with FutureInstances with ArbitraryInstances with EqInstances {
+class FutureSuite extends AnyFunSuite with Discipline with FutureInstances with ArbitraryInstances with EqInstances {
   implicit val eqFutureInt: Eq[Future[Int]] = futureEqWithFailure(1.second)
   implicit val eqFutureFutureInt: Eq[Future[Future[Int]]] = futureEqWithFailure(1.second)
   implicit val eqFutureFutureFutureInt: Eq[Future[Future[Future[Int]]]] = futureEqWithFailure(1.second)
