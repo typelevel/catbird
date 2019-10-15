@@ -43,7 +43,7 @@ lazy val baseSettings = Seq(
   libraryDependencies ++= Seq(
     "org.typelevel" %% "cats-core" % catsVersion,
     "org.scalacheck" %% "scalacheck" % "1.14.2" % Test,
-    "org.scalatest" %% "scalatest" % "3.1.0-RC2" % Test,
+    "org.scalatest" %% "scalatest" % "3.1.0-RC3" % Test,
     "org.typelevel" %% "cats-laws" % catsVersion % Test,
     "org.typelevel" %% "discipline-core" % "1.0.1" % Test,
     "org.typelevel" %% "discipline-scalatest" % "1.0.0-RC1" % Test,
@@ -116,7 +116,7 @@ lazy val benchmark = project
   .settings(allSettings)
   .settings(noPublishSettings)
   .settings(
-    libraryDependencies += "org.scalatest" %% "scalatest" % "3.1.0-RC2",
+    libraryDependencies += "org.scalatest" %% "scalatest" % "3.1.0-RC3",
     scalacOptions ~= {
       _.filterNot(Set("-Yno-imports", "-Yno-predef"))
     }
