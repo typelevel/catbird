@@ -87,7 +87,6 @@ private[util] trait FutureInstances1 extends FutureParallelNewtype {
 }
 
 private[util] trait FutureParallelNewtype {
-
   type FuturePar[+A] = FuturePar.Type[A]
 
   object FuturePar extends internal.Newtype1[Future]

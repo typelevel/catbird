@@ -178,7 +178,6 @@ private[util] trait RerunnableInstances1 extends RerunnableParallelNewtype {
 }
 
 private[util] trait RerunnableParallelNewtype {
-
   type Par[+A] = Par.Type[A]
 
   object Par {
