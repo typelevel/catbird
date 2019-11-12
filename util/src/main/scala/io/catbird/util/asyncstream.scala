@@ -6,7 +6,6 @@ import com.twitter.concurrent._
 import com.twitter.util._
 
 trait AsyncStreamInstances extends AsyncStreamInstances1 {
-
   implicit final val asyncStreamInstances: Monad[AsyncStream] =
     new StackSafeMonad[AsyncStream] {
       final def pure[A](a: A): AsyncStream[A] = AsyncStream.of(a)
@@ -23,11 +22,9 @@ trait AsyncStreamInstances extends AsyncStreamInstances1 {
       atMost
     )
   }
-
 }
 
 trait AsyncStreamInstances1 {
-
   implicit final def asyncStreamMonoid[A](implicit M: Monoid[A]): Monoid[AsyncStream[A]] =
     new AsyncStreamSemigroup[A] with Monoid[AsyncStream[A]] {
       final def empty: AsyncStream[A] = AsyncStream(M.empty)
@@ -38,5 +35,4 @@ private[util] class AsyncStreamSemigroup[A](implicit A: Semigroup[A]) extends Se
   final def combine(fa: AsyncStream[A], fb: AsyncStream[A]): AsyncStream[A] = fa.flatMap { a =>
     fb.map(b => A.combine(a, b))
   }
-
 }

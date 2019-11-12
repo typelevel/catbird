@@ -39,7 +39,6 @@ trait VarInstances1 {
 }
 
 private[util] abstract class VarCoflatMap extends CoflatMap[Var] {
-
   final def coflatMap[A, B](fa: Var[A])(f: Var[A] => B): Var[B] = Var(f(fa))
 
   /**
