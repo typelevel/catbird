@@ -30,11 +30,7 @@ class RerunnableSuite extends AnyFunSuite with Discipline with ArbitraryInstance
     val monitor = Monitor.mk { case e => monitoredException = e; true; }
 
     val rerunnable = Bracket[Rerunnable, Throwable]
-      .bracket(Rerunnable.Unit)(
-        _ => Rerunnable.raiseError(useException)
-      )(
-        _ => Rerunnable.raiseError(releaseException)
-      )
+      .bracket(Rerunnable.Unit)(_ => Rerunnable.raiseError(useException))(_ => Rerunnable.raiseError(releaseException))
       .liftToTry
 
     val result = Await.result(Monitor.using(monitor)(rerunnable.run))
