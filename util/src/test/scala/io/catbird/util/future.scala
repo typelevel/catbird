@@ -11,10 +11,8 @@ import cats.{ Comonad, Eq }
 import com.twitter.conversions.DurationOps._
 import com.twitter.util.Future
 import org.scalacheck.Arbitrary
-import org.scalatest.funsuite.AnyFunSuite
-import org.typelevel.discipline.scalatest.Discipline
 
-class FutureSuite extends AnyFunSuite with Discipline with FutureInstances with ArbitraryInstances with EqInstances {
+class FutureSuite extends CatbirdSuite with FutureInstances with ArbitraryInstances with EqInstances {
   implicit val eqFutureInt: Eq[Future[Int]] = futureEqWithFailure(1.second)
   implicit val eqFutureFutureInt: Eq[Future[Future[Int]]] = futureEqWithFailure(1.second)
   implicit val eqFutureFutureFutureInt: Eq[Future[Future[Future[Int]]]] = futureEqWithFailure(1.second)

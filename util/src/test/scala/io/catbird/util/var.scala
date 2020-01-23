@@ -6,10 +6,8 @@ import cats.kernel.laws.discipline.{ MonoidTests, SemigroupTests }
 import cats.laws.discipline._
 import cats.{ Comonad, Eq }
 import com.twitter.util.Var
-import org.scalatest.funsuite.AnyFunSuite
-import org.typelevel.discipline.scalatest.Discipline
 
-class VarSuite extends AnyFunSuite with Discipline with VarInstances with ArbitraryInstances {
+class VarSuite extends CatbirdSuite with VarInstances with ArbitraryInstances {
   implicit val eqVarInt: Eq[Var[Int]] = varEq
   implicit val eqVarVarInt: Eq[Var[Var[Int]]] = varEq
   implicit val eqVarVarVarInt: Eq[Var[Var[Var[Int]]]] = varEq
