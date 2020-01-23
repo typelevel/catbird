@@ -13,9 +13,15 @@ import cats.laws.discipline.arbitrary._
 import com.twitter.util.{ Await, Monitor, Throw }
 import io.catbird.util.{ ArbitraryInstances, Rerunnable }
 import org.scalatest.funsuite.AnyFunSuite
-import org.typelevel.discipline.scalatest.Discipline
+import org.scalatest.prop.Configuration
+import org.typelevel.discipline.scalatest.FunSuiteDiscipline
 
-class RerunnableSuite extends AnyFunSuite with Discipline with ArbitraryInstances with TestInstances {
+class RerunnableSuite
+    extends AnyFunSuite
+    with FunSuiteDiscipline
+    with Configuration
+    with ArbitraryInstances
+    with TestInstances {
   implicit val context: TestContext = TestContext()
   implicit def rerunnableEq[A](implicit A: Eq[A]): Eq[Rerunnable[A]] =
     Eq.by[Rerunnable[A], IO[A]](rerunnableToIO)

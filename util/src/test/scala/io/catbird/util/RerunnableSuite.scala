@@ -10,10 +10,8 @@ import cats.laws.discipline.arbitrary._
 import cats.{ Comonad, Eq }
 import com.twitter.conversions.DurationOps._
 import org.scalacheck.Arbitrary
-import org.scalatest.funsuite.AnyFunSuite
-import org.typelevel.discipline.scalatest.Discipline
 
-class RerunnableSuite extends AnyFunSuite with Discipline with ArbitraryInstances with EqInstances {
+class RerunnableSuite extends CatbirdSuite with ArbitraryInstances with EqInstances {
   implicit def rerunnableEq[A](implicit A: Eq[A]): Eq[Rerunnable[A]] =
     Rerunnable.rerunnableEqWithFailure[A](1.second)
   implicit val rerunnableComonad: Comonad[Rerunnable] =
