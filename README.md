@@ -2,11 +2,11 @@
 
 [![Build status](https://img.shields.io/travis/travisbrown/catbird/master.svg)](http://travis-ci.org/travisbrown/catbird)
 [![Coverage status](https://img.shields.io/codecov/c/github/travisbrown/catbird/master.svg)](https://codecov.io/github/travisbrown/catbird)
-[![Maven Central](https://img.shields.io/maven-central/v/io.catbird/catbird-finagle_2.11.svg)](https://maven-badges.herokuapp.com/maven-central/io.catbird/catbird-finagle_2.11)
+[![Maven Central](https://img.shields.io/maven-central/v/io.catbird/catbird-finagle_2.13.svg)](https://maven-badges.herokuapp.com/maven-central/io.catbird/catbird-finagle_2.13)
 
 
-This project provides [cats](https://github.com/typelevel/cats) type class instances (and other useful
-cats-related stuff) for various [Twitter Open Source](https://twitter.com/twitteross) Scala
+This project provides [Cats](https://github.com/typelevel/cats) type class instances (and other useful
+Cats-related stuff) for various [Twitter Open Source](https://twitter.com/twitteross) Scala
 projects.
 
 It currently includes the following:
@@ -15,7 +15,12 @@ It currently includes the following:
 * Category and profunctor instances for `Service`
 * A `Rerunnable` type that wraps `Future` but provides semantics more like Scalaz's `Task`
 
-These are reasonably well-tested (thanks to [discipline](https://github.com/typelevel/discipline)).
+These are reasonably well-tested (thanks to [Discipline](https://github.com/typelevel/discipline)).
+
+## Community
+
+People are expected to follow the [Scala Code of Conduct][code-of-conduct] on GitHub and in any
+other project channels.
 
 ## License
 
@@ -27,3 +32,5 @@ distributed under the License is distributed on an "AS IS" BASIS,
 WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 See the License for the specific language governing permissions and
 limitations under the License.
+
+[code-of-conduct]: https://www.scala-lang.org/conduct.html
