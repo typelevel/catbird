@@ -7,8 +7,8 @@ class RerunnableBenchmarkSpec extends AnyFlatSpec with BeforeAndAfter {
   val benchmark: RerunnableBenchmark = new RerunnableBenchmark
   val sum = benchmark.numbers.sum
 
-  before { benchmark.initPool() }
-  after { benchmark.shutdownPool() }
+  before(benchmark.initPool())
+  after(benchmark.shutdownPool())
 
   "The benchmark" should "correctly calculate the sum using futures" in {
     assert(benchmark.sumIntsF === sum)
