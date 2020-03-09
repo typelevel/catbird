@@ -32,7 +32,7 @@ def compilerOptions(scalaVersion: String): Seq[String] = Seq(
 val docMappingsApiDir = settingKey[String]("Subdirectory in site target directory for API docs")
 
 lazy val baseSettings = Seq(
-  crossScalaVersions := Seq("2.11.12", "2.12.10", "2.13.0"),
+  crossScalaVersions := Seq("2.11.12", "2.12.10", "2.13.1"),
   scalacOptions ++= compilerOptions(scalaVersion.value),
   scalacOptions in (Compile, console) ~= {
     _.filterNot(Set("-Ywarn-unused-import", "-Ywarn-unused:imports", "-Yno-imports", "-Yno-predef"))
