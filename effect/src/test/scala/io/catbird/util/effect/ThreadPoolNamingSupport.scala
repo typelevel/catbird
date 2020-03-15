@@ -1,7 +1,7 @@
 package io.catbird.util.effect
 
 import java.lang.{ Runnable, Thread }
-import java.util.concurrent.{ ExecutorService, Executors, ThreadFactory }
+import java.util.concurrent.{ Executors, ThreadFactory }
 
 import scala.concurrent.{ ExecutionContext, ExecutionContextExecutorService }
 
