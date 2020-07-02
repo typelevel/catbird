@@ -1,12 +1,12 @@
 package io.catbird.util
 
-import cats.effect.{ Async, ContextShift, IO }
-import com.twitter.util.{ Future, Return, Throw }
+import cats.effect.{ Async, ContextShift, ExitCase, IO }
+import com.twitter.util.{ Future, Return, Throw, Try }
 import java.lang.Throwable
 
 import scala.util.{ Left, Right }
 
-package object effect extends RerunnableInstances {
+package object effect extends FutureInstances with RerunnableInstances {
 
   /**
    * Converts the `Future` to `F` without changing the underlying execution (same thread pool!).
@@ -41,4 +41,13 @@ package object effect extends RerunnableInstances {
    */
   final def rerunnableToIOAndShift[A](fa: Rerunnable[A])(implicit CS: ContextShift[IO]): IO[A] =
     futureToAsyncAndShift[IO, A](fa.run)
+
+  /**
+   * Convert a twitter-util Try to cats-effect ExitCase
+   */
+  final def tryToExitCase[A](ta: Try[A]): ExitCase[Throwable] =
+    ta match {
+      case Return(_) => ExitCase.complete
+      case Throw(e)  => ExitCase.error(e)
+    }
 }
