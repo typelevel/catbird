@@ -21,26 +21,7 @@ import scala.util.{ Either, Left, Right }
 
 trait FutureInstances extends FutureInstances1 {
   implicit final val twitterFutureInstance: MonadError[Future, Throwable] with CoflatMap[Future] =
-    new FutureCoflatMap with MonadError[Future, Throwable] {
-      final def pure[A](x: A): Future[A] = Future.value(x)
-      final def flatMap[A, B](fa: Future[A])(f: A => Future[B]): Future[B] = fa.flatMap(f)
-      override final def map[A, B](fa: Future[A])(f: A => B): Future[B] = fa.map(f)
-      override final def ap[A, B](f: Future[A => B])(fa: Future[A]): Future[B] = f.join(fa).map {
-        case (ab, a) => ab(a)
-      }
-      override final def product[A, B](fa: Future[A], fb: Future[B]): Future[(A, B)] = fa.join(fb)
-
-      final def handleErrorWith[A](fa: Future[A])(f: Throwable => Future[A]): Future[A] =
-        fa.rescue {
-          case e => f(e)
-        }
-      final def raiseError[A](e: Throwable): Future[A] = Future.exception(e)
-
-      final def tailRecM[A, B](a: A)(f: A => Future[Either[A, B]]): Future[B] = f(a).flatMap {
-        case Right(b)    => pure(b)
-        case Left(nextA) => tailRecM(nextA)(f)
-      }
-    }
+    new FutureCoflatMap with FutureMonadError
 
   implicit final def twitterFutureSemigroup[A](implicit A: Semigroup[A]): Semigroup[Future[A]] =
     new FutureSemigroup[A]
@@ -123,6 +104,27 @@ private[util] trait FutureParallelNewtype {
       final override def eqv(x: FuturePar[A], y: FuturePar[A]): Boolean =
         futureEqWithFailure(atMost)(A, T).eqv(unwrap(x), unwrap(y))
     }
+}
+
+private[util] trait FutureMonadError extends MonadError[Future, Throwable] {
+  final def pure[A](x: A): Future[A] = Future.value(x)
+  final def flatMap[A, B](fa: Future[A])(f: A => Future[B]): Future[B] = fa.flatMap(f)
+  override final def map[A, B](fa: Future[A])(f: A => B): Future[B] = fa.map(f)
+  override final def ap[A, B](f: Future[A => B])(fa: Future[A]): Future[B] = f.join(fa).map {
+    case (ab, a) => ab(a)
+  }
+  override final def product[A, B](fa: Future[A], fb: Future[B]): Future[(A, B)] = fa.join(fb)
+
+  final def handleErrorWith[A](fa: Future[A])(f: Throwable => Future[A]): Future[A] =
+    fa.rescue {
+      case e => f(e)
+    }
+  final def raiseError[A](e: Throwable): Future[A] = Future.exception(e)
+
+  final def tailRecM[A, B](a: A)(f: A => Future[Either[A, B]]): Future[B] = f(a).flatMap {
+    case Right(b)    => pure(b)
+    case Left(nextA) => tailRecM(nextA)(f)
+  }
 }
 
 private[util] sealed abstract class FutureCoflatMap extends CoflatMap[Future] {
