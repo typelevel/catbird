@@ -164,6 +164,15 @@ final object Rerunnable extends RerunnableInstances1 {
 
   final def rerunnableEqWithFailure[A](atMost: Duration)(implicit A: Eq[A], T: Eq[Throwable]): Eq[Rerunnable[A]] =
     Eq.by[Rerunnable[A], Future[A]](_.run)(futureEqWithFailure[A](atMost))
+
+  /**
+   * FunctionK instance to convert to Future
+   *
+   * Useful when you need a parameter for a `mapK` method, for example you could use
+   * [[https://typelevel.org/cats-tagless/ cats-tagless]] in a codebase that mixes [[Rerunnable]] and
+   * [[Future]].
+   */
+  final val toFuture: Rerunnable ~> Future = λ[Rerunnable ~> Future](_.run)
 }
 
 private[util] trait RerunnableInstances1 extends RerunnableParallelNewtype {
