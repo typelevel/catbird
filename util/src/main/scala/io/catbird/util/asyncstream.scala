@@ -21,7 +21,7 @@ trait AsyncStreamInstances extends AsyncStreamInstances1 {
 
   final def asyncStreamEq[A](atMost: Duration)(implicit A: Eq[A]): Eq[AsyncStream[A]] = new Eq[AsyncStream[A]] {
     final def eqv(x: AsyncStream[A], y: AsyncStream[A]): scala.Boolean = Await.result(
-      x.take(1).toSeq.join(y.take(1).toSeq).map { case (x, y) => x == y },
+      x.take(1).toSeq().join(y.take(1).toSeq()).map { case (x, y) => x == y },
       atMost
     )
   }
