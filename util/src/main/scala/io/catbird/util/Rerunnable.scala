@@ -159,14 +159,32 @@ final object Rerunnable extends RerunnableInstances1 {
         λ[Rerunnable ~> Rerunnable.Par](Rerunnable.Par(_))
     }
 
+  /**
+   * Obtain a [[cats.Eq]] instance for [[Rerunnable]].
+   *
+   * This version is only useful for successful actions: if one fails, the resulting exception will be thrown.
+   *
+   * These instances use [[com.twitter.util.Await]] so should be
+   * [[https://finagle.github.io/blog/2016/09/01/block-party/ avoided in production code]].  Likely use cases
+   * include tests, scrips, REPLs etc.
+   */
   final def rerunnableEq[A](atMost: Duration)(implicit A: Eq[A]): Eq[Rerunnable[A]] =
     Eq.by[Rerunnable[A], Future[A]](_.run)(futureEq[A](atMost))
 
+  /**
+   * Obtain a [[cats.Eq]] instance for [[Rerunnable]].
+   *
+   * This version can also compare failed actions and thus requires an `Eq[Throwable]` in scope.
+   *
+   * These instances use [[com.twitter.util.Await]] so should be
+   * [[https://finagle.github.io/blog/2016/09/01/block-party/ avoided in production code]].  Likely use cases
+   * include tests, scrips, REPLs etc.
+   */
   final def rerunnableEqWithFailure[A](atMost: Duration)(implicit A: Eq[A], T: Eq[Throwable]): Eq[Rerunnable[A]] =
     Eq.by[Rerunnable[A], Future[A]](_.run)(futureEqWithFailure[A](atMost))
 
   /**
-   * FunctionK instance to convert to Future
+   * FunctionK instance to convert to Future.
    *
    * Useful when you need a parameter for a `mapK` method, for example you could use
    * [[https://typelevel.org/cats-tagless/ cats-tagless]] in a codebase that mixes [[Rerunnable]] and
@@ -176,6 +194,14 @@ final object Rerunnable extends RerunnableInstances1 {
 }
 
 private[util] trait RerunnableInstances1 extends RerunnableParallelNewtype {
+
+  /**
+   * Obtain a [[cats.Comonad]] instance for [[Rerunnable]]
+   *
+   * These instances use [[com.twitter.util.Await]] so should be
+   * [[https://finagle.github.io/blog/2016/09/01/block-party/ avoided in production code]].  Likely use cases
+   * include tests, scrips, REPLs etc.
+   */
   final def rerunnableComonad(atMost: Duration): Comonad[Rerunnable] =
     new RerunnableCoflatMap with Comonad[Rerunnable] {
       final def extract[A](x: Rerunnable[A]): A = Await.result(x.run, atMost)
