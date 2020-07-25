@@ -46,7 +46,7 @@ lazy val baseSettings = Seq(
     "org.scalatest" %% "scalatest" % "3.2.0" % Test,
     "org.typelevel" %% "cats-laws" % catsVersion % Test,
     "org.typelevel" %% "discipline-core" % "1.0.2" % Test,
-    "org.typelevel" %% "discipline-scalatest" % "1.0.1" % Test,
+    "org.typelevel" %% "discipline-scalatest" % "2.0.0" % Test,
     compilerPlugin(("org.typelevel" %% "kind-projector" % "0.11.0").cross(CrossVersion.full))
   ),
   resolvers += Resolver.sonatypeRepo("snapshots"),
