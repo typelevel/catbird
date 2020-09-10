@@ -281,8 +281,8 @@ private[util] class RerunnableMonadError extends MonadError[Rerunnable, Throwabl
   final def raiseError[A](e: Throwable): Rerunnable[A] = Rerunnable.raiseError(e)
 
   final def handleErrorWith[A](fa: Rerunnable[A])(f: Throwable => Rerunnable[A]): Rerunnable[A] = new Rerunnable[A] {
-    final def run: Future[A] = fa.run.rescue {
-      case error => f(error).run
+    final def run: Future[A] = fa.run.rescue { case error =>
+      f(error).run
     }
   }
 
@@ -298,7 +298,7 @@ private[util] class RerunnableMonadError extends MonadError[Rerunnable, Throwabl
 }
 
 private[util] sealed class RerunnableSemigroup[A](implicit A: Semigroup[A]) extends Semigroup[Rerunnable[A]] {
-  final def combine(fx: Rerunnable[A], fy: Rerunnable[A]): Rerunnable[A] = fx.product(fy).map {
-    case (x, y) => A.combine(x, y)
+  final def combine(fx: Rerunnable[A], fy: Rerunnable[A]): Rerunnable[A] = fx.product(fy).map { case (x, y) =>
+    A.combine(x, y)
   }
 }

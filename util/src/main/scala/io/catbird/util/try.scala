@@ -26,8 +26,8 @@ trait TryInstances extends TryInstances1 {
       final def flatMap[A, B](fa: Try[A])(f: A => Try[B]): Try[B] = fa.flatMap(f)
       override final def map[A, B](fa: Try[A])(f: A => B): Try[B] = fa.map(f)
 
-      final def handleErrorWith[A](fa: Try[A])(f: Throwable => Try[A]): Try[A] = fa.rescue {
-        case e => f(e)
+      final def handleErrorWith[A](fa: Try[A])(f: Throwable => Try[A]): Try[A] = fa.rescue { case e =>
+        f(e)
       }
       final def raiseError[A](e: Throwable): Try[A] = Throw(e)
 

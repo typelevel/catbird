@@ -32,32 +32,32 @@ class RerunnableBenchmark {
 
   @Benchmark
   def sumIntsF: Int = Await.result(
-    numbers.foldLeft(Future(0)) {
-      case (acc, i) => acc.flatMap(prev => Future(prev + i))
+    numbers.foldLeft(Future(0)) { case (acc, i) =>
+      acc.flatMap(prev => Future(prev + i))
     }
   )
 
   @Benchmark
   def sumIntsR: Int = Await.result(
     numbers
-      .foldLeft(Rerunnable(0)) {
-        case (acc, i) => acc.flatMap(prev => Rerunnable(prev + i))
+      .foldLeft(Rerunnable(0)) { case (acc, i) =>
+        acc.flatMap(prev => Rerunnable(prev + i))
       }
       .run
   )
 
   @Benchmark
   def sumIntsPF: Int = Await.result(
-    numbers.foldLeft(pool(0)) {
-      case (acc, i) => acc.flatMap(prev => pool(prev + i))
+    numbers.foldLeft(pool(0)) { case (acc, i) =>
+      acc.flatMap(prev => pool(prev + i))
     }
   )
 
   @Benchmark
   def sumIntsPR: Int = Await.result(
     numbers
-      .foldLeft(Rerunnable.withFuturePool(pool)(0)) {
-        case (acc, i) => acc.flatMap(prev => Rerunnable.withFuturePool(pool)(prev + i))
+      .foldLeft(Rerunnable.withFuturePool(pool)(0)) { case (acc, i) =>
+        acc.flatMap(prev => Rerunnable.withFuturePool(pool)(prev + i))
       }
       .run
   )

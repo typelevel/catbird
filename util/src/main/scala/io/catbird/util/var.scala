@@ -19,8 +19,8 @@ trait VarInstances extends VarInstances1 {
   final def varEq[A](implicit A: Eq[A]): Eq[Var[A]] =
     new Eq[Var[A]] {
       final def eqv(fx: Var[A], fy: Var[A]): Boolean = Var.sample(
-        fx.join(fy).map {
-          case (x, y) => A.eqv(x, y)
+        fx.join(fy).map { case (x, y) =>
+          A.eqv(x, y)
         }
       )
     }
@@ -51,7 +51,7 @@ private[util] abstract class VarCoflatMap extends CoflatMap[Var] {
 }
 
 private[util] class VarSemigroup[A](implicit A: Semigroup[A]) extends Semigroup[Var[A]] {
-  final def combine(fx: Var[A], fy: Var[A]): Var[A] = fx.join(fy).map {
-    case (x, y) => A.combine(x, y)
+  final def combine(fx: Var[A], fy: Var[A]): Var[A] = fx.join(fy).map { case (x, y) =>
+    A.combine(x, y)
   }
 }
