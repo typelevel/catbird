@@ -38,8 +38,8 @@ trait FutureInstances extends FutureInstances1 {
    */
   final def futureEq[A](atMost: Duration)(implicit A: Eq[A]): Eq[Future[A]] = new Eq[Future[A]] {
     final def eqv(x: Future[A], y: Future[A]): Boolean = Await.result(
-      x.join(y).map {
-        case (xa, ya) => A.eqv(xa, ya)
+      x.join(y).map { case (xa, ya) =>
+        A.eqv(xa, ya)
       },
       atMost
     )
@@ -137,14 +137,14 @@ private[util] trait FutureMonadError extends MonadError[Future, Throwable] {
   final def pure[A](x: A): Future[A] = Future.value(x)
   final def flatMap[A, B](fa: Future[A])(f: A => Future[B]): Future[B] = fa.flatMap(f)
   override final def map[A, B](fa: Future[A])(f: A => B): Future[B] = fa.map(f)
-  override final def ap[A, B](f: Future[A => B])(fa: Future[A]): Future[B] = f.join(fa).map {
-    case (ab, a) => ab(a)
+  override final def ap[A, B](f: Future[A => B])(fa: Future[A]): Future[B] = f.join(fa).map { case (ab, a) =>
+    ab(a)
   }
   override final def product[A, B](fa: Future[A], fb: Future[B]): Future[(A, B)] = fa.join(fb)
 
   final def handleErrorWith[A](fa: Future[A])(f: Throwable => Future[A]): Future[A] =
-    fa.rescue {
-      case e => f(e)
+    fa.rescue { case e =>
+      f(e)
     }
   final def raiseError[A](e: Throwable): Future[A] = Future.exception(e)
 
@@ -159,7 +159,7 @@ private[util] sealed abstract class FutureCoflatMap extends CoflatMap[Future] {
 }
 
 private[util] sealed class FutureSemigroup[A](implicit A: Semigroup[A]) extends Semigroup[Future[A]] {
-  final def combine(fx: Future[A], fy: Future[A]): Future[A] = fx.join(fy).map {
-    case (x, y) => A.combine(x, y)
+  final def combine(fx: Future[A], fy: Future[A]): Future[A] = fx.join(fy).map { case (x, y) =>
+    A.combine(x, y)
   }
 }
