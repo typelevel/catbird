@@ -1,7 +1,7 @@
 val catsVersion = "2.0.0"
 val catsEffectVersion = "2.0.0"
-val utilVersion = "20.8.1"
-val finagleVersion = "20.8.1"
+val utilVersion = "20.9.0"
+val finagleVersion = "20.9.0"
 
 organization in ThisBuild := "io.catbird"
 
