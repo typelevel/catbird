@@ -3,7 +3,12 @@ val catsEffectVersion = "2.0.0"
 val utilVersion = "20.10.0"
 val finagleVersion = "20.10.0"
 
+crossScalaVersions in ThisBuild := Seq("2.11.12", "2.12.11", "2.13.3")
+scalaVersion in ThisBuild := crossScalaVersions.value.last
+
 organization in ThisBuild := "io.catbird"
+
+onChangedBuildSource in Global := ReloadOnSourceChanges
 
 def compilerOptions(scalaVersion: String): Seq[String] = Seq(
   "-deprecation",
@@ -32,8 +37,6 @@ def compilerOptions(scalaVersion: String): Seq[String] = Seq(
 val docMappingsApiDir = settingKey[String]("Subdirectory in site target directory for API docs")
 
 lazy val baseSettings = Seq(
-  crossScalaVersions := Seq("2.11.12", "2.12.11", "2.13.3"),
-  scalaVersion := "2.13.3",
   scalacOptions ++= compilerOptions(scalaVersion.value),
   scalacOptions in (Compile, console) ~= {
     _.filterNot(Set("-Ywarn-unused-import", "-Ywarn-unused:imports", "-Yno-imports", "-Yno-predef"))
@@ -183,3 +186,30 @@ def priorTo2_13(scalaVersion: String): Boolean =
     case Some((2, minor)) if minor < 13 => true
     case _                              => false
   }
+
+githubWorkflowJavaVersions in ThisBuild := Seq("adopt@1.8")
+// No auto-publish atm. Remove this line to generate publish stage
+githubWorkflowPublishTargetBranches in ThisBuild := Seq.empty
+githubWorkflowBuild in ThisBuild := Seq(
+  WorkflowStep.Sbt(
+    List(
+      "clean",
+      "coverage",
+      "test",
+      "scalastyle",
+      "scalafmtCheck",
+      "scalafmtSbtCheck",
+      "test:scalafmtCheck",
+      "unidoc",
+      "coverageReport"
+    ),
+    env = Map(
+      "SBT_OPTS" -> "-J-Xmx8G"
+    )
+  ),
+  WorkflowStep.Use(
+    "codecov",
+    "codecov-action",
+    "v1"
+  )
+)
