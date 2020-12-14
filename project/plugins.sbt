@@ -1,4 +1,3 @@
-addSbtPlugin("com.dwijnand" % "sbt-travisci" % "1.2.0")
 addSbtPlugin("com.eed3si9n" % "sbt-unidoc" % "0.4.3")
 addSbtPlugin("com.github.gseitz" % "sbt-release" % "1.0.13")
 addSbtPlugin("com.jsuereth" % "sbt-pgp" % "2.1.1")
