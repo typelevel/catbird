@@ -204,7 +204,7 @@ githubWorkflowBuild in ThisBuild := Seq(
       "coverageReport"
     ),
     env = Map(
-      "SBT_OPTS" -> "-Xmx8G"
+      "SBT_OPTS" -> "-J-Xmx8G"
     )
   ),
   WorkflowStep.Use(
