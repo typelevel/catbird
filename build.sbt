@@ -46,7 +46,7 @@ lazy val baseSettings = Seq(
   },
   libraryDependencies ++= Seq(
     "org.typelevel" %% "cats-core" % catsVersion,
-    "org.scalacheck" %% "scalacheck" % "1.15.1" % Test,
+    "org.scalacheck" %% "scalacheck" % "1.15.2" % Test,
     "org.scalatest" %% "scalatest" % "3.2.3" % Test,
     "org.typelevel" %% "cats-laws" % catsVersion % Test,
     "org.typelevel" %% "discipline-core" % "1.1.2" % Test,
