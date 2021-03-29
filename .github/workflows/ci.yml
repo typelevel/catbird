@@ -55,4 +55,5 @@ jobs:
           SBT_OPTS: '-J-Xmx8G'
         run: 'sbt ++${{ matrix.scala }} clean coverage test scalastyle scalafmtCheck scalafmtSbtCheck test:scalafmtCheck unidoc coverageReport'
 
-      - uses: codecov/codecov-action@v1
+      - name: Code coverage analysis
+        uses: codecov/codecov-action@v1
