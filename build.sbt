@@ -208,8 +208,7 @@ githubWorkflowBuild in ThisBuild := Seq(
     )
   ),
   WorkflowStep.Use(
-    "codecov",
-    "codecov-action",
-    "v1"
+    UseRef.Public("codecov", "codecov-action", "v1"),
+    name = Some("Code coverage analysis")
   )
 )
