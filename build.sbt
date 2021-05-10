@@ -1,14 +1,14 @@
-val catsVersion = "2.0.0"
-val catsEffectVersion = "2.0.0"
+val catsVersion = "2.6.0"
+val catsEffectVersion = "2.5.0"
 val utilVersion = "21.2.0"
 val finagleVersion = "21.2.0"
 
-crossScalaVersions in ThisBuild := Seq("2.11.12", "2.12.11", "2.13.3")
-scalaVersion in ThisBuild := crossScalaVersions.value.last
+ThisBuild / crossScalaVersions := Seq("2.12.13", "2.13.5")
+ThisBuild / scalaVersion := crossScalaVersions.value.last
 
-organization in ThisBuild := "io.catbird"
+ThisBuild / organization := "io.catbird"
 
-onChangedBuildSource in Global := ReloadOnSourceChanges
+(Global / onChangedBuildSource) := ReloadOnSourceChanges
 
 def compilerOptions(scalaVersion: String): Seq[String] = Seq(
   "-deprecation",
@@ -38,10 +38,10 @@ val docMappingsApiDir = settingKey[String]("Subdirectory in site target director
 
 lazy val baseSettings = Seq(
   scalacOptions ++= compilerOptions(scalaVersion.value),
-  scalacOptions in (Compile, console) ~= {
+  (Compile / console / scalacOptions) ~= {
     _.filterNot(Set("-Ywarn-unused-import", "-Ywarn-unused:imports", "-Yno-imports", "-Yno-predef"))
   },
-  scalacOptions in (Test, console) ~= {
+  (Test / console / scalacOptions) ~= {
     _.filterNot(Set("-Ywarn-unused-import", "-Ywarn-unused:imports", "-Yno-imports", "-Yno-predef"))
   },
   libraryDependencies ++= Seq(
@@ -64,12 +64,12 @@ lazy val root = project
   .enablePlugins(GhpagesPlugin, ScalaUnidocPlugin)
   .settings(allSettings ++ noPublishSettings)
   .settings(
-    unidocProjectFilter in (ScalaUnidoc, unidoc) := inAnyProject -- inProjects(benchmark),
-    addMappingsToSiteDir(mappings in (ScalaUnidoc, packageDoc), docMappingsApiDir),
+    (ScalaUnidoc / unidoc / unidocProjectFilter) := inAnyProject -- inProjects(benchmark),
+    addMappingsToSiteDir((ScalaUnidoc / packageDoc / mappings), docMappingsApiDir),
     git.remoteRepo := "git@github.com:travisbrown/catbird.git"
   )
   .settings(
-    initialCommands in console :=
+    (console / initialCommands) :=
       """
         |import com.twitter.finagle._
         |import com.twitter.util._
@@ -85,7 +85,7 @@ lazy val util = project
   .settings(allSettings)
   .settings(
     libraryDependencies += "com.twitter" %% "util-core" % utilVersion,
-    scalacOptions in Test ~= {
+    (Test / scalacOptions) ~= {
       _.filterNot(Set("-Yno-imports", "-Yno-predef"))
     }
   )
@@ -98,7 +98,7 @@ lazy val effect = project
       "org.typelevel" %% "cats-effect" % catsEffectVersion,
       "org.typelevel" %% "cats-effect-laws" % catsEffectVersion % Test
     ),
-    scalacOptions in Test ~= {
+    (Test / scalacOptions) ~= {
       _.filterNot(Set("-Yno-imports", "-Yno-predef"))
     }
   )
@@ -109,7 +109,7 @@ lazy val finagle = project
   .settings(allSettings)
   .settings(
     libraryDependencies += "com.twitter" %% "finagle-core" % finagleVersion,
-    scalacOptions in Test ~= {
+    (Test / scalacOptions) ~= {
       _.filterNot(Set("-Yno-imports", "-Yno-predef"))
     }
   )
@@ -135,7 +135,7 @@ lazy val publishSettings = Seq(
   homepage := Some(url("https://github.com/travisbrown/catbird")),
   licenses := Seq("Apache 2.0" -> url("http://www.apache.org/licenses/LICENSE-2.0")),
   publishMavenStyle := true,
-  publishArtifact in Test := false,
+  (Test / publishArtifact) := false,
   pomIncludeRepository := { _ => false },
   publishTo := {
     val nexus = "https://oss.sonatype.org/"
@@ -187,10 +187,10 @@ def priorTo2_13(scalaVersion: String): Boolean =
     case _                              => false
   }
 
-githubWorkflowJavaVersions in ThisBuild := Seq("adopt@1.8")
+ThisBuild / githubWorkflowJavaVersions := Seq("adopt@1.8")
 // No auto-publish atm. Remove this line to generate publish stage
-githubWorkflowPublishTargetBranches in ThisBuild := Seq.empty
-githubWorkflowBuild in ThisBuild := Seq(
+ThisBuild / githubWorkflowPublishTargetBranches := Seq.empty
+ThisBuild / githubWorkflowBuild := Seq(
   WorkflowStep.Sbt(
     List(
       "clean",

@@ -121,7 +121,7 @@ private[util] trait FutureParallelNewtype {
     import FuturePar.unwrap
 
     final override def eqv(x: FuturePar[A], y: FuturePar[A]): Boolean =
-      futureEq(atMost).eqv(unwrap(x), unwrap(y))
+      futureEq(atMost)(A).eqv(unwrap(x), unwrap(y))
   }
 
   final def futureParEqWithFailure[A](atMost: Duration)(implicit A: Eq[A], T: Eq[Throwable]): Eq[FuturePar[A]] =
