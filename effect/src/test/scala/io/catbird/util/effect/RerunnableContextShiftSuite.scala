@@ -1,6 +1,6 @@
 package io.catbird.util.effect
 
-import cats.effect.{ ContextShift, IO, Sync }
+import cats.effect.{ IO, Sync }
 import com.twitter.util.{ Await, Future, FuturePool }
 import io.catbird.util.Rerunnable
 import org.scalatest.Outcome

@@ -1,6 +1,5 @@
 package io.catbird.util.effect
 
-import cats.effect.ContextShift
 import com.twitter.util.{ Future, FuturePool, Promise }
 import io.catbird.util.Rerunnable
 

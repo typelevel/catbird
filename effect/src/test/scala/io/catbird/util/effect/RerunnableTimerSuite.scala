@@ -1,6 +1,5 @@
 package io.catbird.util.effect
 
-import cats.effect.Timer
 import org.scalatest.Outcome
 import org.scalatest.funsuite.FixtureAnyFunSuite
 import com.twitter.util
@@ -8,6 +7,7 @@ import com.twitter.util.{ Await, Future }
 import io.catbird.util.Rerunnable
 
 import scala.concurrent.duration._
+import cats.effect.Temporal
 
 class RerunnableTimerSuite extends FixtureAnyFunSuite {
 
@@ -16,13 +16,13 @@ class RerunnableTimerSuite extends FixtureAnyFunSuite {
   }
 
   test("A timer can be used to delay execution") { f =>
-    implicit val timer: Timer[Rerunnable] = RerunnableTimer(f.twitterTimer)
+    implicit val timer: Temporal[Rerunnable] = RerunnableTimer(f.twitterTimer)
 
     val result = Await.result(
       Future.selectIndex(
         Vector(
           for {
-            _ <- Timer[Rerunnable].sleep(100.milliseconds).run
+            _ <- Temporal[Rerunnable].sleep(100.milliseconds).run
             r <- Future.value("slow")
           } yield r,
           Future.value("fast").delayed(util.Duration.fromMilliseconds(50))(f.twitterTimer)

@@ -1,12 +1,13 @@
 package io.catbird.util.effect
 
-import cats.effect.{ Clock, Timer }
+import cats.effect.Clock
 import io.catbird.util.Rerunnable
 import com.twitter.util.Future
 import com.twitter.util
 import scala.Unit
 
 import scala.concurrent.duration.FiniteDuration
+import cats.effect.Temporal
 
 /**
  * Can be used to construct a `cats.effect.Timer` instance for `Rerunnable` which let's you delay execution or
@@ -35,7 +36,7 @@ object RerunnableTimer {
   }
 }
 
-final private[effect] class RerunnableTimer private (implicit underlyingTimer: util.Timer) extends Timer[Rerunnable] {
+final private[effect] class RerunnableTimer private (implicit underlyingTimer: util.Timer) extends Temporal[Rerunnable] {
 
   override val clock: Clock[Rerunnable] = RerunnableClock()
 
