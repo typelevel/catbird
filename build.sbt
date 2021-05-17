@@ -3,7 +3,7 @@ val catsEffectVersion = "2.5.0"
 val utilVersion = "21.2.0"
 val finagleVersion = "21.2.0"
 
-ThisBuild / crossScalaVersions := Seq("2.12.13", "2.13.5")
+ThisBuild / crossScalaVersions := Seq("2.12.13", "2.13.6")
 ThisBuild / scalaVersion := crossScalaVersions.value.last
 
 ThisBuild / organization := "io.catbird"
