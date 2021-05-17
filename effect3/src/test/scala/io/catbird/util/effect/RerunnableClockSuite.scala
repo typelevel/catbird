@@ -7,7 +7,7 @@ import cats.effect.Clock
 import com.twitter.util.Await
 import io.catbird.util.Rerunnable
 import org.scalatest.{ Outcome }
-import org.scalatest.concurrent.{Eventually, IntegrationPatience}
+import org.scalatest.concurrent.{ Eventually, IntegrationPatience }
 import org.scalatest.funsuite.FixtureAnyFunSuite
 
 /**
