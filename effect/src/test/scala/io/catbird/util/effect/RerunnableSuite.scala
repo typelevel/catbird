@@ -3,7 +3,7 @@ package io.catbird.util.effect
 import cats.effect.laws.discipline.EffectTests
 import cats.effect.laws.discipline.arbitrary.catsEffectLawsArbitraryForIO
 import cats.effect.laws.util.{ TestContext, TestInstances }
-import cats.effect.{ Bracket, IO }
+import cats.effect.IO
 import cats.instances.either._
 import cats.instances.int._
 import cats.instances.tuple._
@@ -15,6 +15,7 @@ import io.catbird.util.{ ArbitraryInstances, Rerunnable }
 import org.scalatest.funsuite.AnyFunSuite
 import org.scalatest.prop.Configuration
 import org.typelevel.discipline.scalatest.FunSuiteDiscipline
+import cats.effect.MonadCancel
 
 class RerunnableSuite
     extends AnyFunSuite
@@ -35,7 +36,7 @@ class RerunnableSuite
     var monitoredException: Throwable = null
     val monitor = Monitor.mk { case e => monitoredException = e; true; }
 
-    val rerunnable = Bracket[Rerunnable, Throwable]
+    val rerunnable = MonadCancel[Rerunnable, Throwable]
       .bracket(Rerunnable.Unit)(_ => Rerunnable.raiseError(useException))(_ => Rerunnable.raiseError(releaseException))
       .liftToTry
 

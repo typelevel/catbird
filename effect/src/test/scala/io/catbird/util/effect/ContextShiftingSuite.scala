@@ -1,6 +1,6 @@
 package io.catbird.util.effect
 
-import cats.effect.{ ContextShift, IO }
+import cats.effect.IO
 import com.twitter.util.{ ExecutorServiceFuturePool, Future, FuturePool }
 import org.scalatest.Outcome
 import org.scalatest.funsuite.FixtureAnyFunSuite
