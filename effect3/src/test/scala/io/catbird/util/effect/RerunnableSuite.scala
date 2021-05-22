@@ -2,12 +2,11 @@ package io.catbird.util.effect
 
 import cats.effect.MonadCancel
 import cats.effect.kernel.testkit.SyncTypeGenerators
-import cats.effect.laws.{ ClockTests, MonadCancelTests, SyncTests }
+import cats.effect.laws.SyncTests
 import cats.instances.either._
 import cats.instances.int._
 import cats.instances.tuple._
 import cats.instances.unit._
-import cats.laws.discipline.MonadErrorTests
 import cats.laws.discipline.arbitrary._
 import com.twitter.util.{ Await, Monitor, Throw }
 import io.catbird.util.{ ArbitraryInstances, EqInstances, Rerunnable }
@@ -24,9 +23,7 @@ class RerunnableSuite
     with EqInstances
     with Runners {
 
-  checkAll("Rerunnable[Int]", ClockTests[Rerunnable].clock)
-  checkAll("Rerunnable[Int]", MonadErrorTests[Rerunnable, Throwable].monadError[Int, Int, Int])
-  checkAll("Rerunnable[Int]", MonadCancelTests[Rerunnable, Throwable].monadCancel[Int, Int, Int])
+  // This includes tests for Clock, MonadCancel, and MonadError
   checkAll("Rerunnable[Int]", SyncTests[Rerunnable].sync[Int, Int, Int])
 
   test("Exceptions thrown by release are handled by Monitor") {
