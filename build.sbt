@@ -1,7 +1,7 @@
-val catsVersion = "2.6.0"
-val catsEffectVersion = "2.5.0"
-val utilVersion = "21.4.0"
-val finagleVersion = "21.4.0"
+val catsVersion = "2.6.1"
+val catsEffectVersion = "2.5.1"
+val utilVersion = "21.2.0"
+val finagleVersion = "21.2.0"
 
 ThisBuild / crossScalaVersions := Seq("2.12.13", "2.13.5")
 ThisBuild / scalaVersion := crossScalaVersions.value.last
@@ -46,12 +46,12 @@ lazy val baseSettings = Seq(
   },
   libraryDependencies ++= Seq(
     "org.typelevel" %% "cats-core" % catsVersion,
-    "org.scalacheck" %% "scalacheck" % "1.15.2" % Test,
-    "org.scalatest" %% "scalatest" % "3.2.8" % Test,
+    "org.scalacheck" %% "scalacheck" % "1.15.4" % Test,
+    "org.scalatest" %% "scalatest" % "3.2.9" % Test,
     "org.typelevel" %% "cats-laws" % catsVersion % Test,
-    "org.typelevel" %% "discipline-core" % "1.1.3" % Test,
-    "org.typelevel" %% "discipline-scalatest" % "2.1.1" % Test,
-    compilerPlugin(("org.typelevel" %% "kind-projector" % "0.11.3").cross(CrossVersion.full))
+    "org.typelevel" %% "discipline-core" % "1.1.5" % Test,
+    "org.typelevel" %% "discipline-scalatest" % "2.1.5" % Test,
+    compilerPlugin(("org.typelevel" %% "kind-projector" % "0.13.0").cross(CrossVersion.full))
   ),
   resolvers += Resolver.sonatypeRepo("snapshots"),
   docMappingsApiDir := "api"
@@ -120,7 +120,7 @@ lazy val benchmark = project
   .settings(allSettings)
   .settings(noPublishSettings)
   .settings(
-    libraryDependencies += "org.scalatest" %% "scalatest" % "3.2.8",
+    libraryDependencies += "org.scalatest" %% "scalatest" % "3.2.9",
     scalacOptions ~= {
       _.filterNot(Set("-Yno-imports", "-Yno-predef"))
     }
