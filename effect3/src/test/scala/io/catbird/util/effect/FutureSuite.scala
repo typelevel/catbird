@@ -3,7 +3,6 @@ package io.catbird.util.effect
 import cats.Eq
 import cats.effect.laws.MonadCancelTests
 import cats.instances.all._
-import cats.laws.discipline.MonadErrorTests
 import cats.laws.discipline.arbitrary._
 import com.twitter.conversions.DurationOps._
 import com.twitter.util.Future
@@ -14,6 +13,5 @@ class FutureSuite extends BaseLawSuite {
   implicit def futureEq[A](implicit A: Eq[A]): Eq[Future[A]] =
     futureEqWithFailure(1.seconds)
 
-  checkAll("Future[Int]", MonadErrorTests[Future, Throwable].monadError[Int, Int, Int])
   checkAll("Future[Int]", MonadCancelTests[Future, Throwable].monadCancel[Int, Int, Int])
 }
