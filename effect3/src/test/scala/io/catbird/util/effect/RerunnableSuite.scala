@@ -9,19 +9,9 @@ import cats.instances.tuple._
 import cats.instances.unit._
 import cats.laws.discipline.arbitrary._
 import com.twitter.util.{ Await, Monitor, Throw }
-import io.catbird.util.{ ArbitraryInstances, EqInstances, Rerunnable }
-import org.scalatest.funsuite.AnyFunSuite
-import org.scalatest.prop.Configuration
-import org.typelevel.discipline.scalatest.FunSuiteDiscipline
+import io.catbird.util.Rerunnable
 
-class RerunnableSuite
-    extends AnyFunSuite
-    with FunSuiteDiscipline
-    with Configuration
-    with ArbitraryInstances
-    with SyncTypeGenerators
-    with EqInstances
-    with Runners {
+class RerunnableSuite extends BaseLawSuite with SyncTypeGenerators with Runners {
 
   // This includes tests for Clock, MonadCancel, and MonadError
   checkAll("Rerunnable[Int]", SyncTests[Rerunnable].sync[Int, Int, Int])
