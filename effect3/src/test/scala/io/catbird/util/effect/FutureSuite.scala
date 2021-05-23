@@ -6,9 +6,9 @@ import cats.instances.all._
 import cats.laws.discipline.arbitrary._
 import com.twitter.conversions.DurationOps._
 import com.twitter.util.Future
-import io.catbird.util.futureEqWithFailure
+import io.catbird.util.{ ArbitraryInstances, futureEqWithFailure }
 
-class FutureSuite extends BaseLawSuite {
+class FutureSuite extends BaseLawSuite with ArbitraryInstances {
 
   implicit def futureEq[A](implicit A: Eq[A]): Eq[Future[A]] =
     futureEqWithFailure(1.seconds)

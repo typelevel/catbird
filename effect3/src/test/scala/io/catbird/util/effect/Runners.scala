@@ -2,10 +2,11 @@ package io.catbird.util.effect
 
 import cats.Eq
 import cats.effect.{ IO, Outcome, unsafe }
+import cats.effect.kernel.testkit.SyncGenerators
 import cats.effect.testkit.TestContext
 import cats.effect.unsafe.IORuntimeConfig
 import io.catbird.util.{ EqInstances, Rerunnable }
-import org.scalacheck.Prop
+import org.scalacheck.{ Arbitrary, Cogen, Prop }
 
 import scala.annotation.implicitNotFound
 import scala.concurrent.duration.FiniteDuration
@@ -16,6 +17,18 @@ import scala.language.implicitConversions
  * Test helpers mostly taken from the cats-effect IOSpec.
  */
 trait Runners { self: EqInstances =>
+
+  implicit def arbitraryRerunnable[A: Arbitrary: Cogen]: Arbitrary[Rerunnable[A]] = {
+    val generators = new SyncGenerators[Rerunnable] {
+      val F = rerunnableInstance
+
+      val arbitraryE = Arbitrary.arbThrowable
+      val cogenE = Cogen.cogenThrowable
+
+      val arbitraryFD = Arbitrary.arbFiniteDuration
+    }
+    Arbitrary(generators.generators[A])
+  }
 
   implicit val ticker: Ticker = Ticker(TestContext())
 
