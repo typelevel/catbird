@@ -2,12 +2,11 @@ package io.catbird.util.effect
 
 import cats.effect.Clock
 import cats.effect.kernel.{ MonadCancel, Outcome, Sync }
-import com.twitter.util.{ Future, Monitor }
+import com.twitter.util.{ Future, Monitor, Stopwatch, Time }
 import io.catbird.util.{ Rerunnable, RerunnableMonadError }
 
 import java.lang.Throwable
 import java.util.concurrent.TimeUnit
-import java.lang.System
 
 import scala.Unit
 import scala.concurrent.duration.FiniteDuration
@@ -24,10 +23,10 @@ trait RerunnableInstances {
         Rerunnable(thunk)
 
       final override def realTime: Rerunnable[FiniteDuration] =
-        Rerunnable(FiniteDuration(System.currentTimeMillis(), TimeUnit.MILLISECONDS))
+        Rerunnable(FiniteDuration(Time.nowNanoPrecision.inNanoseconds, TimeUnit.NANOSECONDS))
 
       final override def monotonic: Rerunnable[FiniteDuration] =
-        Rerunnable(FiniteDuration(System.nanoTime(), TimeUnit.NANOSECONDS))
+        Rerunnable(FiniteDuration(Stopwatch.timeNanos(), TimeUnit.NANOSECONDS))
 
       final override def forceR[A, B](fa: Rerunnable[A])(fb: Rerunnable[B]): Rerunnable[B] =
         fa.liftToTry.flatMap { resultA =>
