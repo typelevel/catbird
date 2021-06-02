@@ -1,9 +1,9 @@
 val catsVersion = "2.6.1"
-val catsEffectVersion = "2.5.0"
-val utilVersion = "21.2.0"
-val finagleVersion = "21.2.0"
+val catsEffectVersion = "2.5.1"
+val utilVersion = "21.5.0"
+val finagleVersion = "21.5.0"
 
-ThisBuild / crossScalaVersions := Seq("2.12.13", "2.13.6")
+ThisBuild / crossScalaVersions := Seq("2.12.14", "2.13.5")
 ThisBuild / scalaVersion := crossScalaVersions.value.last
 
 ThisBuild / organization := "io.catbird"
@@ -50,7 +50,7 @@ lazy val baseSettings = Seq(
     "org.scalatest" %% "scalatest" % "3.2.9" % Test,
     "org.typelevel" %% "cats-laws" % catsVersion % Test,
     "org.typelevel" %% "discipline-core" % "1.1.5" % Test,
-    "org.typelevel" %% "discipline-scalatest" % "2.1.4" % Test,
+    "org.typelevel" %% "discipline-scalatest" % "2.1.5" % Test,
     compilerPlugin(("org.typelevel" %% "kind-projector" % "0.13.0").cross(CrossVersion.full))
   ),
   resolvers += Resolver.sonatypeRepo("snapshots"),
