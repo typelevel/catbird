@@ -1,5 +1,9 @@
 val catsVersion = "2.6.1"
+
+// For the transition period, we publish artifacts for both cats-effect 2.x and 3.x
 val catsEffectVersion = "2.5.1"
+val catsEffect3Version = "3.1.1"
+
 val utilVersion = "21.5.0"
 val finagleVersion = "21.5.0"
 
@@ -64,7 +68,7 @@ lazy val root = project
   .enablePlugins(GhpagesPlugin, ScalaUnidocPlugin)
   .settings(allSettings ++ noPublishSettings)
   .settings(
-    (ScalaUnidoc / unidoc / unidocProjectFilter) := inAnyProject -- inProjects(benchmark),
+    (ScalaUnidoc / unidoc / unidocProjectFilter) := inAnyProject -- inProjects(benchmark, effect3),
     addMappingsToSiteDir((ScalaUnidoc / packageDoc / mappings), docMappingsApiDir),
     git.remoteRepo := "git@github.com:travisbrown/catbird.git"
   )
@@ -77,7 +81,7 @@ lazy val root = project
         |import io.catbird.util._
       """.stripMargin
   )
-  .aggregate(util, effect, finagle, benchmark)
+  .aggregate(util, effect, effect3, finagle, benchmark)
   .dependsOn(util, effect, finagle)
 
 lazy val util = project
@@ -97,6 +101,22 @@ lazy val effect = project
     libraryDependencies ++= Seq(
       "org.typelevel" %% "cats-effect" % catsEffectVersion,
       "org.typelevel" %% "cats-effect-laws" % catsEffectVersion % Test
+    ),
+    (Test / scalacOptions) ~= {
+      _.filterNot(Set("-Yno-imports", "-Yno-predef"))
+    }
+  )
+  .dependsOn(util, util % "test->test")
+
+lazy val effect3 = project
+  .in(file("effect3"))
+  .settings(moduleName := "catbird-effect3")
+  .settings(allSettings)
+  .settings(
+    libraryDependencies ++= Seq(
+      "org.typelevel" %% "cats-effect" % catsEffect3Version,
+      "org.typelevel" %% "cats-effect-laws" % catsEffect3Version % Test,
+      "org.typelevel" %% "cats-effect-testkit" % catsEffect3Version % Test
     ),
     (Test / scalacOptions) ~= {
       _.filterNot(Set("-Yno-imports", "-Yno-predef"))
