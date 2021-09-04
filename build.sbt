@@ -2,7 +2,7 @@ val catsVersion = "2.6.1"
 
 // For the transition period, we publish artifacts for both cats-effect 2.x and 3.x
 val catsEffectVersion = "2.5.3"
-val catsEffect3Version = "3.2.5"
+val catsEffect3Version = "3.2.6"
 
 val utilVersion = "21.8.0"
 val finagleVersion = "21.8.0"
