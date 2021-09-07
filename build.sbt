@@ -74,7 +74,6 @@ lazy val baseSettings = Seq(
   ),
   libraryDependencies ++= Seq(
     "org.typelevel" %% "cats-core" % catsVersion,
-    "org.scala-lang.modules" %% "scala-collection-compat" % "2.5.0",
     "org.scalacheck" %% "scalacheck" % "1.15.4" % Test,
     "org.scalatest" %% "scalatest" % "3.2.9" % Test,
     "org.typelevel" %% "cats-laws" % catsVersion % Test,
@@ -112,10 +111,8 @@ lazy val util = project
   .settings(moduleName := "catbird-util")
   .settings(allSettings)
   .settings(
-    libraryDependencies ++=
-      Seq(
-        ("com.twitter" %% "util-core" % utilVersion).exclude("org.scala-lang.modules", "scala-collection-compat_2.13")
-      ),
+    libraryDependencies +=
+      ("com.twitter" %% "util-core" % utilVersion).cross(CrossVersion.for3Use2_13),
     (Test / scalacOptions) ~= {
       _.filterNot(Set("-Yno-imports", "-Yno-predef"))
     }
@@ -155,11 +152,11 @@ lazy val finagle = project
   .settings(moduleName := "catbird-finagle")
   .settings(allSettings)
   .settings(
-    libraryDependencies +=
-      ("com.twitter" %% "finagle-core" % finagleVersion).cross(CrossVersion.for3Use2_13)
-        .exclude("org.scala-lang.modules", "scala-collection-compat_2.13")
-        .exclude("org.scala-lang.modules", "scala-parser-combinators_2.13")
-        .exclude("com.twitter", "util-core_2.13"),
+    libraryDependencies ++=
+      Seq(
+        ("com.twitter" %% "util-core" % utilVersion).cross(CrossVersion.for3Use2_13),
+        ("com.twitter" %% "finagle-core" % finagleVersion).cross(CrossVersion.for3Use2_13)
+      ),
     (Test / scalacOptions) ~= {
       _.filterNot(Set("-Yno-imports", "-Yno-predef"))
     }
