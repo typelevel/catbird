@@ -153,10 +153,16 @@ final object Rerunnable extends RerunnableInstances1 {
         rerunnableInstance
 
       final override val sequential: Rerunnable.Par ~> Rerunnable =
-        λ[Rerunnable.Par ~> Rerunnable](Rerunnable.Par.unwrap(_))
+        new ~>[Rerunnable.Par, Rerunnable] {
+          def apply[A](fa: Rerunnable.Par[A]): Rerunnable[A] =
+            Rerunnable.Par.unwrap[A](fa)
+        }
 
       final override val parallel: Rerunnable ~> Rerunnable.Par =
-        λ[Rerunnable ~> Rerunnable.Par](Rerunnable.Par(_))
+        new ~>[Rerunnable, Rerunnable.Par] {
+          def apply[A](fa: Rerunnable[A]): Rerunnable.Par[A] =
+            Rerunnable.Par(fa)
+        }
     }
 
   /**
@@ -190,7 +196,11 @@ final object Rerunnable extends RerunnableInstances1 {
    * [[https://typelevel.org/cats-tagless/ cats-tagless]] in a codebase that mixes [[Rerunnable]] and
    * [[Future]].
    */
-  final val toFuture: Rerunnable ~> Future = λ[Rerunnable ~> Future](_.run)
+  final val toFuture: Rerunnable ~> Future =
+    new ~>[Rerunnable, Future] {
+      def apply[A](fa: Rerunnable[A]): Future[A] =
+        fa.run
+    }
 }
 
 private[util] trait RerunnableInstances1 extends RerunnableParallelNewtype {
