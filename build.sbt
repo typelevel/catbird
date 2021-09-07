@@ -7,36 +7,56 @@ val catsEffect3Version = "3.2.7"
 val utilVersion = "21.8.0"
 val finagleVersion = "21.8.0"
 
-ThisBuild / crossScalaVersions := Seq("2.12.14", "2.13.6")
-ThisBuild / scalaVersion := crossScalaVersions.value.last
+val Scala212 = "2.12.14"
+val Scala213 = "2.13.6"
+val Scala3 = "3.0.2"
+
+ThisBuild / crossScalaVersions := Seq(Scala212, Scala213, Scala3)
+ThisBuild / scalaVersion := Scala213
+ThisBuild / scalaBinaryVersion := "2.13"
 
 ThisBuild / organization := "io.catbird"
 
 (Global / onChangedBuildSource) := ReloadOnSourceChanges
 
-def compilerOptions(scalaVersion: String): Seq[String] = Seq(
-  "-deprecation",
-  "-encoding",
-  "UTF-8",
-  "-feature",
-  "-language:existentials",
-  "-language:higherKinds",
-  "-unchecked",
-  "-Ywarn-dead-code",
-  "-Ywarn-numeric-widen",
-  "-Yno-imports",
-  "-Yno-predef"
-) ++ (if (priorTo2_13(scalaVersion))
-        Seq(
-          "-Ywarn-unused-import",
-          "-Yno-adapted-args",
-          "-Xfuture"
-        )
-      else
-        Seq(
-          "-Ywarn-unused:imports",
-          "-Ymacro-annotations"
-        ))
+def compilerOptions(scalaVersion: String): Seq[String] =
+  if (ScalaArtifacts.isScala3(scalaVersion))
+    Seq(
+      "-deprecation",
+      "-encoding",
+      "utf-8",
+      "-explain-types",
+      "-feature",
+      "-language:existentials",
+      "-language:higherKinds",
+      "-language:implicitConversions",
+      "-unchecked",
+      "-Ykind-projector"
+    )
+  else
+    Seq(
+      "-deprecation",
+      "-encoding",
+      "UTF-8",
+      "-feature",
+      "-language:existentials",
+      "-language:higherKinds",
+      "-unchecked",
+      "-Ywarn-dead-code",
+      "-Ywarn-numeric-widen",
+      "-Yno-imports",
+      "-Yno-predef"
+    ) ++ (if (priorTo2_13(scalaVersion))
+            Seq(
+              "-Ywarn-unused-import",
+              "-Yno-adapted-args",
+              "-Xfuture"
+            )
+          else
+            Seq(
+              "-Ywarn-unused:imports",
+              "-Ymacro-annotations"
+            ))
 
 val docMappingsApiDir = settingKey[String]("Subdirectory in site target directory for API docs")
 
@@ -48,14 +68,18 @@ lazy val baseSettings = Seq(
   (Test / console / scalacOptions) ~= {
     _.filterNot(Set("-Ywarn-unused-import", "-Ywarn-unused:imports", "-Yno-imports", "-Yno-predef"))
   },
+  libraryDependencies ++= (
+    if (ScalaArtifacts.isScala3(scalaVersion.value)) Nil
+    else Seq(compilerPlugin(("org.typelevel" %% "kind-projector" % "0.13.0").cross(CrossVersion.full)))
+  ),
   libraryDependencies ++= Seq(
     "org.typelevel" %% "cats-core" % catsVersion,
+    "org.scala-lang.modules" %% "scala-collection-compat" % "2.5.0",
     "org.scalacheck" %% "scalacheck" % "1.15.4" % Test,
     "org.scalatest" %% "scalatest" % "3.2.9" % Test,
     "org.typelevel" %% "cats-laws" % catsVersion % Test,
     "org.typelevel" %% "discipline-core" % "1.1.5" % Test,
-    "org.typelevel" %% "discipline-scalatest" % "2.1.5" % Test,
-    compilerPlugin(("org.typelevel" %% "kind-projector" % "0.13.0").cross(CrossVersion.full))
+    "org.typelevel" %% "discipline-scalatest" % "2.1.5" % Test
   ),
   resolvers += Resolver.sonatypeRepo("snapshots"),
   docMappingsApiDir := "api"
@@ -88,7 +112,10 @@ lazy val util = project
   .settings(moduleName := "catbird-util")
   .settings(allSettings)
   .settings(
-    libraryDependencies += "com.twitter" %% "util-core" % utilVersion,
+    libraryDependencies ++=
+      Seq(
+        ("com.twitter" %% "util-core" % utilVersion).exclude("org.scala-lang.modules", "scala-collection-compat_2.13")
+      ),
     (Test / scalacOptions) ~= {
       _.filterNot(Set("-Yno-imports", "-Yno-predef"))
     }
@@ -128,7 +155,7 @@ lazy val finagle = project
   .settings(moduleName := "catbird-finagle")
   .settings(allSettings)
   .settings(
-    libraryDependencies += "com.twitter" %% "finagle-core" % finagleVersion,
+    libraryDependencies += ("com.twitter" %% "finagle-core" % finagleVersion).cross(CrossVersion.for3Use2_13),
     (Test / scalacOptions) ~= {
       _.filterNot(Set("-Yno-imports", "-Yno-predef"))
     }
