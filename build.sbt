@@ -152,11 +152,8 @@ lazy val finagle = project
   .settings(moduleName := "catbird-finagle")
   .settings(allSettings)
   .settings(
-    libraryDependencies ++=
-      Seq(
-        ("com.twitter" %% "util-core" % utilVersion).cross(CrossVersion.for3Use2_13),
-        ("com.twitter" %% "finagle-core" % finagleVersion).cross(CrossVersion.for3Use2_13)
-      ),
+    libraryDependencies +=
+      ("com.twitter" %% "finagle-core" % finagleVersion).cross(CrossVersion.for3Use2_13),
     (Test / scalacOptions) ~= {
       _.filterNot(Set("-Yno-imports", "-Yno-predef"))
     }
