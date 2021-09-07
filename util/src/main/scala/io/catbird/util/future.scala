@@ -67,9 +67,15 @@ trait FutureInstances extends FutureInstances1 {
       final override val monad: Monad[Future] =
         twitterFutureInstance
 
-      final override val sequential: FuturePar ~> Future = λ[FuturePar ~> Future](FuturePar.unwrap(_))
+      final override val sequential: FuturePar ~> Future =
+        new ~>[FuturePar, Future] {
+          def apply[A](fa: FuturePar[A]): Future[A] = FuturePar.unwrap(fa)
+        }
 
-      final override val parallel: Future ~> FuturePar = λ[Future ~> FuturePar](FuturePar(_))
+      final override val parallel: Future ~> FuturePar =
+        new ~>[Future, FuturePar] {
+          def apply[A](fa: Future[A]): FuturePar[A] = FuturePar(fa)
+        }
     }
 }
 
