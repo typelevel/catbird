@@ -10,7 +10,7 @@ val finagleVersion = "21.8.0"
 ThisBuild / crossScalaVersions := Seq("2.12.14", "2.13.6")
 ThisBuild / scalaVersion := crossScalaVersions.value.last
 
-ThisBuild / organization := "io.catbird"
+ThisBuild / organization := "org.typelevel"
 
 (Global / onChangedBuildSource) := ReloadOnSourceChanges
 
@@ -70,15 +70,15 @@ lazy val root = project
   .settings(
     (ScalaUnidoc / unidoc / unidocProjectFilter) := inAnyProject -- inProjects(benchmark, effect3),
     addMappingsToSiteDir((ScalaUnidoc / packageDoc / mappings), docMappingsApiDir),
-    git.remoteRepo := "git@github.com:travisbrown/catbird.git"
+    git.remoteRepo := "git@github.com:typelevel/catbird.git"
   )
   .settings(
     (console / initialCommands) :=
       """
         |import com.twitter.finagle._
         |import com.twitter.util._
-        |import io.catbird.finagle._
-        |import io.catbird.util._
+        |import org.typelevel.catbird.finagle._
+        |import org.typelevel.catbird.util._
       """.stripMargin
   )
   .aggregate(util, effect, effect3, finagle, benchmark)
@@ -152,7 +152,7 @@ lazy val publishSettings = Seq(
   releaseCrossBuild := true,
   releasePublishArtifactsAction := PgpKeys.publishSigned.value,
   releaseVcsSign := true,
-  homepage := Some(url("https://github.com/travisbrown/catbird")),
+  homepage := Some(url("https://github.com/typelevel/catbird")),
   licenses := Seq("Apache 2.0" -> url("http://www.apache.org/licenses/LICENSE-2.0")),
   publishMavenStyle := true,
   (Test / publishArtifact) := false,
@@ -165,11 +165,11 @@ lazy val publishSettings = Seq(
       Some("releases".at(nexus + "service/local/staging/deploy/maven2"))
   },
   autoAPIMappings := true,
-  apiURL := Some(url("https://travisbrown.github.io/catbird/api/")),
+  apiURL := Some(url("https://typelevel.org/catbird/api/")),
   scmInfo := Some(
     ScmInfo(
-      url("https://github.com/travisbrown/catbird"),
-      "scm:git:git@github.com:travisbrown/catbird.git"
+      url("https://github.com/typelevel/catbird"),
+      "scm:git:git@github.com:typelevel/catbird.git"
     )
   ),
   pomExtra := (
