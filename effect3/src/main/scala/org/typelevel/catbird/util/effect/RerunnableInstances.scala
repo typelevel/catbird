@@ -31,7 +31,7 @@ trait RerunnableInstances {
 
       final override def forceR[A, B](fa: Rerunnable[A])(fb: Rerunnable[B]): Rerunnable[B] =
         fa.liftToTry.flatMap { resultA =>
-          resultA.handle(Monitor.catcher)
+          resultA.handle[Any](Monitor.catcher)
           fb
         }
 

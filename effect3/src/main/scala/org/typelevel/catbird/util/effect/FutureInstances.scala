@@ -15,7 +15,7 @@ trait FutureInstances {
 
       final override def forceR[A, B](fa: Future[A])(fb: Future[B]): Future[B] =
         fa.liftToTry.flatMap { resultA =>
-          resultA.handle(Monitor.catcher)
+          resultA.handle[Any](Monitor.catcher)
           fb
         }
 

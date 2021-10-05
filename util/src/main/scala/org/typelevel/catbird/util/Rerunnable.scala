@@ -188,7 +188,7 @@ final object Rerunnable extends RerunnableInstances1 {
    *
    * Useful when you need a parameter for a `mapK` method, for example you could use
    * [[https://typelevel.org/cats-tagless/ cats-tagless]] in a codebase that mixes [[Rerunnable]] and
-   * [[Future]].
+   * [[com.twitter.util.Future]].
    */
   final val toFuture: Rerunnable ~> Future = λ[Rerunnable ~> Future](_.run)
 }

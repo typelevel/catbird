@@ -42,6 +42,7 @@ class RerunnableContextShiftSuite extends FixtureAnyFunSuite with ThreadPoolNami
     assert(poolName1 == f.futurePoolName)
     assert(poolName2 == f.ioPoolName)
     assert(poolName2 == f.ioPoolName)
+    assert(poolName3 == f.futurePoolName)
   }
 
   test("ContextShift[Rerunnable].evalOn executes on correct pool and shifts back to previous pool") { f =>

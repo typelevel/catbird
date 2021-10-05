@@ -20,6 +20,8 @@ package object effect extends FutureInstances with RerunnableInstances {
       case Return(a)  => k(Right(a))
       case Throw(err) => k(Left(err))
     }
+
+    ()
   }
 
   /**

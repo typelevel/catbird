@@ -14,34 +14,9 @@ ThisBuild / organization := "org.typelevel"
 
 (Global / onChangedBuildSource) := ReloadOnSourceChanges
 
-def compilerOptions(scalaVersion: String): Seq[String] = Seq(
-  "-deprecation",
-  "-encoding",
-  "UTF-8",
-  "-feature",
-  "-language:existentials",
-  "-language:higherKinds",
-  "-unchecked",
-  "-Ywarn-dead-code",
-  "-Ywarn-numeric-widen",
-  "-Yno-imports",
-  "-Yno-predef"
-) ++ (if (priorTo2_13(scalaVersion))
-        Seq(
-          "-Ywarn-unused-import",
-          "-Yno-adapted-args",
-          "-Xfuture"
-        )
-      else
-        Seq(
-          "-Ywarn-unused:imports",
-          "-Ymacro-annotations"
-        ))
-
 val docMappingsApiDir = settingKey[String]("Subdirectory in site target directory for API docs")
 
 lazy val baseSettings = Seq(
-  scalacOptions ++= compilerOptions(scalaVersion.value),
   (Compile / console / scalacOptions) ~= {
     _.filterNot(Set("-Ywarn-unused-import", "-Ywarn-unused:imports", "-Yno-imports", "-Yno-predef"))
   },
@@ -66,11 +41,12 @@ lazy val allSettings = baseSettings ++ publishSettings
 lazy val root = project
   .in(file("."))
   .enablePlugins(GhpagesPlugin, ScalaUnidocPlugin)
-  .settings(allSettings ++ noPublishSettings)
+  .settings(allSettings)
   .settings(
     (ScalaUnidoc / unidoc / unidocProjectFilter) := inAnyProject -- inProjects(benchmark, effect3),
     addMappingsToSiteDir((ScalaUnidoc / packageDoc / mappings), docMappingsApiDir),
-    git.remoteRepo := "git@github.com:typelevel/catbird.git"
+    git.remoteRepo := "git@github.com:typelevel/catbird.git",
+    publish / skip := true
   )
   .settings(
     (console / initialCommands) :=
@@ -136,10 +112,10 @@ lazy val finagle = project
   .dependsOn(util)
 
 lazy val benchmark = project
-  .settings(moduleName := "catbird-benchmark")
   .settings(allSettings)
-  .settings(noPublishSettings)
   .settings(
+    moduleName := "catbird-benchmark",
+    publish / skip := true,
     libraryDependencies += "org.scalatest" %% "scalatest" % "3.2.10",
     scalacOptions ~= {
       _.filterNot(Set("-Yno-imports", "-Yno-predef"))
@@ -161,20 +137,8 @@ lazy val publishSettings = Seq(
       "scm:git:git@github.com:typelevel/catbird.git"
     )
   ),
-  developers += Developer("travisbrown", "Travis Brown", "", url("https://twitter.com/travisbrown")),
+  developers += Developer("travisbrown", "Travis Brown", "", url("https://twitter.com/travisbrown"))
 )
-
-lazy val noPublishSettings = Seq(
-  publish := {},
-  publishLocal := {},
-  publishArtifact := false
-)
-
-def priorTo2_13(scalaVersion: String): Boolean =
-  CrossVersion.partialVersion(scalaVersion) match {
-    case Some((2, minor)) if minor < 13 => true
-    case _                              => false
-  }
 
 ThisBuild / githubWorkflowJavaVersions := Seq("adopt@1.8")
 ThisBuild / githubWorkflowPublishTargetBranches := Seq(RefPredicate.StartsWith(Ref.Tag("v")))
@@ -198,7 +162,7 @@ ThisBuild / githubWorkflowBuild := Seq(
       "scalastyle",
       "scalafmtCheck",
       "scalafmtSbtCheck",
-      "test:scalafmtCheck",
+      "Test / scalafmtCheck",
       "unidoc",
       "coverageReport"
     ),

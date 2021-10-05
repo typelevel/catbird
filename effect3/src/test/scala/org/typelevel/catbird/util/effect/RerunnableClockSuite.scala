@@ -33,7 +33,7 @@ class RerunnableClockSuite extends FixtureAnyFunSuite with Eventually with Integ
     }
   }
 
-  test("Retrieval of monotonic time") { f =>
+  test("Retrieval of monotonic time") { _ =>
     eventually {
       val result = Await.result(
         Clock[Rerunnable].monotonic.map(duration => duration.toNanos).run

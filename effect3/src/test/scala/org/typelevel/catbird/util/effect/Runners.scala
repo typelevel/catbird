@@ -10,7 +10,6 @@ import org.scalacheck.Prop
 import scala.annotation.implicitNotFound
 import scala.concurrent.duration.FiniteDuration
 import scala.concurrent.duration._
-import scala.language.implicitConversions
 
 /**
  * Test helpers mostly taken from the cats-effect IOSpec.
