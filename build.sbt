@@ -7,7 +7,7 @@ val catsEffect3Version = "3.2.9"
 val utilVersion = "21.8.0"
 val finagleVersion = "21.8.0"
 
-ThisBuild / crossScalaVersions := Seq("2.12.14", "2.13.6")
+ThisBuild / crossScalaVersions := Seq("2.12.15", "2.13.6")
 ThisBuild / scalaVersion := crossScalaVersions.value.last
 
 ThisBuild / organization := "org.typelevel"
@@ -30,7 +30,7 @@ lazy val baseSettings = Seq(
     "org.typelevel" %% "cats-laws" % catsVersion % Test,
     "org.typelevel" %% "discipline-core" % "1.1.5" % Test,
     "org.typelevel" %% "discipline-scalatest" % "2.1.5" % Test,
-    compilerPlugin(("org.typelevel" %% "kind-projector" % "0.13.0").cross(CrossVersion.full))
+    compilerPlugin(("org.typelevel" %% "kind-projector" % "0.13.2").cross(CrossVersion.full))
   ),
   resolvers += Resolver.sonatypeRepo("snapshots"),
   docMappingsApiDir := "api"
@@ -43,7 +43,13 @@ lazy val root = project
   .enablePlugins(GhpagesPlugin, ScalaUnidocPlugin)
   .settings(allSettings)
   .settings(
-    (ScalaUnidoc / unidoc / unidocProjectFilter) := inAnyProject -- inProjects(benchmark, effect3),
+    (ScalaUnidoc / unidoc / unidocProjectFilter) := inAnyProject -- inProjects(
+      benchmark,
+      effect3,
+      `scalafix-input`,
+      `scalafix-output`,
+      `scalafix-tests`
+    ),
     addMappingsToSiteDir((ScalaUnidoc / packageDoc / mappings), docMappingsApiDir),
     git.remoteRepo := "git@github.com:typelevel/catbird.git",
     publish / skip := true
@@ -57,7 +63,7 @@ lazy val root = project
         |import org.typelevel.catbird.util._
       """.stripMargin
   )
-  .aggregate(util, effect, effect3, finagle, benchmark)
+  .aggregate(util, effect, effect3, finagle, benchmark, `scalafix-rules`, `scalafix-tests`)
   .dependsOn(util, effect, finagle)
 
 lazy val util = project
@@ -175,3 +181,44 @@ ThisBuild / githubWorkflowBuild := Seq(
     name = Some("Code coverage analysis")
   )
 )
+
+lazy val `scalafix-rules` = (project in file("scalafix/rules")).settings(
+  moduleName := "catbird-scalafix",
+  libraryDependencies ++= Seq(
+    "ch.epfl.scala" %% "scalafix-core" % _root_.scalafix.sbt.BuildInfo.scalafixVersion
+  )
+)
+
+lazy val `scalafix-input` = (project in file("scalafix/input")).settings(
+  publish / skip := true,
+  libraryDependencies ++= Seq(
+    "io.catbird" %% "catbird-util" % "21.8.0"
+  ),
+  scalacOptions ~= { _.filterNot(_ == "-Xfatal-warnings") },
+  semanticdbEnabled := true,
+  semanticdbVersion := scalafixSemanticdb.revision
+)
+
+lazy val `scalafix-output` = (project in file("scalafix/output"))
+  .settings(
+    githubWorkflowArtifactUpload := false,
+    publish / skip := true,
+    scalacOptions ~= { _.filterNot(_ == "-Xfatal-warnings") }
+  )
+  .dependsOn(util)
+
+lazy val `scalafix-tests` = (project in file("scalafix/tests"))
+  .settings(
+    publish / skip := true,
+    libraryDependencies += {
+      import _root_.scalafix.sbt.BuildInfo.scalafixVersion
+      ("ch.epfl.scala" % "scalafix-testkit" % scalafixVersion % Test).cross(CrossVersion.full)
+    },
+    scalafixTestkitOutputSourceDirectories := (`scalafix-output` / Compile / unmanagedSourceDirectories).value,
+    scalafixTestkitInputSourceDirectories := (`scalafix-input` / Compile / unmanagedSourceDirectories).value,
+    scalafixTestkitInputClasspath := (`scalafix-input` / Compile / fullClasspath).value,
+    scalafixTestkitInputScalacOptions := (`scalafix-input` / Compile / scalacOptions).value,
+    scalafixTestkitInputScalaVersion := (`scalafix-input` / Compile / scalaVersion).value
+  )
+  .dependsOn(`scalafix-rules`)
+  .enablePlugins(ScalafixTestkitPlugin)
