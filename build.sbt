@@ -116,7 +116,7 @@ lazy val effect3 = project
     libraryDependencies ++= Seq(
       "org.typelevel" %% "cats-effect" % catsEffect3Version,
       "org.typelevel" %% "cats-effect-laws" % catsEffect3Version % Test,
-      "org.typelevel" %% "cats-effect-testkit" % catsEffect3Version % Test
+      "org.typelevel" %% "cats-effect-kernel-testkit" % catsEffect3Version % Test
     ),
     (Test / scalacOptions) ~= {
       _.filterNot(Set("-Yno-imports", "-Yno-predef"))
