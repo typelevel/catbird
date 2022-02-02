@@ -8,6 +8,10 @@ object FinaglePlugin extends AutoPlugin {
 
   override def trigger = allRequirements
 
+  object autoImport {
+    lazy val finagleVersion = versions.head
+  }
+
   val versions = Seq("21.8.0", "21.6.0")
 
   lazy val modules = Seq(
@@ -29,9 +33,8 @@ object FinaglePlugin extends AutoPlugin {
         )
     }
 
-    val rootFinagle = project.in(file(s".rootFinagle"))
-      .enablePlugins(NoPublishPlugin)
-      .aggregate(subprojects.map(_.project): _*)
+    val rootFinagle =
+      project.in(file(s".rootFinagle")).enablePlugins(NoPublishPlugin).aggregate(subprojects.map(_.project): _*)
 
     rootFinagle +: subprojects
   }
