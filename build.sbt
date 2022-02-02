@@ -22,11 +22,11 @@ lazy val baseSettings = Seq(
     "org.scalatest" %% "scalatest" % "3.2.10" % Test,
     "org.typelevel" %% "cats-laws" % catsVersion % Test,
     "org.typelevel" %% "discipline-core" % "1.3.0" % Test,
-    "org.typelevel" %% "discipline-scalatest" % "2.1.5" % Test,
-    compilerPlugin(("org.typelevel" %% "kind-projector" % "0.13.2").cross(CrossVersion.full))
+    "org.typelevel" %% "discipline-scalatest" % "2.1.5" % Test
   ),
   resolvers += Resolver.sonatypeRepo("snapshots"),
-  docMappingsApiDir := "api"
+  docMappingsApiDir := "api",
+  doc / tlFatalWarnings := false
 )
 
 lazy val allSettings = baseSettings
