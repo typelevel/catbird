@@ -42,7 +42,7 @@ lazy val root = project
       `scalafix-output`,
       `scalafix-tests`
     ),
-    (ScalaUnidoc / unidoc / tlFatalWarnings) := false,
+    (ScalaUnidoc / tlFatalWarnings) := false,
     addMappingsToSiteDir((ScalaUnidoc / packageDoc / mappings), docMappingsApiDir),
     git.remoteRepo := "git@github.com:typelevel/catbird.git"
   )
