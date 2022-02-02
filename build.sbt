@@ -122,7 +122,7 @@ lazy val benchmark = project
   .settings(
     moduleName := "catbird-benchmark",
     publish / skip := true,
-    libraryDependencies += "org.scalatest" %% "scalatest" % "3.2.10",
+    libraryDependencies += "org.scalatest" %% "scalatest" % "3.2.11",
     scalacOptions ~= {
       _.filterNot(Set("-Yno-imports", "-Yno-predef"))
     }
