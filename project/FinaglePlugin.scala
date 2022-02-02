@@ -6,9 +6,9 @@ import org.typelevel.sbt.NoPublishPlugin
 
 object FinaglePlugin extends AutoPlugin {
 
-  val versions = Seq("21.8.0", "21.6.0")
-
   override def trigger = allRequirements
+
+  val versions = Seq("21.8.0", "21.6.0")
 
   lazy val modules = Seq(
     "com.twitter" %% "finagle-core" % versions.head
