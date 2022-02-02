@@ -136,9 +136,6 @@ ThisBuild / githubWorkflowBuild := Seq(
       "scalafmtSbtCheck",
       "unidoc",
       "coverageReport"
-    ),
-    env = Map(
-      "SBT_OPTS" -> "-J-Xmx8G"
     )
   ),
   WorkflowStep.Use(

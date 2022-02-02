@@ -58,9 +58,7 @@ jobs:
       - name: Check that workflows are up to date
         run: sbt '++${{ matrix.scala }}' 'project /' githubWorkflowCheck
 
-      - env:
-          SBT_OPTS: '-J-Xmx8G'
-        run: sbt '++${{ matrix.scala }}' clean coverage test scalastyle scalafmtCheckAll scalafmtSbtCheck unidoc coverageReport
+      - run: sbt '++${{ matrix.scala }}' clean coverage test scalastyle scalafmtCheckAll scalafmtSbtCheck unidoc coverageReport
 
       - name: Code coverage analysis
         uses: codecov/codecov-action@v1
