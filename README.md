@@ -1,9 +1,8 @@
 # catbird
 
-[![Build status](https://img.shields.io/github/workflow/status/travisbrown/catbird/Continuous%20Integration.svg)](http://github.com/travisbrown/catbird/actions)
-[![Coverage status](https://img.shields.io/codecov/c/github/travisbrown/catbird/master.svg)](https://codecov.io/github/travisbrown/catbird)
-[![Maven Central](https://img.shields.io/maven-central/v/io.catbird/catbird-finagle_2.13.svg)](https://maven-badges.herokuapp.com/maven-central/io.catbird/catbird-finagle_2.13)
-
+[![Build status](https://img.shields.io/github/workflow/status/typelevel/catbird/Continuous%20Integration.svg)](http://github.com/typelevel/catbird/actions)
+[![Coverage status](https://img.shields.io/codecov/c/github/typelevel/catbird/master.svg)](https://codecov.io/github/typelevel/catbird)
+[![Maven Central](https://img.shields.io/maven-central/v/org.typelevel.catbird/catbird-finagle_2.13.svg)](https://maven-badges.herokuapp.com/maven-central/org.typelevel.catbird/catbird-finagle_2.13)
 
 This project provides [Cats](https://github.com/typelevel/cats) type class instances (and other useful
 Cats-related stuff) for various [Twitter Open Source](https://twitter.com/twitteross) Scala
@@ -13,7 +12,7 @@ It currently includes the following:
 
 * Type class instances for `Future`, `Var`, and `Try` (including `Monad` or `MonadError`, `Semigroup`, and equality)
 * Category and profunctor instances for `Service`
-* A `Rerunnable` type that wraps `Future` but provides semantics more like Scalaz's `Task`
+* A `Rerunnable` type that wraps `Future` but provides semantics more like Cats Effect's `IO`
 
 These are reasonably well-tested (thanks to [Discipline](https://github.com/typelevel/discipline)).
 
