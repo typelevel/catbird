@@ -25,7 +25,8 @@ lazy val baseSettings = Seq(
     "org.typelevel" %% "discipline-scalatest" % "2.1.5" % Test
   ),
   resolvers += Resolver.sonatypeRepo("snapshots"),
-  docMappingsApiDir := "api"
+  docMappingsApiDir := "api",
+  autoAPIMappings := true
 )
 
 lazy val allSettings = baseSettings
@@ -42,7 +43,6 @@ lazy val root = project
       `scalafix-output`,
       `scalafix-tests`
     ),
-    (ScalaUnidoc / tlFatalWarnings) := false,
     addMappingsToSiteDir((ScalaUnidoc / packageDoc / mappings), docMappingsApiDir),
     git.remoteRepo := "git@github.com:typelevel/catbird.git"
   )
