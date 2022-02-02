@@ -7,41 +7,16 @@ val catsEffect3Version = "3.2.9"
 val utilVersion = "21.8.0"
 val finagleVersion = "21.8.0"
 
-ThisBuild / crossScalaVersions := Seq("2.12.14", "2.13.6")
+ThisBuild / crossScalaVersions := Seq("2.12.15", "2.13.6")
 ThisBuild / scalaVersion := crossScalaVersions.value.last
 
-ThisBuild / organization := "io.catbird"
+ThisBuild / organization := "org.typelevel"
 
 (Global / onChangedBuildSource) := ReloadOnSourceChanges
-
-def compilerOptions(scalaVersion: String): Seq[String] = Seq(
-  "-deprecation",
-  "-encoding",
-  "UTF-8",
-  "-feature",
-  "-language:existentials",
-  "-language:higherKinds",
-  "-unchecked",
-  "-Ywarn-dead-code",
-  "-Ywarn-numeric-widen",
-  "-Yno-imports",
-  "-Yno-predef"
-) ++ (if (priorTo2_13(scalaVersion))
-        Seq(
-          "-Ywarn-unused-import",
-          "-Yno-adapted-args",
-          "-Xfuture"
-        )
-      else
-        Seq(
-          "-Ywarn-unused:imports",
-          "-Ymacro-annotations"
-        ))
 
 val docMappingsApiDir = settingKey[String]("Subdirectory in site target directory for API docs")
 
 lazy val baseSettings = Seq(
-  scalacOptions ++= compilerOptions(scalaVersion.value),
   (Compile / console / scalacOptions) ~= {
     _.filterNot(Set("-Ywarn-unused-import", "-Ywarn-unused:imports", "-Yno-imports", "-Yno-predef"))
   },
@@ -55,7 +30,7 @@ lazy val baseSettings = Seq(
     "org.typelevel" %% "cats-laws" % catsVersion % Test,
     "org.typelevel" %% "discipline-core" % "1.3.0" % Test,
     "org.typelevel" %% "discipline-scalatest" % "2.1.5" % Test,
-    compilerPlugin(("org.typelevel" %% "kind-projector" % "0.13.0").cross(CrossVersion.full))
+    compilerPlugin(("org.typelevel" %% "kind-projector" % "0.13.2").cross(CrossVersion.full))
   ),
   resolvers += Resolver.sonatypeRepo("snapshots"),
   docMappingsApiDir := "api"
@@ -66,22 +41,29 @@ lazy val allSettings = baseSettings ++ publishSettings
 lazy val root = project
   .in(file("."))
   .enablePlugins(GhpagesPlugin, ScalaUnidocPlugin)
-  .settings(allSettings ++ noPublishSettings)
+  .settings(allSettings)
   .settings(
-    (ScalaUnidoc / unidoc / unidocProjectFilter) := inAnyProject -- inProjects(benchmark, effect3),
+    (ScalaUnidoc / unidoc / unidocProjectFilter) := inAnyProject -- inProjects(
+      benchmark,
+      effect3,
+      `scalafix-input`,
+      `scalafix-output`,
+      `scalafix-tests`
+    ),
     addMappingsToSiteDir((ScalaUnidoc / packageDoc / mappings), docMappingsApiDir),
-    git.remoteRepo := "git@github.com:travisbrown/catbird.git"
+    git.remoteRepo := "git@github.com:typelevel/catbird.git",
+    publish / skip := true
   )
   .settings(
     (console / initialCommands) :=
       """
         |import com.twitter.finagle._
         |import com.twitter.util._
-        |import io.catbird.finagle._
-        |import io.catbird.util._
+        |import org.typelevel.catbird.finagle._
+        |import org.typelevel.catbird.util._
       """.stripMargin
   )
-  .aggregate(util, effect, effect3, finagle, benchmark)
+  .aggregate(util, effect, effect3, finagle, benchmark, `scalafix-rules`, `scalafix-tests`)
   .dependsOn(util, effect, finagle)
 
 lazy val util = project
@@ -136,10 +118,10 @@ lazy val finagle = project
   .dependsOn(util)
 
 lazy val benchmark = project
-  .settings(moduleName := "catbird-benchmark")
   .settings(allSettings)
-  .settings(noPublishSettings)
   .settings(
+    moduleName := "catbird-benchmark",
+    publish / skip := true,
     libraryDependencies += "org.scalatest" %% "scalatest" % "3.2.10",
     scalacOptions ~= {
       _.filterNot(Set("-Yno-imports", "-Yno-predef"))
@@ -149,67 +131,34 @@ lazy val benchmark = project
   .dependsOn(util)
 
 lazy val publishSettings = Seq(
-  releaseCrossBuild := true,
-  releasePublishArtifactsAction := PgpKeys.publishSigned.value,
-  releaseVcsSign := true,
-  homepage := Some(url("https://github.com/travisbrown/catbird")),
+  homepage := Some(url("https://github.com/typelevel/catbird")),
   licenses := Seq("Apache 2.0" -> url("http://www.apache.org/licenses/LICENSE-2.0")),
-  publishMavenStyle := true,
   (Test / publishArtifact) := false,
   pomIncludeRepository := { _ => false },
-  publishTo := {
-    val nexus = "https://oss.sonatype.org/"
-    if (isSnapshot.value)
-      Some("snapshots".at(nexus + "content/repositories/snapshots"))
-    else
-      Some("releases".at(nexus + "service/local/staging/deploy/maven2"))
-  },
   autoAPIMappings := true,
-  apiURL := Some(url("https://travisbrown.github.io/catbird/api/")),
+  apiURL := Some(url("https://typelevel.org/catbird/api/")),
   scmInfo := Some(
     ScmInfo(
-      url("https://github.com/travisbrown/catbird"),
-      "scm:git:git@github.com:travisbrown/catbird.git"
+      url("https://github.com/typelevel/catbird"),
+      "scm:git:git@github.com:typelevel/catbird.git"
     )
   ),
-  pomExtra := (
-    <developers>
-      <developer>
-        <id>travisbrown</id>
-        <name>Travis Brown</name>
-        <url>https://twitter.com/travisbrown</url>
-      </developer>
-    </developers>
-  )
+  developers += Developer("travisbrown", "Travis Brown", "", url("https://twitter.com/travisbrown"))
 )
-
-lazy val noPublishSettings = Seq(
-  publish := {},
-  publishLocal := {},
-  publishArtifact := false
-)
-
-credentials ++= (
-  for {
-    username <- Option(System.getenv().get("SONATYPE_USERNAME"))
-    password <- Option(System.getenv().get("SONATYPE_PASSWORD"))
-  } yield Credentials(
-    "Sonatype Nexus Repository Manager",
-    "oss.sonatype.org",
-    username,
-    password
-  )
-).toSeq
-
-def priorTo2_13(scalaVersion: String): Boolean =
-  CrossVersion.partialVersion(scalaVersion) match {
-    case Some((2, minor)) if minor < 13 => true
-    case _                              => false
-  }
 
 ThisBuild / githubWorkflowJavaVersions := Seq("adopt@1.8")
-// No auto-publish atm. Remove this line to generate publish stage
-ThisBuild / githubWorkflowPublishTargetBranches := Seq.empty
+ThisBuild / githubWorkflowPublishTargetBranches := Seq(RefPredicate.StartsWith(Ref.Tag("v")))
+ThisBuild / githubWorkflowPublish := Seq(
+  WorkflowStep.Sbt(
+    List("ci-release"),
+    env = Map(
+      "PGP_PASSPHRASE" -> "${{ secrets.PGP_PASSPHRASE }}",
+      "PGP_SECRET" -> "${{ secrets.PGP_SECRET }}",
+      "SONATYPE_PASSWORD" -> "${{ secrets.SONATYPE_PASSWORD }}",
+      "SONATYPE_USERNAME" -> "${{ secrets.SONATYPE_USERNAME }}"
+    )
+  )
+)
 ThisBuild / githubWorkflowBuild := Seq(
   WorkflowStep.Sbt(
     List(
@@ -219,7 +168,7 @@ ThisBuild / githubWorkflowBuild := Seq(
       "scalastyle",
       "scalafmtCheck",
       "scalafmtSbtCheck",
-      "test:scalafmtCheck",
+      "Test / scalafmtCheck",
       "unidoc",
       "coverageReport"
     ),
@@ -232,3 +181,44 @@ ThisBuild / githubWorkflowBuild := Seq(
     name = Some("Code coverage analysis")
   )
 )
+
+lazy val `scalafix-rules` = (project in file("scalafix/rules")).settings(
+  moduleName := "catbird-scalafix",
+  libraryDependencies ++= Seq(
+    "ch.epfl.scala" %% "scalafix-core" % _root_.scalafix.sbt.BuildInfo.scalafixVersion
+  )
+)
+
+lazy val `scalafix-input` = (project in file("scalafix/input")).settings(
+  publish / skip := true,
+  libraryDependencies ++= Seq(
+    "io.catbird" %% "catbird-util" % "21.8.0"
+  ),
+  scalacOptions ~= { _.filterNot(_ == "-Xfatal-warnings") },
+  semanticdbEnabled := true,
+  semanticdbVersion := scalafixSemanticdb.revision
+)
+
+lazy val `scalafix-output` = (project in file("scalafix/output"))
+  .settings(
+    githubWorkflowArtifactUpload := false,
+    publish / skip := true,
+    scalacOptions ~= { _.filterNot(_ == "-Xfatal-warnings") }
+  )
+  .dependsOn(util)
+
+lazy val `scalafix-tests` = (project in file("scalafix/tests"))
+  .settings(
+    publish / skip := true,
+    libraryDependencies += {
+      import _root_.scalafix.sbt.BuildInfo.scalafixVersion
+      ("ch.epfl.scala" % "scalafix-testkit" % scalafixVersion % Test).cross(CrossVersion.full)
+    },
+    scalafixTestkitOutputSourceDirectories := (`scalafix-output` / Compile / unmanagedSourceDirectories).value,
+    scalafixTestkitInputSourceDirectories := (`scalafix-input` / Compile / unmanagedSourceDirectories).value,
+    scalafixTestkitInputClasspath := (`scalafix-input` / Compile / fullClasspath).value,
+    scalafixTestkitInputScalacOptions := (`scalafix-input` / Compile / scalacOptions).value,
+    scalafixTestkitInputScalaVersion := (`scalafix-input` / Compile / scalaVersion).value
+  )
+  .dependsOn(`scalafix-rules`)
+  .enablePlugins(ScalafixTestkitPlugin)
