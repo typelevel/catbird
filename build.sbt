@@ -28,7 +28,7 @@ lazy val baseSettings = Seq(
     "org.scalacheck" %% "scalacheck" % "1.15.4" % Test,
     "org.scalatest" %% "scalatest" % "3.2.10" % Test,
     "org.typelevel" %% "cats-laws" % catsVersion % Test,
-    "org.typelevel" %% "discipline-core" % "1.3.0" % Test,
+    "org.typelevel" %% "discipline-core" % "1.5.0" % Test,
     "org.typelevel" %% "discipline-scalatest" % "2.1.5" % Test,
     compilerPlugin(("org.typelevel" %% "kind-projector" % "0.13.2").cross(CrossVersion.full))
   ),
