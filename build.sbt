@@ -4,8 +4,8 @@ val catsVersion = "2.6.1"
 val catsEffectVersion = "2.5.4"
 val catsEffect3Version = "3.2.9"
 
-val utilVersion = "22.3.0"
-val finagleVersion = "22.3.0"
+val utilVersion = "22.4.0"
+val finagleVersion = "22.4.0"
 
 ThisBuild / crossScalaVersions := Seq("2.12.15", "2.13.6")
 ThisBuild / scalaVersion := crossScalaVersions.value.last
