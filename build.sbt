@@ -3,9 +3,6 @@ val catsVersion = "2.7.0"
 ThisBuild / tlBaseVersion := "21.8" // TODO
 ThisBuild / tlCiReleaseBranches := Seq()
 
-ThisBuild / tlBaseVersion := "21.8" // TODO
-ThisBuild / tlCiReleaseBranches := Seq()
-
 // For the transition period, we publish artifacts for both cats-effect 2.x and 3.x
 val catsEffectVersion = "2.5.4"
 val catsEffect3Version = "3.2.9"
