@@ -36,7 +36,7 @@ trait Runners { self: EqInstances =>
         case Right(a) => results = Outcome.Succeeded(Some(a))
       }(unsafe.IORuntime(ticker.ctx, ticker.ctx, scheduler, () => (), IORuntimeConfig()))
 
-      ticker.ctx.tickAll(1.days)
+      ticker.ctx.advanceAndTick(1.days)
 
       results
     } catch {
