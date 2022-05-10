@@ -1,4 +1,7 @@
-val catsVersion = "2.6.1"
+val catsVersion = "2.7.0"
+
+ThisBuild / tlBaseVersion := "21.8" // TODO
+ThisBuild / tlCiReleaseBranches := Seq()
 
 ThisBuild / tlBaseVersion := "21.8" // TODO
 ThisBuild / tlCiReleaseBranches := Seq()
