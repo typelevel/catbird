@@ -29,12 +29,12 @@ trait FutureInstances extends FutureInstances1 {
   /**
    * Obtain a [[cats.Eq]] instance for [[com.twitter.util.Future]].
    *
-   * This version is only useful for successful futures: if one of the futures fails, the resulting exception
-   * will be thrown.
+   * This version is only useful for successful futures: if one of the futures fails, the resulting exception will be
+   * thrown.
    *
    * These instances use [[com.twitter.util.Await]] so should be
-   * [[https://finagle.github.io/blog/2016/09/01/block-party/ avoided in production code]].  Likely use cases
-   * include tests, scrips, REPLs etc.
+   * [[https://finagle.github.io/blog/2016/09/01/block-party/ avoided in production code]]. Likely use cases include
+   * tests, scrips, REPLs etc.
    */
   final def futureEq[A](atMost: Duration)(implicit A: Eq[A]): Eq[Future[A]] = new Eq[Future[A]] {
     final def eqv(x: Future[A], y: Future[A]): Boolean = Await.result(
@@ -51,8 +51,8 @@ trait FutureInstances extends FutureInstances1 {
    * This version can also compare failed futures and thus requires an `Eq[Throwable]` in scope.
    *
    * These instances use [[com.twitter.util.Await]] so should be
-   * [[https://finagle.github.io/blog/2016/09/01/block-party/ avoided in production code]].  Likely use cases
-   * include tests, scrips, REPLs etc.
+   * [[https://finagle.github.io/blog/2016/09/01/block-party/ avoided in production code]]. Likely use cases include
+   * tests, scrips, REPLs etc.
    */
   final def futureEqWithFailure[A](atMost: Duration)(implicit A: Eq[A], T: Eq[Throwable]): Eq[Future[A]] =
     Eq.by[Future[A], Future[Try[A]]](_.liftToTry)(futureEq[Try[A]](atMost))
@@ -79,8 +79,8 @@ private[util] trait FutureInstances1 extends FutureParallelNewtype {
    * Obtain a [[cats.Comonad]] instance for [[com.twitter.util.Future]].
    *
    * These instances use [[com.twitter.util.Await]] so should be
-   * [[https://finagle.github.io/blog/2016/09/01/block-party/ avoided in production code]].  Likely use cases
-   * include tests, scrips, REPLs etc.
+   * [[https://finagle.github.io/blog/2016/09/01/block-party/ avoided in production code]]. Likely use cases include
+   * tests, scrips, REPLs etc.
    */
   final def futureComonad(atMost: Duration): Comonad[Future] =
     new FutureCoflatMap with Comonad[Future] {
@@ -101,7 +101,7 @@ private[util] trait FutureParallelNewtype {
 
   implicit final val futureParCommutativeApplicative: CommutativeApplicative[FuturePar] =
     new CommutativeApplicative[FuturePar] {
-      import FuturePar.{ unwrap, apply => par }
+      import FuturePar.{ apply => par, unwrap }
 
       final override def pure[A](x: A): FuturePar[A] =
         par(Future.value(x))

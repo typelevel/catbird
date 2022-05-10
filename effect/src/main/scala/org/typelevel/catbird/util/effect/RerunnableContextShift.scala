@@ -11,8 +11,8 @@ import java.util.concurrent.ExecutorService
 import scala.concurrent.{ ExecutionContext, ExecutionContextExecutorService }
 
 /**
- * The goal here is to provide an implicit instance for `ContextShift[Rerunnable]`, so you can use libraries like
- * `fs2` in a finagle-based application without converting between `Future` and `IO` everywhere.
+ * The goal here is to provide an implicit instance for `ContextShift[Rerunnable]`, so you can use libraries like `fs2`
+ * in a finagle-based application without converting between `Future` and `IO` everywhere.
  *
  * Usage:
  * {{{

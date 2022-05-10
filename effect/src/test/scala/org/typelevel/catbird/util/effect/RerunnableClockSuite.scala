@@ -13,9 +13,9 @@ import org.scalatest.funsuite.FixtureAnyFunSuite
 /**
  * We'll use `eventually` and a reasonably big tolerance here to prevent CI from failing if it is a bit slow.
  *
- * Technically the implementation is just an extremely thin wrapper around `System.currentTimeMillis()`
- * and `System.nanoTime()` so as long as the result is the same order of magnitude (and therefore the
- * unit-conversion is correct) we should be fine.
+ * Technically the implementation is just an extremely thin wrapper around `System.currentTimeMillis()` and
+ * `System.nanoTime()` so as long as the result is the same order of magnitude (and therefore the unit-conversion is
+ * correct) we should be fine.
  */
 class RerunnableClockSuite extends FixtureAnyFunSuite with Eventually {
 

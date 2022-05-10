@@ -3,14 +3,11 @@ package org.typelevel.catbird.util.internal
 /**
  * INTERNAL API — Newtype encoding for types with one type parameter.
  *
- * The `Newtype1` abstract class indirection is needed for Scala 2.10,
- * otherwise we could just define these types straight on the
- * companion object. In Scala 2.10 definining these types
- * straight on the companion object yields an error like:
- * ''"only classes can have declared but undefined members"''.
+ * The `Newtype1` abstract class indirection is needed for Scala 2.10, otherwise we could just define these types
+ * straight on the companion object. In Scala 2.10 definining these types straight on the companion object yields an
+ * error like: ''"only classes can have declared but undefined members"''.
  *
- * Inspired by
- * [[https://github.com/alexknvl/newtypes alexknvl/newtypes]].
+ * Inspired by [[https://github.com/alexknvl/newtypes alexknvl/newtypes]].
  */
 private[util] abstract class Newtype1[F[_]] { self =>
   type Base
