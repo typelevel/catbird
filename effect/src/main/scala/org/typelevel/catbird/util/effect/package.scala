@@ -21,12 +21,12 @@ package object effect extends FutureInstances with RerunnableInstances {
   }
 
   /**
-   * The same as `futureToAsync` but doesn't stay on the thread pool of the `Future` and instead shifts execution
-   * back to the one provided by `ContextShift[F]` (which is usually the default one).
+   * The same as `futureToAsync` but doesn't stay on the thread pool of the `Future` and instead shifts execution back
+   * to the one provided by `ContextShift[F]` (which is usually the default one).
    *
-   * This is likely what you want when you interact with libraries that return a `Future` like `finagle-http` where
-   * the `Future` is running on a thread pool controlled by the library (e.g. the underlying Netty pool).
-   * It also is closer to the behavior of `IO.fromFuture` for Scala futures which also shifts back.
+   * This is likely what you want when you interact with libraries that return a `Future` like `finagle-http` where the
+   * `Future` is running on a thread pool controlled by the library (e.g. the underlying Netty pool). It also is closer
+   * to the behavior of `IO.fromFuture` for Scala futures which also shifts back.
    */
   def futureToAsyncAndShift[F[_], A](fa: => Future[A])(implicit F: Async[F], CS: ContextShift[F]): F[A] =
     F.guarantee(futureToAsync[F, A](fa))(CS.shift)

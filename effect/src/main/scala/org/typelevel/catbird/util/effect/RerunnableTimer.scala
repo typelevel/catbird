@@ -9,8 +9,8 @@ import scala.Unit
 import scala.concurrent.duration.FiniteDuration
 
 /**
- * Can be used to construct a `cats.effect.Timer` instance for `Rerunnable` which let's you delay execution or
- * retrieve the current time via `RerunnableClock`.
+ * Can be used to construct a `cats.effect.Timer` instance for `Rerunnable` which let's you delay execution or retrieve
+ * the current time via `RerunnableClock`.
  *
  * Usage:
  * {{{
