@@ -22,7 +22,7 @@ lazy val baseSettings = Seq(
     "org.scalacheck" %% "scalacheck" % "1.15.4" % Test,
     "org.scalatest" %% "scalatest" % "3.2.12" % Test,
     "org.typelevel" %% "cats-laws" % catsVersion % Test,
-    "org.typelevel" %% "discipline-core" % "1.3.0" % Test,
+    "org.typelevel" %% "discipline-core" % "1.5.1" % Test,
     "org.typelevel" %% "discipline-scalatest" % "2.1.5" % Test
   ),
   resolvers += Resolver.sonatypeRepo("snapshots"),
