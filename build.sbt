@@ -19,7 +19,7 @@ val docMappingsApiDir = settingKey[String]("Subdirectory in site target director
 lazy val baseSettings = Seq(
   libraryDependencies ++= Seq(
     "org.typelevel" %% "cats-core" % catsVersion,
-    "org.scalacheck" %% "scalacheck" % "1.15.4" % Test,
+    "org.scalacheck" %% "scalacheck" % "1.16.0" % Test,
     "org.scalatest" %% "scalatest" % "3.2.12" % Test,
     "org.typelevel" %% "cats-laws" % catsVersion % Test,
     "org.typelevel" %% "discipline-core" % "1.5.1" % Test,
