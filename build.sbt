@@ -4,7 +4,7 @@ ThisBuild / tlBaseVersion := "21.8" // TODO
 
 // For the transition period, we publish artifacts for both cats-effect 2.x and 3.x
 val catsEffectVersion = "2.5.4"
-val catsEffect3Version = "3.3.11"
+val catsEffect3Version = "3.3.12"
 
 val utilVersion = "21.8.0"
 val finagleVersion = "21.8.0"
