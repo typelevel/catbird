@@ -165,8 +165,8 @@ final object Rerunnable extends RerunnableInstances1 {
    * This version is only useful for successful actions: if one fails, the resulting exception will be thrown.
    *
    * These instances use [[com.twitter.util.Await]] so should be
-   * [[https://finagle.github.io/blog/2016/09/01/block-party/ avoided in production code]].  Likely use cases
-   * include tests, scrips, REPLs etc.
+   * [[https://finagle.github.io/blog/2016/09/01/block-party/ avoided in production code]]. Likely use cases include
+   * tests, scrips, REPLs etc.
    */
   final def rerunnableEq[A](atMost: Duration)(implicit A: Eq[A]): Eq[Rerunnable[A]] =
     Eq.by[Rerunnable[A], Future[A]](_.run)(futureEq[A](atMost))
@@ -177,8 +177,8 @@ final object Rerunnable extends RerunnableInstances1 {
    * This version can also compare failed actions and thus requires an `Eq[Throwable]` in scope.
    *
    * These instances use [[com.twitter.util.Await]] so should be
-   * [[https://finagle.github.io/blog/2016/09/01/block-party/ avoided in production code]].  Likely use cases
-   * include tests, scrips, REPLs etc.
+   * [[https://finagle.github.io/blog/2016/09/01/block-party/ avoided in production code]]. Likely use cases include
+   * tests, scrips, REPLs etc.
    */
   final def rerunnableEqWithFailure[A](atMost: Duration)(implicit A: Eq[A], T: Eq[Throwable]): Eq[Rerunnable[A]] =
     Eq.by[Rerunnable[A], Future[A]](_.run)(futureEqWithFailure[A](atMost))
@@ -199,8 +199,8 @@ private[util] trait RerunnableInstances1 extends RerunnableParallelNewtype {
    * Obtain a [[cats.Comonad]] instance for [[Rerunnable]]
    *
    * These instances use [[com.twitter.util.Await]] so should be
-   * [[https://finagle.github.io/blog/2016/09/01/block-party/ avoided in production code]].  Likely use cases
-   * include tests, scrips, REPLs etc.
+   * [[https://finagle.github.io/blog/2016/09/01/block-party/ avoided in production code]]. Likely use cases include
+   * tests, scrips, REPLs etc.
    */
   final def rerunnableComonad(atMost: Duration): Comonad[Rerunnable] =
     new RerunnableCoflatMap with Comonad[Rerunnable] {

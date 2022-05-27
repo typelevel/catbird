@@ -1,15 +1,14 @@
 val catsVersion = "2.7.0"
 
 ThisBuild / tlBaseVersion := "21.8" // TODO
-ThisBuild / tlCiReleaseBranches := Seq()
 
 // For the transition period, we publish artifacts for both cats-effect 2.x and 3.x
 val catsEffectVersion = "2.5.4"
-val catsEffect3Version = "3.2.9"
+val catsEffect3Version = "3.3.11"
 
 val utilVersion = "21.8.0"
 
-ThisBuild / crossScalaVersions := Seq("2.12.15", "2.13.6")
+ThisBuild / crossScalaVersions := Seq("2.12.15", "2.13.8")
 
 (Global / onChangedBuildSource) := ReloadOnSourceChanges
 
@@ -18,10 +17,10 @@ val docMappingsApiDir = settingKey[String]("Subdirectory in site target director
 lazy val baseSettings = Seq(
   libraryDependencies ++= Seq(
     "org.typelevel" %% "cats-core" % catsVersion,
-    "org.scalacheck" %% "scalacheck" % "1.15.4" % Test,
-    "org.scalatest" %% "scalatest" % "3.2.10" % Test,
+    "org.scalacheck" %% "scalacheck" % "1.16.0" % Test,
+    "org.scalatest" %% "scalatest" % "3.2.12" % Test,
     "org.typelevel" %% "cats-laws" % catsVersion % Test,
-    "org.typelevel" %% "discipline-core" % "1.3.0" % Test,
+    "org.typelevel" %% "discipline-core" % "1.5.1" % Test,
     "org.typelevel" %% "discipline-scalatest" % "2.1.5" % Test
   ),
   resolvers += Resolver.sonatypeRepo("snapshots"),
@@ -114,7 +113,7 @@ lazy val benchmark = project
   .settings(allSettings)
   .settings(
     moduleName := "catbird-benchmark",
-    libraryDependencies += "org.scalatest" %% "scalatest" % "3.2.10",
+    libraryDependencies += "org.scalatest" %% "scalatest" % "3.2.12",
     scalacOptions ~= {
       _.filterNot(Set("-Yno-imports", "-Yno-predef"))
     }
