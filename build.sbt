@@ -1,13 +1,18 @@
 val catsVersion = "2.7.0"
 
-ThisBuild / tlBaseVersion := "21.8" // TODO
+ThisBuild / tlBaseVersion := "21.8"
+ThisBuild / tlMimaPreviousVersions := Set.empty
+
+// Finagle releases monthly using a {year}.{month}.{patch} version scheme.
+// The combination of year and month is effectively a major version, because
+// each monthly release often contains binary-incompatible changes.
+// This means we should release at least monthly as well, when Finagle does,
+// but in between those monthly releases, maintain binary compatibility.
+ThisBuild / versionScheme := Option("year-month-patch")
 
 // For the transition period, we publish artifacts for both cats-effect 2.x and 3.x
 val catsEffectVersion = "2.5.5"
 val catsEffect3Version = "3.3.11"
-
-val utilVersion = "21.8.0"
-val finagleVersion = "21.8.0"
 
 ThisBuild / crossScalaVersions := Seq("2.12.15", "2.13.8")
 
@@ -62,7 +67,7 @@ lazy val util = project
   .settings(moduleName := "catbird-util")
   .settings(allSettings)
   .settings(
-    libraryDependencies += "com.twitter" %% "util-core" % utilVersion,
+    libraryDependencies += "com.twitter" %% "util-core" % (tlBaseVersion.value + ".0"),
     Test / scalacOptions ~= {
       _.filterNot(Set("-Yno-imports", "-Yno-predef"))
     }
@@ -102,7 +107,7 @@ lazy val finagle = project
   .settings(moduleName := "catbird-finagle")
   .settings(allSettings)
   .settings(
-    libraryDependencies += "com.twitter" %% "finagle-core" % finagleVersion,
+    libraryDependencies += "com.twitter" %% "finagle-core" % (tlBaseVersion.value + ".0"),
     Test / scalacOptions ~= {
       _.filterNot(Set("-Yno-imports", "-Yno-predef"))
     }
