@@ -7,7 +7,7 @@ ThisBuild / tlVersionIntroduced := // test bincompat starting from the beginning
 
 // For the transition period, we publish artifacts for both cats-effect 2.x and 3.x
 val catsEffectVersion = "2.5.5"
-val catsEffect3Version = "3.3.11"
+val catsEffect3Version = "3.3.12"
 
 ThisBuild / crossScalaVersions := Seq("2.12.15", "2.13.8")
 
