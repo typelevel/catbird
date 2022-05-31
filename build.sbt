@@ -1,15 +1,9 @@
 val catsVersion = "2.7.0"
-val finagleVersion = "21.8.0"
+val finagleVersion = "22.4.0"
 
 ThisBuild / tlBaseVersion := BaseVersion(finagleVersion)
-ThisBuild / tlMimaPreviousVersions := Set.empty
-
-// Finagle releases monthly using a {year}.{month}.{patch} version scheme.
-// The combination of year and month is effectively a major version, because
-// each monthly release often contains binary-incompatible changes.
-// This means we should release at least monthly as well, when Finagle does,
-// but in between those monthly releases, maintain binary compatibility.
-ThisBuild / versionScheme := Option("year-month-patch")
+ThisBuild / tlVersionIntroduced := // test bincompat starting from the beginning of this series
+  List("2.12", "2.13").map(_ -> s"${tlBaseVersion.value}.0").toMap
 
 // For the transition period, we publish artifacts for both cats-effect 2.x and 3.x
 val catsEffectVersion = "2.5.5"
@@ -22,6 +16,14 @@ Global / onChangedBuildSource := ReloadOnSourceChanges
 val docMappingsApiDir = settingKey[String]("Subdirectory in site target directory for API docs")
 
 lazy val baseSettings = Seq(
+  // Finagle releases monthly using a {year}.{month}.{patch} version scheme.
+  // The combination of year and month is effectively a major version, because
+  // each monthly release often contains binary-incompatible changes.
+  // This means we should release at least monthly as well, when Finagle does,
+  // but in between those monthly releases, maintain binary compatibility.
+  // This is effectively PVP style versioning.
+  // We set this at the project-level instead of ThisBuild to circumvent sbt-typelevel checks.
+  versionScheme := Some("pvp"),
   libraryDependencies ++= Seq(
     "org.typelevel" %% "cats-core" % catsVersion,
     "org.scalacheck" %% "scalacheck" % "1.16.0" % Test,
@@ -137,6 +139,7 @@ ThisBuild / githubWorkflowBuild := Seq(
       "clean",
       "coverage",
       "test",
+      "mimaReportBinaryIssues",
       "scalastyle",
       "scalafmtCheckAll",
       "scalafmtSbtCheck",
