@@ -11,7 +11,7 @@ val finagleVersion = "21.8.0"
 
 ThisBuild / crossScalaVersions := Seq("2.12.15", "2.13.8")
 
-(Global / onChangedBuildSource) := ReloadOnSourceChanges
+Global / onChangedBuildSource := ReloadOnSourceChanges
 
 val docMappingsApiDir = settingKey[String]("Subdirectory in site target directory for API docs")
 
@@ -36,7 +36,7 @@ lazy val root = project
   .enablePlugins(GhpagesPlugin, ScalaUnidocPlugin, NoPublishPlugin)
   .settings(allSettings)
   .settings(
-    (ScalaUnidoc / unidoc / unidocProjectFilter) := inAnyProject -- inProjects(
+    ScalaUnidoc / unidoc / unidocProjectFilter := inAnyProject -- inProjects(
       benchmark,
       effect3,
       `scalafix-input`,
@@ -47,7 +47,7 @@ lazy val root = project
     git.remoteRepo := "git@github.com:typelevel/catbird.git"
   )
   .settings(
-    (console / initialCommands) :=
+    console / initialCommands :=
       """
         |import com.twitter.finagle._
         |import com.twitter.util._
@@ -63,7 +63,7 @@ lazy val util = project
   .settings(allSettings)
   .settings(
     libraryDependencies += "com.twitter" %% "util-core" % utilVersion,
-    (Test / scalacOptions) ~= {
+    Test / scalacOptions ~= {
       _.filterNot(Set("-Yno-imports", "-Yno-predef"))
     }
   )
@@ -76,7 +76,7 @@ lazy val effect = project
       "org.typelevel" %% "cats-effect" % catsEffectVersion,
       "org.typelevel" %% "cats-effect-laws" % catsEffectVersion % Test
     ),
-    (Test / scalacOptions) ~= {
+    Test / scalacOptions ~= {
       _.filterNot(Set("-Yno-imports", "-Yno-predef"))
     }
   )
@@ -92,7 +92,7 @@ lazy val effect3 = project
       "org.typelevel" %% "cats-effect-laws" % catsEffect3Version % Test,
       "org.typelevel" %% "cats-effect-testkit" % catsEffect3Version % Test
     ),
-    (Test / scalacOptions) ~= {
+    Test / scalacOptions ~= {
       _.filterNot(Set("-Yno-imports", "-Yno-predef"))
     }
   )
@@ -103,7 +103,7 @@ lazy val finagle = project
   .settings(allSettings)
   .settings(
     libraryDependencies += "com.twitter" %% "finagle-core" % finagleVersion,
-    (Test / scalacOptions) ~= {
+    Test / scalacOptions ~= {
       _.filterNot(Set("-Yno-imports", "-Yno-predef"))
     }
   )
