@@ -12,7 +12,7 @@ import scala.concurrent.duration._
 class RerunnableTimerSuite extends FixtureAnyFunSuite {
 
   protected final class FixtureParam {
-    val twitterTimer: util.Timer = new util.JavaTimer()
+    val twitterTimer: util.Timer = new util.JavaTimer
   }
 
   test("A timer can be used to delay execution") { f =>

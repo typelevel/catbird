@@ -1,17 +1,23 @@
 val catsVersion = "2.7.0"
+val finagleVersion = "21.8.0"
 
-ThisBuild / tlBaseVersion := "21.8" // TODO
+ThisBuild / tlBaseVersion := BaseVersion(finagleVersion)
+ThisBuild / tlMimaPreviousVersions := Set.empty
+
+// Finagle releases monthly using a {year}.{month}.{patch} version scheme.
+// The combination of year and month is effectively a major version, because
+// each monthly release often contains binary-incompatible changes.
+// This means we should release at least monthly as well, when Finagle does,
+// but in between those monthly releases, maintain binary compatibility.
+ThisBuild / versionScheme := Option("year-month-patch")
 
 // For the transition period, we publish artifacts for both cats-effect 2.x and 3.x
-val catsEffectVersion = "2.5.4"
+val catsEffectVersion = "2.5.5"
 val catsEffect3Version = "3.3.12"
-
-val utilVersion = "21.8.0"
-val finagleVersion = "21.8.0"
 
 ThisBuild / crossScalaVersions := Seq("2.12.15", "2.13.8")
 
-(Global / onChangedBuildSource) := ReloadOnSourceChanges
+Global / onChangedBuildSource := ReloadOnSourceChanges
 
 val docMappingsApiDir = settingKey[String]("Subdirectory in site target directory for API docs")
 
@@ -36,7 +42,7 @@ lazy val root = project
   .enablePlugins(GhpagesPlugin, ScalaUnidocPlugin, NoPublishPlugin)
   .settings(allSettings)
   .settings(
-    (ScalaUnidoc / unidoc / unidocProjectFilter) := inAnyProject -- inProjects(
+    ScalaUnidoc / unidoc / unidocProjectFilter := inAnyProject -- inProjects(
       benchmark,
       effect3,
       `scalafix-input`,
@@ -47,7 +53,7 @@ lazy val root = project
     git.remoteRepo := "git@github.com:typelevel/catbird.git"
   )
   .settings(
-    (console / initialCommands) :=
+    console / initialCommands :=
       """
         |import com.twitter.finagle._
         |import com.twitter.util._
@@ -62,8 +68,8 @@ lazy val util = project
   .settings(moduleName := "catbird-util")
   .settings(allSettings)
   .settings(
-    libraryDependencies += "com.twitter" %% "util-core" % utilVersion,
-    (Test / scalacOptions) ~= {
+    libraryDependencies += "com.twitter" %% "util-core" % finagleVersion,
+    Test / scalacOptions ~= {
       _.filterNot(Set("-Yno-imports", "-Yno-predef"))
     }
   )
@@ -76,7 +82,7 @@ lazy val effect = project
       "org.typelevel" %% "cats-effect" % catsEffectVersion,
       "org.typelevel" %% "cats-effect-laws" % catsEffectVersion % Test
     ),
-    (Test / scalacOptions) ~= {
+    Test / scalacOptions ~= {
       _.filterNot(Set("-Yno-imports", "-Yno-predef"))
     }
   )
@@ -92,7 +98,7 @@ lazy val effect3 = project
       "org.typelevel" %% "cats-effect-laws" % catsEffect3Version % Test,
       "org.typelevel" %% "cats-effect-testkit" % catsEffect3Version % Test
     ),
-    (Test / scalacOptions) ~= {
+    Test / scalacOptions ~= {
       _.filterNot(Set("-Yno-imports", "-Yno-predef"))
     }
   )
@@ -103,7 +109,7 @@ lazy val finagle = project
   .settings(allSettings)
   .settings(
     libraryDependencies += "com.twitter" %% "finagle-core" % finagleVersion,
-    (Test / scalacOptions) ~= {
+    Test / scalacOptions ~= {
       _.filterNot(Set("-Yno-imports", "-Yno-predef"))
     }
   )
