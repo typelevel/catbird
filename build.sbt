@@ -1,6 +1,7 @@
 val catsVersion = "2.7.0"
+val finagleVersion = "21.8.0"
 
-ThisBuild / tlBaseVersion := "21.8"
+ThisBuild / tlBaseVersion := BaseVersion(finagleVersion)
 ThisBuild / tlMimaPreviousVersions := Set.empty
 
 // Finagle releases monthly using a {year}.{month}.{patch} version scheme.
@@ -67,7 +68,7 @@ lazy val util = project
   .settings(moduleName := "catbird-util")
   .settings(allSettings)
   .settings(
-    libraryDependencies += "com.twitter" %% "util-core" % (tlBaseVersion.value + ".0"),
+    libraryDependencies += "com.twitter" %% "util-core" % finagleVersion,
     Test / scalacOptions ~= {
       _.filterNot(Set("-Yno-imports", "-Yno-predef"))
     }
@@ -107,7 +108,7 @@ lazy val finagle = project
   .settings(moduleName := "catbird-finagle")
   .settings(allSettings)
   .settings(
-    libraryDependencies += "com.twitter" %% "finagle-core" % (tlBaseVersion.value + ".0"),
+    libraryDependencies += "com.twitter" %% "finagle-core" % finagleVersion,
     Test / scalacOptions ~= {
       _.filterNot(Set("-Yno-imports", "-Yno-predef"))
     }
