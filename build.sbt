@@ -1,4 +1,4 @@
-val catsVersion = "2.7.0"
+val catsVersion = "2.8.0"
 val finagleVersion = "22.4.0"
 
 ThisBuild / tlBaseVersion := BaseVersion(finagleVersion)
