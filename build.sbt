@@ -11,6 +11,12 @@ val catsEffect3Version = "3.3.13"
 
 ThisBuild / crossScalaVersions := Seq("2.12.15", "2.13.8")
 
+ThisBuild / libraryDependencySchemes ++= Seq(
+  // scoverage depends on scala-xml 1, but discipline-scalatest transitively pulls in scala-xml 2
+  // this is normally discouraged but was recommended by one of the scoverage maintainers in the Typelevel Discord
+  "org.scala-lang.modules" %% "scala-xml" % VersionScheme.Always
+)
+
 Global / onChangedBuildSource := ReloadOnSourceChanges
 
 val docMappingsApiDir = settingKey[String]("Subdirectory in site target directory for API docs")
