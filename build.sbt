@@ -160,27 +160,27 @@ lazy val `scalafix-rules` = (project in file("scalafix/rules")).settings(
   )
 )
 
-lazy val `scalafix-input` = (project in file("scalafix/input")).settings(
-  publish / skip := true,
-  libraryDependencies ++= Seq(
-    "io.catbird" %% "catbird-util" % "21.8.0"
-  ),
-  scalacOptions ~= { _.filterNot(_ == "-Xfatal-warnings") },
-  semanticdbEnabled := true,
-  semanticdbVersion := scalafixSemanticdb.revision
-)
+lazy val `scalafix-input` = (project in file("scalafix/input"))
+  .settings(
+    libraryDependencies ++= Seq(
+      "io.catbird" %% "catbird-util" % "21.8.0"
+    ),
+    scalacOptions ~= { _.filterNot(_ == "-Xfatal-warnings") },
+    semanticdbEnabled := true,
+    semanticdbVersion := scalafixSemanticdb.revision
+  )
+  .enablePlugins(NoPublishPlugin)
 
 lazy val `scalafix-output` = (project in file("scalafix/output"))
   .settings(
     githubWorkflowArtifactUpload := false,
-    publish / skip := true,
     scalacOptions ~= { _.filterNot(_ == "-Xfatal-warnings") }
   )
   .dependsOn(util)
+  .enablePlugins(NoPublishPlugin)
 
 lazy val `scalafix-tests` = (project in file("scalafix/tests"))
   .settings(
-    publish / skip := true,
     libraryDependencies += {
       import _root_.scalafix.sbt.BuildInfo.scalafixVersion
       ("ch.epfl.scala" % "scalafix-testkit" % scalafixVersion % Test).cross(CrossVersion.full)
@@ -192,4 +192,7 @@ lazy val `scalafix-tests` = (project in file("scalafix/tests"))
     scalafixTestkitInputScalaVersion := (`scalafix-input` / Compile / scalaVersion).value
   )
   .dependsOn(`scalafix-rules`)
-  .enablePlugins(ScalafixTestkitPlugin)
+  .enablePlugins(
+    ScalafixTestkitPlugin,
+    NoPublishPlugin
+  )
