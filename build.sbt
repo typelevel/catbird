@@ -33,7 +33,7 @@ lazy val baseSettings = Seq(
   libraryDependencies ++= Seq(
     "org.typelevel" %% "cats-core" % catsVersion,
     "org.scalacheck" %% "scalacheck" % "1.16.0" % Test,
-    "org.scalatest" %% "scalatest" % "3.2.12" % Test,
+    "org.scalatest" %% "scalatest" % "3.2.13" % Test,
     "org.typelevel" %% "cats-laws" % catsVersion % Test,
     "org.typelevel" %% "discipline-core" % "1.5.1" % Test,
     "org.typelevel" %% "discipline-scalatest" % "2.2.0" % Test
@@ -128,7 +128,7 @@ lazy val benchmark = project
   .settings(allSettings)
   .settings(
     moduleName := "catbird-benchmark",
-    libraryDependencies += "org.scalatest" %% "scalatest" % "3.2.12",
+    libraryDependencies += "org.scalatest" %% "scalatest" % "3.2.13",
     scalacOptions ~= {
       _.filterNot(Set("-Yno-imports", "-Yno-predef"))
     }
