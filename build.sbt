@@ -4,6 +4,7 @@ val finagleVersion = "22.4.0"
 ThisBuild / tlBaseVersion := BaseVersion(finagleVersion)
 ThisBuild / tlVersionIntroduced := // test bincompat starting from the beginning of this series
   List("2.12", "2.13").map(_ -> s"${tlBaseVersion.value}.0").toMap
+ThisBuild / tlCiHeaderCheck := false
 
 // For the transition period, we publish artifacts for both cats-effect 2.x and 3.x
 val catsEffectVersion = "2.5.5"
@@ -38,9 +39,12 @@ lazy val baseSettings = Seq(
     "org.typelevel" %% "discipline-core" % "1.5.1" % Test,
     "org.typelevel" %% "discipline-scalatest" % "2.2.0" % Test
   ),
-  resolvers += Resolver.sonatypeRepo("snapshots"),
+  resolvers ++= Resolver.sonatypeOssRepos("snapshots"),
   docMappingsApiDir := "api",
-  autoAPIMappings := true
+  autoAPIMappings := true,
+
+  // disable automatic copyright header creation otherwise added via sbt-typelevel
+  headerMappings := Map.empty
 )
 
 lazy val allSettings = baseSettings
@@ -159,12 +163,14 @@ ThisBuild / githubWorkflowBuild := Seq(
   )
 )
 
-lazy val `scalafix-rules` = (project in file("scalafix/rules")).settings(
-  moduleName := "catbird-scalafix",
-  libraryDependencies ++= Seq(
-    "ch.epfl.scala" %% "scalafix-core" % _root_.scalafix.sbt.BuildInfo.scalafixVersion
+lazy val `scalafix-rules` = (project in file("scalafix/rules"))
+  .settings(allSettings)
+  .settings(
+    moduleName := "catbird-scalafix",
+    libraryDependencies ++= Seq(
+      "ch.epfl.scala" %% "scalafix-core" % _root_.scalafix.sbt.BuildInfo.scalafixVersion
+    )
   )
-)
 
 lazy val `scalafix-input` = (project in file("scalafix/input"))
   .settings(
@@ -186,6 +192,7 @@ lazy val `scalafix-output` = (project in file("scalafix/output"))
   .enablePlugins(NoPublishPlugin)
 
 lazy val `scalafix-tests` = (project in file("scalafix/tests"))
+  .settings(allSettings)
   .settings(
     libraryDependencies += {
       import _root_.scalafix.sbt.BuildInfo.scalafixVersion
