@@ -68,7 +68,7 @@ jobs:
       - name: Check that workflows are up to date
         run: sbt githubWorkflowCheck
 
-      - run: sbt '++${{ matrix.scala }}' clean coverage test mimaReportBinaryIssues scalastyle scalafmtCheckAll scalafmtSbtCheck unidoc coverageReport
+      - run: sbt '++ ${{ matrix.scala }}' clean coverage test mimaReportBinaryIssues scalastyle scalafmtCheckAll scalafmtSbtCheck unidoc coverageReport
 
       - name: Code coverage analysis
         uses: codecov/codecov-action@v1
@@ -164,4 +164,4 @@ jobs:
           (echo "$PGP_PASSPHRASE"; echo; echo) | gpg --command-fd 0 --pinentry-mode loopback --change-passphrase $(gpg --list-secret-keys --with-colons 2> /dev/null | grep '^sec:' | cut --delimiter ':' --fields 5 | tail -n 1)
 
       - name: Publish
-        run: sbt '++${{ matrix.scala }}' tlRelease
+        run: sbt '++ ${{ matrix.scala }}' tlRelease
