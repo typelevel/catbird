@@ -50,7 +50,7 @@ lazy val allSettings = baseSettings
 
 lazy val root = project
   .in(file("."))
-  .enablePlugins(GhpagesPlugin, ScalaUnidocPlugin, NoPublishPlugin)
+  .enablePlugins(GhpagesPlugin, ScalaUnidocPlugin, NoPublishPlugin, FinaglePlugin)
   .settings(allSettings)
   .settings(
     ScalaUnidoc / unidoc / unidocProjectFilter := inAnyProject -- inProjects(
@@ -72,7 +72,7 @@ lazy val root = project
         |import org.typelevel.catbird.util._
       """.stripMargin
   )
-  .aggregate(util, effect, effect3, finagle, benchmark, `scalafix-rules`, `scalafix-tests`)
+  .aggregate(util, effect, effect3, finagle, benchmark, `scalafix-rules`, `scalafix-tests`, FinaglePlugin.rootFinagle)
   .dependsOn(util, effect, finagle)
 
 lazy val util = project
