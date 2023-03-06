@@ -20,31 +20,29 @@ object FinaglePlugin extends AutoPlugin {
    * because the newest release is not binary compatible with the older
    * versions it was checked against.
    */
-  val versions = Seq("22.7.0")
+  val versions = Seq("22.12.0")
 
   lazy val modules = Seq(
     "com.twitter" %% "finagle-core" % versions.head
   )
 
-  override lazy val extraProjects = {
-    val subprojects = modules.map { module =>
-      Project(module.name, file(s".${module.name}"))
-        .enablePlugins(NoPublishPlugin)
-        .settings(
-          libraryDependencies += module,
-          mimaCurrentClassfiles := {
-            (Compile / dependencyClasspath).value.seq.map(_.data).find(_.getName.startsWith(module.name)).get
-          },
-          mimaPreviousArtifacts := versions.tail.map { v =>
-            module.withRevision(v)
-          }.toSet
-        )
-    }
-
-    val rootFinagle =
-      project.in(file(s".rootFinagle")).enablePlugins(NoPublishPlugin).aggregate(subprojects.map(_.project): _*)
-
-    rootFinagle +: subprojects
+  private lazy val subprojects = modules.map { module =>
+    Project(module.name, file(s".${module.name}"))
+      .enablePlugins(NoPublishPlugin)
+      .settings(
+        libraryDependencies += module,
+        mimaCurrentClassfiles := {
+          (Compile / dependencyClasspath).value.seq.map(_.data).find(_.getName.startsWith(module.name)).get
+        },
+        mimaPreviousArtifacts := versions.tail.map { v =>
+          module.withRevision(v)
+        }.toSet
+      )
   }
+
+  lazy val rootFinagle =
+    project.in(file(s".rootFinagle")).enablePlugins(NoPublishPlugin).aggregate(subprojects.map(_.project): _*)
+
+  override lazy val extraProjects: Seq[Project] = rootFinagle +: subprojects
 
 }
