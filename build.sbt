@@ -7,7 +7,7 @@ ThisBuild / tlCiHeaderCheck := false
 
 // For the transition period, we publish artifacts for both cats-effect 2.x and 3.x
 val catsEffectVersion = "2.5.5"
-val catsEffect3Version = "3.4.3"
+val catsEffect3Version = "3.4.11"
 
 ThisBuild / crossScalaVersions := Seq("2.12.17", "2.13.10")
 
