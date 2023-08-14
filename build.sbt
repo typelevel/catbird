@@ -1,4 +1,4 @@
-val catsVersion = "2.9.0"
+val catsVersion = "2.10.0"
 
 ThisBuild / tlBaseVersion := BaseVersion(finagleVersion)
 ThisBuild / tlVersionIntroduced := // test bincompat starting from the beginning of this series
