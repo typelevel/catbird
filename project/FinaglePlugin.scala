@@ -20,7 +20,7 @@ object FinaglePlugin extends AutoPlugin {
    * because the newest release is not binary compatible with the older
    * versions it was checked against.
    */
-  val versions = Seq("23.11.0")
+  val versions = Seq("22.12.0", "23.11.0")
 
   lazy val modules = Seq(
     "com.twitter" %% "finagle-core" % versions.head
