@@ -72,8 +72,8 @@ lazy val root = project
         |import org.typelevel.catbird.util._
       """.stripMargin
   )
-  .aggregate(util, effect, effect3, finagle, benchmark, `scalafix-rules`, `scalafix-tests`, FinaglePlugin.rootFinagle)
-  .dependsOn(util, effect, finagle)
+  .aggregate(util, effect3, finagle, benchmark, `scalafix-rules`, `scalafix-tests`, FinaglePlugin.rootFinagle)
+  .dependsOn(util, finagle)
 
 lazy val util = project
   .settings(moduleName := "catbird-util")
@@ -84,20 +84,6 @@ lazy val util = project
       _.filterNot(Set("-Yno-imports", "-Yno-predef"))
     }
   )
-
-lazy val effect = project
-  .settings(moduleName := "catbird-effect")
-  .settings(allSettings)
-  .settings(
-    libraryDependencies ++= Seq(
-      "org.typelevel" %% "cats-effect" % catsEffectVersion,
-      "org.typelevel" %% "cats-effect-laws" % catsEffectVersion % Test
-    ),
-    Test / scalacOptions ~= {
-      _.filterNot(Set("-Yno-imports", "-Yno-predef"))
-    }
-  )
-  .dependsOn(util, util % "test->test")
 
 lazy val effect3 = project
   .in(file("effect3"))
