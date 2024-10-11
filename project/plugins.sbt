@@ -1,5 +1,5 @@
 addSbtPlugin("com.github.sbt" % "sbt-unidoc" % "0.5.0")
-addSbtPlugin("org.typelevel" % "sbt-typelevel" % "0.4.17")
+addSbtPlugin("org.typelevel" % "sbt-typelevel" % "0.7.4")
 addSbtPlugin("com.typesafe.sbt" % "sbt-ghpages" % "0.6.3")
 addSbtPlugin("org.scalastyle" %% "scalastyle-sbt-plugin" % "1.0.0")
 addSbtPlugin("org.scoverage" % "sbt-scoverage" % "2.0.6")
