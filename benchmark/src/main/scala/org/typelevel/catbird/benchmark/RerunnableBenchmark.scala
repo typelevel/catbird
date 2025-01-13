@@ -6,7 +6,7 @@ import java.util.concurrent.{ ExecutorService, Executors, TimeUnit }
 import org.openjdk.jmh.annotations._
 
 /**
- * Compare the performance of `Rerunnable` against ordinary `Future`s.
+ * Compare the performance of `Rerunnable` against ordinary `Future` s.
  *
  * The following command will run the benchmarks with reasonable settings:
  *
