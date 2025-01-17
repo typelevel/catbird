@@ -22,7 +22,6 @@ class RerunnableBenchmarkSpec extends AnyFlatSpec with BeforeAndAfter {
     assert(benchmark.sumIntsR === sum)
   }
 
-  it should "correctly calculate the sum using rerunnables and future pools" in {
+  it should "correctly calculate the sum using rerunnables and future pools" in
     assert(benchmark.sumIntsPR === sum)
-  }
 }
