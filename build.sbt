@@ -50,7 +50,7 @@ lazy val allSettings = baseSettings
 
 lazy val root = project
   .in(file("."))
-  .enablePlugins(GhpagesPlugin, ScalaUnidocPlugin, NoPublishPlugin)
+  .enablePlugins(GhpagesPlugin, ScalaUnidocPlugin, NoPublishPlugin, MergifyPlugin)
   .settings(allSettings)
   .settings(
     ScalaUnidoc / unidoc / unidocProjectFilter := inAnyProject -- inProjects(
