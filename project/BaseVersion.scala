@@ -4,7 +4,7 @@ object BaseVersion {
   def apply(s: String): String =
     s match {
       case versionRegex(year, month) => s"$year.$month"
-      case _ =>
+      case _                         =>
         throw new IllegalArgumentException(s"base version must start with {year}.{month}, but got $s")
     }
 }
