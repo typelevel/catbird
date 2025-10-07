@@ -9,7 +9,7 @@ ThisBuild / tlCiHeaderCheck := false
 val catsEffectVersion = "2.5.5"
 val catsEffect3Version = "3.4.11"
 
-ThisBuild / crossScalaVersions := Seq("2.12.20", "2.13.16")
+ThisBuild / crossScalaVersions := Seq("2.12.20", "2.13.17")
 
 ThisBuild / libraryDependencySchemes ++= Seq(
   // scoverage depends on scala-xml 1, but discipline-scalatest transitively pulls in scala-xml 2
