@@ -31,9 +31,8 @@ object FinaglePlugin extends AutoPlugin {
       .enablePlugins(NoPublishPlugin)
       .settings(
         libraryDependencies += module,
-        mimaCurrentClassfiles := {
-          (Compile / dependencyClasspath).value.seq.map(_.data).find(_.getName.startsWith(module.name)).get
-        },
+        mimaCurrentClassfiles :=
+          (Compile / dependencyClasspath).value.seq.map(_.data).find(_.getName.startsWith(module.name)).get,
         mimaPreviousArtifacts := versions.tail.map { v =>
           module.withRevision(v)
         }.toSet
