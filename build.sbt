@@ -148,6 +148,12 @@ ThisBuild / githubWorkflowBuild := Seq(
   )
 )
 
+ThisBuild / mergifyStewardConfig ~= {
+  _.map {
+    _.withMergeMinors(true).withAuthor("typelevel-steward[bot]")
+  }
+}
+
 lazy val `scalafix-rules` = (project in file("scalafix/rules"))
   .settings(allSettings)
   .settings(
